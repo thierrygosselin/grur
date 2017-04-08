@@ -7,7 +7,7 @@ output:
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![DOI](https://zenodo.org/badge/14548/thierrygosselin/stackr.svg)](https://zenodo.org/badge/latestdoi/14548/thierrygosselin/stackr)
+[![DOI](https://zenodo.org/badge/14548/thierrygosselin/grur.svg)](https://zenodo.org/badge/latestdoi/14548/thierrygosselin/grur)
 
 ```{r, echo = FALSE}
 description <- readLines("DESCRIPTION")
