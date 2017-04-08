@@ -15,11 +15,7 @@ Use **grur** to:
 
 -   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity).
 
--   **Imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).
-
--   Imputations can be conducted **overall samples** or **by populations**.
-
--   Imputations are integrated in several of [stackr](https://github.com/thierrygosselin/stackr) and [assigner](https://github.com/thierrygosselin/assigner) functions.
+-   **Imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used). Imputations can be conducted **overall samples** or **by populations**.
 
 Installation
 ------------
