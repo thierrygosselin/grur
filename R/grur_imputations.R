@@ -288,7 +288,7 @@
 # @importFrom base split
 #' @importFrom randomForestSRC impute.rfsrc
 #' @importFrom readr write_lines write_tsv
-#' @importFrom stackr tidy_wide change_alleles
+#' @importFrom stackr tidy_wide change_alleles detect_biallelic_markers
 
 #' @examples
 #' \dontrun{
@@ -574,7 +574,7 @@ grur_imputations <- function(
   } else {
     ref.column <- FALSE
   }
-  biallelic <- detect_biallelic_markers(data = input)
+  biallelic <- stackr::detect_biallelic_markers(data = input)
 
 
   # Manage Genotype Likelihood -------------------------------------------------
@@ -1715,7 +1715,7 @@ encoding_snp <- function(locus.list = NULL, data = NULL) {
     dplyr::mutate(
       GT = stringi::stri_replace_all_fixed(
         str = GT, pattern = "NA", replacement = NA, vectorize_all = FALSE),
-      MARKERS = rep(binded.markers, n())
+      MARKERS = rep(binded.markers, n(.))
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::select(MARKERS, CHROM_LOCUS, POP_ID, INDIVIDUALS, GT)

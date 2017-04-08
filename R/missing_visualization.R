@@ -97,7 +97,7 @@
 #' @importFrom readr read_tsv write_tsv
 #' @importFrom data.table fread melt.data.table as.data.table
 #' @importFrom ape pcoa
-#' @importFrom stats dist
+#' @importFrom stats dist lm
 #' @importFrom tibble data_frame
 #' @importFrom stackr tidy_genomic_data change_pop_names ibdg_fh
 
@@ -441,7 +441,7 @@ missing_visualization <- function(
 
   missing.genotypes.fh.plot <- ggplot2::ggplot(missing.genotypes.ind.fh, ggplot2::aes(y = FH, x = MISSING_GENOTYPE_PROP)) +
     ggplot2::geom_point() +
-    ggplot2::stat_smooth(method = lm, level = 0.99) +
+    ggplot2::stat_smooth(method = stats::lm, level = 0.99) +
     # labs(title = "Correlation between missingness and inbreeding coefficient") +
     ggplot2::labs(y = "Individual IBDg (FH)") +
     ggplot2::labs(x = "Missing genotype (proportion)") +
