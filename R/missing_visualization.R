@@ -30,7 +30,7 @@
 #'    function also output the data in a tidy format.
 #' }
 
-#' @inheritParams tidy_genomic_data
+#' @inheritParams stackr::tidy_genomic_data
 
 #' @param strata.select (optional, character) Use this argument to select the column
 #' from the strata file to generate the PCoA-IBM plot. More than 1 column you
@@ -99,6 +99,7 @@
 #' @importFrom ape pcoa
 #' @importFrom stats dist
 #' @importFrom tibble data_frame
+#' @importFrom stackr tidy_genomic_data change_pop_names ibdg_fh
 
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}

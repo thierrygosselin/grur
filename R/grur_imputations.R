@@ -287,6 +287,7 @@
 # @importFrom base split
 #' @importFrom randomForestSRC impute.rfsrc
 #' @importFrom readr write_lines write_tsv
+#' @importFrom stackr tidy_wide change_alleles
 
 #' @examples
 #' \dontrun{

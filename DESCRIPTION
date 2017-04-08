@@ -1,4 +1,4 @@
-Package: stackr
+Package: grur
 Type: Package
 Title: grur: an R package tailored for RADseq data imputation
 Version: 0.0.1
@@ -23,21 +23,16 @@ Imports:
     stringi,
     lazyeval,
     ape,
-    stringdist,
     parallel,
     amap,
-    methods,
     magrittr,
     stats,
     utils,
-    adegenet,
-    pryr,
     ranger,
     pbmcapply,
     xgboost,
-    UpSetR,
     randomForestSRC,
-    pegas
+    pegas,
     stackr
 Suggests:
     knitr,
