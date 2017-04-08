@@ -15,6 +15,12 @@ Use **grur** to:
 
 -   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity).
 
+-   **Imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).
+
+-   Imputations can be conducted **overall samples** or **by populations**.
+
+-   Imputations are integrated in several of [stackr](https://github.com/thierrygosselin/stackr) and [assigner](https://github.com/thierrygosselin/assigner) functions.
+
 Installation
 ------------
 
@@ -26,48 +32,11 @@ devtools::install_github("thierrygosselin/grur")
 library(grur) # to load
 ```
 
-<table style="width:100%;">
-<colgroup>
-<col width="26%" />
-<col width="73%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Caracteristics</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left"><strong>Import</strong></td>
-<td align="left">List of the 11 supported genomic file formats in <code>tidy_genomic_format</code> and <code>genomic_converter</code>:<br> <a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a> (Danecek et al., 2011)<br><a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a> (Purcell et al., 2007)<br><a href="https://github.com/thibautjombart/adegenet">genind</a> (Jombart et al., 2010; Jombart and Ahmed, 2011)<br> <a href="https://github.com/thibautjombart/adegenet">genlight</a> (Jombart et al., 2010; Jombart and Ahmed, 2011), also in <code>tidy_genlight</code><br><a href="https://github.com/EricArcher/strataG">strataG gtypes</a> (Archer et al., 2016)<br><a href="http://genepop.curtin.edu.au">Genepop</a> (Raymond and Rousset, 1995; Rousset, 2008), also in <code>tidy_genepop</code><br><a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a> (Catchen et al., 2011, 2013)<br> <a href="https://github.com/jgx65/hierfstat">hierfstat</a> (Goudet, 2005), also in <code>tidy_fstat</code><br>Dataframes of genotypes in wide or long/tidy format, also in <code>tidy_wide</code></td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Output</strong></td>
-<td align="left">16 genomic data formats can be exported out of <strong>stackr</strong> using <code>genomic_converter</code> or these separate modules:<br><code>write_vcf</code>: <a href="https://samtools.github.io/hts-specs/">VCF</a> (Danecek et al., 2011)<br><code>write_plink</code>: <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a> (Purcell et al., 2007)<br><code>write_genind</code>: <a href="https://github.com/thibautjombart/adegenet">adegenet genind and genlight</a> (Jombart et al., 2010; Jombart and Ahmed, 2011)<br><code>write_genlight</code>: <a href="https://github.com/thibautjombart/adegenet">genlight</a> (Jombart et al., 2010; Jombart and Ahmed, 2011)<br><code>write_gtypes</code>: <a href="https://github.com/EricArcher/strataG">strataG gtypes</a> (Archer et al. 2016)<br><code>write_colony</code>: <a href="https://www.zsl.org/science/software/colony">COLONY</a> (Jones and Wang, 2010; Wang, 2012)<br><code>write_genepop</code>: <a href="http://genepop.curtin.edu.au">Genepop</a> (Raymond and Rousset, 1995; Rousset, 2008)<br><a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a> (Catchen et al., 2011, 2013)<br><code>write_betadiv</code>: <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a> (Lamy, 2015)<br> <code>vcf2dadi</code>: <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a> (Gutenkunst et al., 2009)<br> <code>write_structure</code>: <a href="http://pritchardlab.stanford.edu/structure.html">structure</a> (Pritchard et al., 2000)<br> <code>write_arlequin</code>: <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a> (Excoffier et al. 2005)<br> <code>write_hierfstat</code>: <a href="https://github.com/jgx65/hierfstat">hierfstat</a> (Goudet, 2005)<br> <code>write_snprelate</code>: <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a> (Zheng et al. 2012)<br>Dataframes of genotypes in wide or long/tidy format</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Conversion function</strong></td>
-<td align="left"><code>genomic_converter</code> import/export genomic formats mentioned above. The function is also integrated with usefull filters, blacklist and whitelist.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Pattern of missingness</strong></td>
-<td align="left"><code>missing_visualization</code>: Visualize patterns of missing data. Find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc)</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Imputations</strong></td>
-<td align="left"><strong>Map-independent</strong> imputations of missing genotypes.<br>Using <strong>Random Forests</strong> (on-the-fly-imputations or predictive modeling), <strong>Extreme Gradient Tree Boosting</strong> and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).<br> Imputations can be conducted <strong>overall samples</strong> or <strong>by populations</strong>.<br><br>Imputations are integrated in several of <strong>stackr</strong> and <strong>assigner</strong> functions.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
-<td align="left">Visualize distribution of important metric and statistics and create publication-ready figures</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Parallel</strong></td>
-<td align="left">Codes designed and optimized for fast computations running imputations, iterations, etc. in parallel. Works with all OS: Linux, Mac and now PC!</td>
-</tr>
-</tbody>
-</table>
+| Caracteristics | Description                                                            |
+|:---------------|:-----------------------------------------------------------------------|
+| **Import**     | [stackr](https://github.com/thierrygosselin/stackr) is used seamlessly |
+
+to import various genomic file formats ( [VCF, SNPs and haplotypes](https://samtools.github.io/hts-specs/), [PLINK tped/tfam](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr), [genind](https://github.com/thibautjombart/adegenet), [genlight](https://github.com/thibautjombart/adegenet), [strataG gtypes](https://github.com/EricArcher/strataG), [Genepop](http://genepop.curtin.edu.au), [STACKS haplotype file](http://catchenlab.life.illinois.edu/stacks/), [hierfstat](https://github.com/jgx65/hierfstat)| | **Output** | [stackr](https://github.com/thierrygosselin/stackr) is used seamlessly to output the imputed dataset in various genomic file formats ( [VCF, SNPs and haplotypes](https://samtools.github.io/hts-specs/), [PLINK tped/tfam](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr), [genind](https://github.com/thibautjombart/adegenet), [genlight](https://github.com/thibautjombart/adegenet), [strataG gtypes](https://github.com/EricArcher/strataG), [Genepop](http://genepop.curtin.edu.au), [STACKS haplotype file](http://catchenlab.life.illinois.edu/stacks/), [hierfstat](https://github.com/jgx65/hierfstat), [COLONY](https://www.zsl.org/science/software/colony), [betadiv](http://adn.biol.umontreal.ca/~numericalecology/Rcode/) [δaδi](http://gutengroup.mcb.arizona.edu/software/) [structure](http://pritchardlab.stanford.edu/structure.html) [Arlequin](http://cmpg.unibe.ch/software/arlequin35/) [SNPRelate](https://github.com/zhengxwen/SNPRelate), Dataframes of genotypes in wide or long/tidy format| |**Conversion function**| The imputations offered in grur are seamlesly integrated in **stackr** `genomic_converter` import/export genomic formats mentioned above. The function is also integrated with usefull filters, blacklist and whitelist.| |**Pattern of missingness**|`missing_visualization`: Visualize patterns of missing data. Find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc)| |**Imputations**|**Map-independent** imputations of missing genotypes.<br>Using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).<br> Imputations can be conducted **overall samples** or **by populations**.<br><br>Imputations are integrated in several of **stackr** and **assigner** functions.| |**[ggplot2](http://ggplot2.org)-based plotting**|Visualize distribution of important metric and statistics and create publication-ready figures| |**Parallel**|Codes designed and optimized for fast computations running imputations, iterations, etc. in parallel. Works with all OS: Linux, Mac and now PC!|
 
 [More in grur workflow below](https://github.com/thierrygosselin/grur#grur-workflow)
 
@@ -138,14 +107,14 @@ New to pull request on github ? The process is very easy:
 GBS workflow
 ------------
 
-The **grur** package should fit here in your RADseq/GBS workflow. ![](vignettes/grur_workflow.png)
+The **grur** package should fit here in your RADseq/GBS workflow.
 
 stackr workflow
 ---------------
 
 Currently under construction. Come back soon!
 
-**Table 1: Quality control and filtering RAD/GBS data**
+\*\* Pattern of missingness\*\*
 
 <table style="width:86%;">
 <colgroup>
@@ -184,33 +153,14 @@ Currently under construction. Come back soon!
 <td align="center">x</td>
 <td align="center">x</td>
 </tr>
-<tr class="even">
-<td align="left">Missingness</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-<td align="center">x</td>
-</tr>
 </tbody>
 </table>
-
-**Step 1 Pattern of missingness**
 
 -   Use `missing_visualization` with/without your new blacklists (e.g. of genotypes, individuals) and with/without whitelist of markers to examine patterns of missingness in you dataset before more extensive filtering (there is a vignette for this step)
 -   The trick here is to use the `strata` argument to find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, etc).
 -   Do you see a trend between your missing pattern and reads/samples ? Heterozygosity?
 -   Do you need more sequencing? Do you have to re-run some lanes?
-
-**Step 2 Proportion of genotyped individuals**
-
--   Use imputation methods provided inside some of **stackr** functions (e.g. `tidy_genomic_data` or `genomic_converter`), to assess the impact of lowering or increasing threshold that impact missing data.
-
-**Step 3 Pattern of missingness, again**
-
+-   Use imputation methods provided inside some of **stackr** functions (e.g. `tidy_genomic_data` or `genomic_converter`), to assess the impact of lowering or increasing different filtering thresholds that impact missing data.
 -   Use `missing_visualization` with your new blacklists (e.g. of genotypes, individuals) and with your whitelist of markers to examine patterns of missingness in your dataset after filtering (there is a vignette for this step)
--   The trick here is to use the `strata` argument to find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, etc).
+-   The trick again here is to use the `strata` argument to find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, etc).
 -   Do you see a trend between your missing pattern and reads/samples ? Heterozygosity?
