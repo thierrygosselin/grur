@@ -47,7 +47,8 @@
 #'
 #'
 #' Before running this function to populate the original dataset with synthetic
-#' data I highly recommend you look for patterns of missingness \code{\link[grur]{missing_visualization}}
+#' data I highly recommend you look for patterns of missingness
+#' \code{\link[grur]{missing_visualization}}
 #' and explore the reasons for their presence.
 #' Follow the \href{https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0}{vignette}
 #' for more info.
