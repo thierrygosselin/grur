@@ -31,22 +31,43 @@
 #' }
 
 #' @inheritParams stackr::tidy_genomic_data
+#' @param strata (optional/required) Required for VCF and haplotypes files,
+#' optional for the other formats supported.
+#'
+#' The strata file is a tab delimited file with a minimum of 2 columns headers:
+#' \code{INDIVIDUALS} and \code{STRATA}. For a data frame of genotypes in wide
+#' format, the will be created automatically using the \code{INDIVIDUALS} and 
+#' the \code{POP_ID} columns.
+#' For PLINK tped/tfam files, the first 2 columns of the \code{tfam} are used.
+#' Note that if a \code{strata} file is specified with all file formats that don't
+#' require the strata, the strata argument will have precedence on the population
+#' groupings used with those format.
+#' The \code{STRATA} column can be any hierarchical grouping.
+#' To create a strata file see \code{\link[stackr]{individuals2strata}}.
+#' If you have already run
+#' \href{http://catchenlab.life.illinois.edu/stacks/}{stacks} on your data,
+#' the strata file is similar to a stacks \emph{population map file}, make sure you
+#' have the required column names (\code{INDIVIDUALS} and \code{STRATA}).
+#' For \code{missing_visualization} function, use additional columns in the strata
+#' file to store metadata that you want to look for pattern of missingness.
+#' e.g. lanes, chips, sequencers, etc.
+#' Default: \code{strata = NULL}.
 
 #' @param strata.select (optional, character) Use this argument to select the column
 #' from the strata file to generate the PCoA-IBM plot. More than 1 column you
 #' want to visualize, use a string of character
 #' e.g. \code{strata.select = c("POP_ID", "LANES", "SEQUENCER", "WATERSHED")} to test
 #' 4 grouping columns inside the \code{strata} file.
-#' Default: \code{strata.select = "POP_ID"}
+#' Default: \code{strata.select = "POP_ID"},
 
 #' @param distance.method (character) The distance measure to be used.
 #' This must be one of "euclidean", "maximum", "manhattan", "canberra",
 #' "binary" or "minkowski". The function uses \code{\link[stats]{dist}}.
-#' Default: \code{distance.method = "euclidean"}
+#' Default: \code{distance.method = "euclidean"}.
 
 #' @param ind.missing.geno.threshold (string) Percentage of missing genotype
 #' allowed per individuals.
-#' Default:\code{ind.missing.geno.threshold = c(10,20,30,40,50,60,70)}
+#' Default:\code{ind.missing.geno.threshold = c(10,20,30,40,50,60,70)}.
 
 #' @param filename (optional) Name of the tidy data set,
 #' written to the working directory.
