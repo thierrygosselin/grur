@@ -50,12 +50,30 @@ library(grur) # to load
 </tr>
 <tr class="even">
 <td align="left"><strong>Output</strong></td>
-<td align="left"><a href="https://github.com/thierrygosselin/stackr">stackr</a> is used seamlessly to output the imputed dataset in various genomic file formats (<a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>,</td>
+<td align="left"><a href="https://github.com/thierrygosselin/stackr">stackr</a> is used seamlessly to output the imputed dataset in various genomic file formats (<a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>, <a href="https://www.zsl.org/science/software/colony">COLONY</a>, <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a>, <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a>, <a href="http://pritchardlab.stanford.edu/structure.html">structure</a>, <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a>, <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a>, Dataframes of genotypes in wide or long/tidy format</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Conversion function</strong></td>
+<td align="left">The imputations offered in grur are seamlesly integrated in <strong>stackr</strong> <code>genomic_converter</code> import/export genomic formats mentioned above. The function is also integrated with usefull filters, blacklist and whitelist.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Pattern of missingness</strong></td>
+<td align="left"><code>missing_visualization</code>: Visualize patterns of missing data. Find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc)</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Imputations</strong></td>
+<td align="left"><strong>Map-independent</strong> imputations of missing genotypes.<br>Using <strong>Random Forests</strong> (on-the-fly-imputations or predictive modeling), <strong>Extreme Gradient Tree Boosting</strong> and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).<br> Imputations can be conducted <strong>overall samples</strong> or <strong>by populations</strong>.<br><br>Imputations are integrated in several of <strong>stackr</strong> and <strong>assigner</strong> functions.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
+<td align="left">Visualize distribution of important metric and statistics and create publication-ready figures.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Parallel</strong></td>
+<td align="left">Codes designed and optimized for fast computations running imputations, iterations, etc. in parallel. Works with all OS: Linux, Mac and now PC!</td>
 </tr>
 </tbody>
 </table>
-
-[COLONY](https://www.zsl.org/science/software/colony), [betadiv](http://adn.biol.umontreal.ca/~numericalecology/Rcode/), [δaδi](http://gutengroup.mcb.arizona.edu/software/) [structure](http://pritchardlab.stanford.edu/structure.html), [Arlequin](http://cmpg.unibe.ch/software/arlequin35/) [SNPRelate](https://github.com/zhengxwen/SNPRelate), Dataframes of genotypes in wide or long/tidy format| |**Conversion function**| The imputations offered in grur are seamlesly integrated in **stackr** `genomic_converter` import/export genomic formats mentioned above. The function is also integrated with usefull filters, blacklist and whitelist.| |**Pattern of missingness**|`missing_visualization`: Visualize patterns of missing data. Find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc)| |**Imputations**|**Map-independent** imputations of missing genotypes.<br>Using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).<br> Imputations can be conducted **overall samples** or **by populations**.<br><br>Imputations are integrated in several of **stackr** and **assigner** functions.| |**[ggplot2](http://ggplot2.org)-based plotting**|Visualize distribution of important metric and statistics and create publication-ready figures.| |**Parallel**|Codes designed and optimized for fast computations running imputations, iterations, etc. in parallel. Works with all OS: Linux, Mac and now PC!|
 
 [More in grur workflow below](https://github.com/thierrygosselin/grur#grur-workflow)
 
