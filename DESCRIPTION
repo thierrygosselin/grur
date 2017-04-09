@@ -1,6 +1,6 @@
 Package: grur
 Type: Package
-Title: grur: an R package tailored for RADseq data imputation
+Title: grur: an R package tailored for RADseq data imputations
 Version: 0.0.1
 Date: 2017-04-07
 Encoding: UTF-8
@@ -8,7 +8,7 @@ Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre"))
   )
 Maintainer: Thierry Gosselin <thierrygosselin@icloud.com>
-Description: grur: an R package tailored for RADseq data imputation.
+Description: grur: an R package tailored for RADseq data imputations.
 Depends:
     R (>= 3.2.3)
 Imports:

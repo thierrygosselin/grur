@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# grur: an R package tailored for RADseq data imputation
+# grur: an R package tailored for RADseq data imputations
 
 Numerous genomic analysis are vulnerable to missing values,
 don't get trapped by missing genotypes in your RADseq dataset.
