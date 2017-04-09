@@ -9,9 +9,9 @@ grur: an R package tailored for RADseq data imputation
 
 Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to:
 
--   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity). The analysis is similar to PLINK's identify-by-missingness analysis (IBM), but more powerful (more output and figures) and as fast!
+-   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity). Similar to PLINK's identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures.
 
--   **Perform map-independent imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or using predictive modeling), **Extreme Gradient Tree Boosting** and the classic Strawman imputation that uses the most frequently observed, non-missing genotypes. The algorithms can build the model for the imputations using the **population** groupings or not (i.e. **overall samples**).
+-   **Perform map-independent imputations of missing genotypes** with several algorithms: **Random Forests** (on-the-fly-imputations or using predictive modeling), **Extreme Gradient Tree Boosting** and the classic Strawman imputation that uses the most frequently observed, non-missing genotypes. The choice of hierarchy to build the algorithm's model can account for **population** groupings or not (i.e. **overall samples**). Furthermore, when multiple SNPs per LOCUS (read/haplotype) are detected, the algorithms will impute the SNPs jointly, reducing imputation artifacts.
 
 Installation
 ------------
