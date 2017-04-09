@@ -36,13 +36,10 @@ Default: \code{vcf.metadata = FALSE}.}
 optional for the other formats supported.
 
 The strata file is a tab delimited file with a minimum of 2 columns headers:
-\code{INDIVIDUALS} and \code{STRATA}. For a data frame of genotypes in wide
-format, the will be created automatically using the \code{INDIVIDUALS} and 
-the \code{POP_ID} columns.
-For PLINK tped/tfam files, the first 2 columns of the \code{tfam} are used.
-Note that if a \code{strata} file is specified with all file formats that don't
-require the strata, the strata argument will have precedence on the population
-groupings used with those format.
+\code{INDIVIDUALS} and \code{STRATA}. 
+If a \code{strata} file is specified with all file formats that don't
+require it, the strata argument will have precedence on the population
+groupings used internally in those file formats.
 The \code{STRATA} column can be any hierarchical grouping.
 To create a strata file see \code{\link[stackr]{individuals2strata}}.
 If you have already run

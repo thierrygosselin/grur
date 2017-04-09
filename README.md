@@ -7,11 +7,7 @@
 grur: an R package tailored for RADseq data imputation
 ======================================================
 
-Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see features below).
-
-genotypes:\*\* find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity). Similar to PLINK's identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures.
-
--   **Perform map-independent imputations of missing genotypes** with several algorithms: **Random Forests** (on-the-fly-imputations or using predictive modeling), **Extreme Gradient Tree Boosting** and the classic Strawman imputation that uses the most frequently observed, non-missing genotypes. The choice of hierarchy to build the algorithm's model can account for **population** groupings or not (i.e. **overall samples**). Furthermore, when multiple SNPs per LOCUS (read/haplotype) are detected, the algorithms will impute the SNPs jointly, reducing imputation artifacts.
+Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see [features](https://github.com/thierrygosselin/grur#features) below).
 
 Installation
 ------------
@@ -23,6 +19,14 @@ if (!require("devtools")) install.packages("devtools") # to install
 devtools::install_github("thierrygosselin/grur")
 library(grur) # to load
 ```
+
+Prerequisite - Suggestions - Troubleshooting
+--------------------------------------------
+
+-   **Parallel computing**: Follow the steps in this [vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
+-   **Installation problem:** see this [vignette](https://github.com/thierrygosselin/stackr/blob/master/vignettes/vignette_installation_problems.Rmd)
+-   **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
+-   For a better experience in **grur**, I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/). The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)).
 
 Features
 --------
@@ -40,47 +44,34 @@ Features
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Input/Output</strong></td>
-<td align="left">The imputations offered in <strong>grur</strong> are seamlesly integrated in <strong>stackr</strong> and **assigner. Imputations are also integrated with usefull filters, blacklist and whitelist inside those 2 packages. Format includes: <a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>, <a href="https://www.zsl.org/science/software/colony">COLONY</a>, <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a>, <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a>, <a href="http://pritchardlab.stanford.edu/structure.html">structure</a>, <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a>, <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a>, Dataframes of genotypes in wide or long/tidy format</td>
+<td align="left"><strong>Patterns of missingness</strong></td>
+<td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Pattern of missingness</strong></td>
-<td align="left"><code>missing_visualization</code>: Visualize patterns of missing data. Find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc)</td>
+<td align="left"><strong>Imputations</strong></td>
+<td align="left"><strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modeling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts.</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Imputations</strong></td>
-<td align="left"><strong>Map-independent</strong> imputations of missing genotypes.<br>Using <strong>Random Forests</strong> (on-the-fly-imputations or predictive modeling), <strong>Extreme Gradient Tree Boosting</strong> and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used).<br> Imputations can be conducted <strong>overall samples</strong> or <strong>by populations</strong>.<br><br>Imputations are integrated in several of <strong>stackr</strong> and <strong>assigner</strong> functions.</td>
+<td align="left"><strong>Input/Output</strong></td>
+<td align="left">The imputations offered in <strong>grur</strong> are seamlesly integrated in <strong>stackr</strong> and <strong>assigner</strong>. Imputations are also integrated with usefull filters, blacklist and whitelist inside those 2 packages. Genetic formats recognized: <a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>, <a href="https://www.zsl.org/science/software/colony">COLONY</a>, <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a>, <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a>, <a href="http://pritchardlab.stanford.edu/structure.html">structure</a>, <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a>, <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a>, dataframes of genotypes in wide or long/tidy format</td>
 </tr>
 <tr class="even">
 <td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
-<td align="left">Visualize distribution of important metric and statistics and create publication-ready figures.</td>
+<td align="left">Visualization: publication-ready figures of important metrics and statistics.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Parallel</strong></td>
-<td align="left">Codes designed and optimized for fast computations running imputations, iterations, etc. in parallel. Works with all OS: Linux, Mac and now PC!</td>
+<td align="left">Codes designed and optimized for fast computations with progress bars. Works with all OS: Linux, Mac and yes PC!</td>
 </tr>
 </tbody>
 </table>
-
-[More in grur workflow below](https://github.com/thierrygosselin/grur#grur-workflow)
-
-Prerequisite - Suggestions - Troubleshooting
---------------------------------------------
-
--   **Parallel computing**: Follow the steps in this [vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [data.table](https://github.com/Rdatatable/data.table) and [XGBoost](https://github.com/dmlc/xgboost) packages (e.g. to do imputations in parallel).
--   **Installation problem:** see this [vignette](https://github.com/thierrygosselin/stackr/blob/master/vignettes/vignette_installation_problems.Rmd)
--   **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
--   For a better experience in **stackr** and in R in general, I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/). The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)).
 
 Vignettes, R Notebooks and examples
 -----------------------------------
 
 **Vignettes (in development, check periodically for updates):**
 
--   Vignettes with real data for example in the form of R Notebooks take too much space to be included in package, without CRAN complaining. Consequently, vignettes are distributed separately, follow the links below.
--   [installation problems](https://github.com/thierrygosselin/stackr/blob/master/vignettes/vignette_installation_problems.Rmd)
--   [parallel computing during imputations](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd)
--   Missing data visualization and analysis [(html vignette)](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0) and [(Rmd)](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)
+Vignettes with real data for example in the form of R Notebooks take too much space to be included in package, without CRAN complaining. Consequently, vignettes are distributed separately, follow the links below. \* Missing data visualization and analysis [(html vignette)](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0) and [(Rmd)](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)
 
 Citation:
 ---------
@@ -114,7 +105,7 @@ Contributions:
 
 This package has been developed in the open, and it wouldn’t be nearly as good without your contributions. There are a number of ways you can help me make this package even better:
 
--   If you don’t understand something, please let me know.
+-   If you don’t understand something, please let me know and raise an [issue](https://github.com/thierrygosselin/grur/issues)
 -   Your feedback on what is confusing or hard to understand is valuable.
 -   If you spot a typo, feel free to edit the underlying page and send a pull request.
 
@@ -124,24 +115,3 @@ New to pull request on github ? The process is very easy:
 -   Make the changes using github’s in-page editor and save.
 -   Submit a pull request and include a brief description of your changes.
 -   “Fixing typos” is perfectly adequate.
-
-GBS workflow
-------------
-
-The **grur** package should fit here in your RADseq/GBS workflow.
-
-stackr workflow
----------------
-
-Currently under construction. Come back soon!
-
-**Pattern of missingness**
-
--   Use `missing_visualization` with/without your new blacklists (e.g. of genotypes, individuals) and with/without whitelist of markers to examine patterns of missingness in you dataset before more extensive filtering (there is a vignette for this step)
--   The trick here is to use the `strata` argument to find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, etc).
--   Do you see a trend between your missing pattern and reads/samples ? Heterozygosity?
--   Do you need more sequencing? Do you have to re-run some lanes?
--   Use imputation methods provided inside some of **stackr** functions (e.g. `tidy_genomic_data` or `genomic_converter`), to assess the impact of lowering or increasing different filtering thresholds that impact missing data.
--   Use `missing_visualization` with your new blacklists (e.g. of genotypes, individuals) and with your whitelist of markers to examine patterns of missingness in your dataset after filtering (there is a vignette for this step)
--   The trick again here is to use the `strata` argument to find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, etc).
--   Do you see a trend between your missing pattern and reads/samples ? Heterozygosity?
