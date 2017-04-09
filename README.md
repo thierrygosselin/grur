@@ -7,7 +7,7 @@
 grur: an R package tailored for RADseq data imputation
 ======================================================
 
-Don't get trapped by missing genotypes in your RADseq dataset. Numerous genomic analysis are vulnerable to missing values, so you can use **grur** to:
+Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to:
 
 -   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity). The analysis is similar to PLINK's identify-by-missingness analysis (IBM), but more powerful (more output and figures) and as fast!
 
