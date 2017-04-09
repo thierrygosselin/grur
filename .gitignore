@@ -3,4 +3,3 @@
 .RData
 inst/doc
 vignettes/*.R
-vignettes/*.Rmd
