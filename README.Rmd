@@ -35,9 +35,10 @@ knitr::opts_chunk$set(
 
 Numerous genomic analysis are vulnerable to missing values,
 don't get trapped by missing genotypes in your RADseq dataset.
-Use **grur** to: 
+Use **grur** to **visualize patterns of missingness** and 
+**perform map-independent imputations of missing genotypes** (see features below).
 
-* **Visualize patterns of missing genotypes:** find patterns associated with
+genotypes:** find patterns associated with
 different variables of your study (lanes, chips, sequencers, populations,
 sample sites, reads/samples, homozygosity). Similar to PLINK's
 identify-by-missingness analysis (IBM), **grur** is more powerful because it 
@@ -64,7 +65,7 @@ devtools::install_github("thierrygosselin/grur")
 library(grur) # to load
 ```
 
-
+## Features
 | Caracteristics | Description |
 |:-------------------|:--------------------------------------------------------|
 | **Input/Output** | The imputations offered in **grur** are seamlesly integrated in **stackr** and **assigner. Imputations are also integrated with usefull filters, blacklist and whitelist inside those 2 packages. Format includes: [VCF, SNPs and haplotypes](https://samtools.github.io/hts-specs/), [PLINK tped/tfam](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr), [genind](https://github.com/thibautjombart/adegenet), [genlight](https://github.com/thibautjombart/adegenet), [strataG gtypes](https://github.com/EricArcher/strataG), [Genepop](http://genepop.curtin.edu.au), [STACKS haplotype file](http://catchenlab.life.illinois.edu/stacks/), [hierfstat](https://github.com/jgx65/hierfstat), [COLONY](https://www.zsl.org/science/software/colony), [betadiv](http://adn.biol.umontreal.ca/~numericalecology/Rcode/), [δaδi](http://gutengroup.mcb.arizona.edu/software/), [structure](http://pritchardlab.stanford.edu/structure.html), [Arlequin](http://cmpg.unibe.ch/software/arlequin35/), [SNPRelate](https://github.com/zhengxwen/SNPRelate), Dataframes of genotypes in wide or long/tidy format|
