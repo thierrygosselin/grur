@@ -1,17 +1,17 @@
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/14548/thierrygosselin/grur.svg)](https://zenodo.org/badge/latestdoi/14548/thierrygosselin/grur)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--04--07-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--04--08-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
 grur: an R package tailored for RADseq data imputation
 ======================================================
 
-Don't get trapped by missing genotypes in your RADseq dataset. Numerous genomic analysis are vulnerable to missing values requiring your data to be complete. Use **grur** to:
+Don't get trapped by missing genotypes in your RADseq dataset. Numerous genomic analysis are vulnerable to missing values, so you can use **grur** to:
 
--   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity).
+-   **Visualize patterns of missing genotypes:** find patterns associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity). The analysis is similar to PLINK's identify-by-missingness analysis (IBM), but more powerful (more output and figures) and as fast!
 
--   **Imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or predictive modeling), **Extreme Gradient Tree Boosting** and Strawman imputations (~ max/mean/mode: the most frequently observed, non-missing genotypes is used). Imputations can be conducted **overall samples** or **by populations**.
+-   **Perform map-independent imputations of missing genotypes:** using **Random Forests** (on-the-fly-imputations or using predictive modeling), **Extreme Gradient Tree Boosting** and the classic Strawman imputation that uses the most frequently observed, non-missing genotypes. The algorithms can build the model for the imputations using the **population** groupings or not (i.e. **overall samples**).
 
 Installation
 ------------
