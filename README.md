@@ -23,8 +23,8 @@ library(grur) # to load
 Prerequisite - Suggestions - Troubleshooting
 --------------------------------------------
 
--   **Parallel computing**: Follow the steps in this [vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
--   **Installation problem:** see this [vignette](https://github.com/thierrygosselin/stackr/blob/master/vignettes/vignette_installation_problems.Rmd)
+-   **Parallel computing**: [Follow these steps](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
+-   [Installation problems](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
 -   **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 -   For a better experience in **grur**, I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/). The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)).
 
@@ -69,7 +69,7 @@ Features
 Vignettes, R Notebooks and examples
 -----------------------------------
 
-Vignettes with real data for example in the form of R Notebooks take too much space to be included in package, without CRAN complaining. Consequently, vignettes are distributed separately, follow the links below.
+Vignettes with real data for example in the form of R Notebooks take too much space to be included in package, without CRAN complaining. Consequently, vignettes will start to be distributed separately, follow the links below.
 
 -   Missing data visualization and analysis [(html vignette)](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0) and [(Rmd)](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)
 
