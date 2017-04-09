@@ -12,7 +12,7 @@
 
 <meta name="author" content="Thierry Gosselin" />
 
-<meta name="date" content="2017-04-06" />
+<meta name="date" content="2017-04-08" />
 
 <title>Imputations in Parallel</title>
 
@@ -70,12 +70,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Imputations in Parallel</h1>
 <h4 class="author"><em>Thierry Gosselin</em></h4>
-<h4 class="date"><em>2017-04-06</em></h4>
+<h4 class="date"><em>2017-04-08</em></h4>
 
 
 
-<div id="parallel-computing-in-r-and-stackr" class="section level2">
-<h2>Parallel computing in R and stackr</h2>
+<div id="parallel-computing-in-r-and-grur" class="section level2">
+<h2>Parallel computing in R and grur</h2>
 <p>On Mac OSX using OpenMP greatly reduce the computation time for the imputations. To do the imputations in parallel, you need to install an OpenMP enabled <a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">randomForestSRC</a>. Note that this also works to have <a href="https://github.com/Rdatatable/data.table">data.table</a> work in parallel. (time: max 10 minutes).</p>
 <div id="option-1-from-source-linux-mac-osx-details-here" class="section level3">
 <h3>Option 1: From source (Linux &amp; Mac OSX) <a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">details here</a></h3>
@@ -126,7 +126,7 @@ devtools::<span class="kw">install_url</span>(<span class="dt">url =</span> <spa
 </div>
 <div id="note" class="section level2">
 <h2>Note</h2>
-<p>I recommend using <a href="https://www.rstudio.com/products/rstudio/download/">RStudio</a> to run <strong>stackr</strong> or <strong>assigner</strong>. The R GUI is unstable with functions using parallel. More details can be found <code>parallel::mclapply</code> or on the web. Users of third-party front-ends should consult their documentation.</p>
+<p>I recommend using <a href="https://www.rstudio.com/products/rstudio/download/">RStudio</a>. The R GUI is unstable with functions using parallel. More details can be found <code>parallel::mclapply</code> or on the web. Users of third-party front-ends should consult their documentation.</p>
 </div>
 
 
