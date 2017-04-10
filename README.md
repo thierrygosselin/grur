@@ -1,6 +1,6 @@
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/14548/thierrygosselin/grur.svg)](https://zenodo.org/badge/latestdoi/14548/thierrygosselin/grur)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--04--08-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--04--10-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -45,11 +45,11 @@ Features
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Patterns of missingness</strong></td>
-<td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.</td>
+<td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.<br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Imputations</strong></td>
-<td align="left"><strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modeling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts.</td>
+<td align="left"><code>grur_imputations</code>: <strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modeling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Input/Output</strong></td>
