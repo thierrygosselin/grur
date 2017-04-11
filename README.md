@@ -9,7 +9,9 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 ------------------------------------------------------------------------
 
-Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see [features](https://github.com/thierrygosselin/grur#features) below).
+Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset.
+
+Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see [features](https://github.com/thierrygosselin/grur#features) below).
 
 Installation
 ------------
@@ -22,8 +24,7 @@ devtools::install_github("thierrygosselin/grur")
 library(grur) # to load
 ```
 
-Prerequisite - Suggestions - Troubleshooting
---------------------------------------------
+#### Troubleshooting
 
 -   **Parallel computing**: [Follow these steps (~ 5 min)](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
 -   [Installation problems](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
@@ -68,15 +69,15 @@ Features
 </tbody>
 </table>
 
-Vignettes, R Notebooks and examples
------------------------------------
+Vignettes and examples
+----------------------
 
 Vignettes with real data for example in the form of R Notebooks take too much space to be included in package, without CRAN complaining. Consequently, vignettes will start to be distributed separately, follow the links below.
 
 -   Missing data visualization and analysis [(html vignette)](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0) and [(Rmd)](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)
 
-Citation:
----------
+Citation
+--------
 
 To get the citation, inside R:
 
@@ -93,8 +94,7 @@ Change log, version, new features and bug history lives in the [NEWS.md file](ht
 
 -   **grur** package launch!
 
-Roadmap of future developments:
--------------------------------
+#### Roadmap of future developments
 
 -   Integrate more imputation method.
 -   Workflow tutorial and vignettes to further explore some problems: *in progress*
@@ -102,8 +102,7 @@ Roadmap of future developments:
 -   Until publication **grur** will change rapidly, stay updated with releases and contribute with bug reports.
 -   Suggestions ?
 
-Contributions:
---------------
+#### Contributions
 
 This package has been developed in the open, and it wouldn’t be nearly as good without your contributions. There are a number of ways you can help me make this package even better:
 
