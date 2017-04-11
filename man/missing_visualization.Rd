@@ -2,7 +2,7 @@
 % Please edit documentation in R/missing_visualization.R
 \name{missing_visualization}
 \alias{missing_visualization}
-\title{Visualize missing genotypes in genomic data set.}
+\title{Visualize missing genotypes in genomic data set}
 \usage{
 missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   strata.select = "POP_ID", distance.method = "euclidean",

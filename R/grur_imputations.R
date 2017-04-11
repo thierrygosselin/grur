@@ -1,7 +1,7 @@
 # grur imputations module
 
 #' @name grur_imputations
-#' @title Map-independent imputation of missing genotype
+#' @title Map-independent imputations of missing genotypes
 #'
 #' @description Used internally in \href{https://github.com/thierrygosselin/assigner}{assigner} and
 #' \href{https://github.com/thierrygosselin/stackr}{stackr} and

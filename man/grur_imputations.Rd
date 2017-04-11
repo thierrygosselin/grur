@@ -2,7 +2,7 @@
 % Please edit documentation in R/grur_imputations.R
 \name{grur_imputations}
 \alias{grur_imputations}
-\title{Map-independent imputation of missing genotype}
+\title{Map-independent imputations of missing genotypes}
 \usage{
 grur_imputations(data, imputation.method = "rf",
   hierarchical.levels = "populations", num.tree = 50,

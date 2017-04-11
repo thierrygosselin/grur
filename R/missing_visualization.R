@@ -1,5 +1,5 @@
 #' @name missing_visualization
-#' @title Visualize missing genotypes in genomic data set.
+#' @title Visualize missing genotypes in genomic data set
 #' @description Use this function to visualize pattern of missing data.
 #'  \itemize{
 #'    \item \strong{Imput file:} various file format are supported
