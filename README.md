@@ -9,6 +9,10 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 ------------------------------------------------------------------------
 
+The name **grur** |ɡro͞oˈr| was chosen because the missing genotypes dilemma with RADseq data reminds me of the cheese paradox.
+
+Here, I don't want to sustain a [war](http://www.lefigaro.fr/flash-eco/2012/12/07/97002-20121207FILWWW00487-le-gruyere-francais-doit-avoir-des-trous.php) or the controversy of cheese with holes, so choose as you like the *French Gruyère* or the *Swiss Emmental*. The paradox is that the more cheese you have the more holes you'll get. But, the more holes you have means the less cheese you have... So, someone could conclude, the more cheese = the less cheese ? I'll leave that up to you, back to genomics...
+
 Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset.
 
 Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see [features](https://github.com/thierrygosselin/grur#features) below).
