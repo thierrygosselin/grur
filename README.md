@@ -9,9 +9,6 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 ------------------------------------------------------------------------
 
-grur: an R package tailored for RADseq data imputations
-=======================================================
-
 Numerous genomic analysis are vulnerable to missing values, don't get trapped by missing genotypes in your RADseq dataset. Use **grur** to **visualize patterns of missingness** and **perform map-independent imputations of missing genotypes** (see [features](https://github.com/thierrygosselin/grur#features) below).
 
 Installation

@@ -5,13 +5,7 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-```
+
 
 # grur<img src="README_grur_logo.png" align="right"/>
 
@@ -21,26 +15,14 @@ knitr::opts_chunk$set(
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-```{r, echo = FALSE}
-description <- readLines("DESCRIPTION")
-rvers <- stringr::str_match(grep("R \\(", description, value = TRUE), "[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}")[1,1]
-```
-```{r, echo = FALSE}
-description <- readLines("DESCRIPTION")
-version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, value = TRUE)))
-```
-[![packageversion](https://img.shields.io/badge/Package%20version-`r version`-orange.svg)](commits/master)
-[![Last-changedate](https://img.shields.io/badge/last%20change-`r gsub('-', '--', Sys.Date())`-brightgreen.svg)](/commits/master)
+
+
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2017--04--11-brightgreen.svg)](/commits/master)
 
 ---
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-```
+
 
 
 Numerous genomic analysis are vulnerable to missing values,
