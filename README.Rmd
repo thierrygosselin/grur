@@ -1,8 +1,20 @@
 ---
-output:
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# grur<img src="README_grur_logo.png" align="right"/>
+
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
