@@ -344,7 +344,7 @@ grur_imputations <- function(
   if (verbose) {
     cat("\n\n")
     cat("###############################################################################\n")
-    cat("##################### grur::grur_imputations #######################\n")
+    cat("########################### grur::grur_imputations ############################\n")
     cat("###############################################################################\n")
   }
   message("Imputation method: ", imputation.method)
@@ -553,7 +553,7 @@ grur_imputations <- function(
     marker.meta <- dplyr::distinct(.data = input, MARKERS) %>%
       dplyr::mutate(NEW_MARKERS = stringi::stri_join("M", seq(1, nrow(.))))
     input <- dplyr::full_join(marker.meta, input, by = "MARKERS")
-    if (tibble::has_name(input, "CHROM")) {
+    if (tibble::has_name(input, "CHROM") && tibble::has_name(input, "LOCUS") && tibble::has_name(input, "POS")) {
       marker.meta <- dplyr::distinct(.data = input, NEW_MARKERS, MARKERS, CHROM, LOCUS, POS)
     }
     input <- dplyr::select(.data = input, -MARKERS) %>%
@@ -561,7 +561,7 @@ grur_imputations <- function(
   } else {
     # not sure necessary for max, need checking
     # scan for the columnn CHROM and keep the info to include back after imputations
-    if (tibble::has_name(input, "CHROM")) {
+    if (tibble::has_name(input, "CHROM") && tibble::has_name(input, "LOCUS") && tibble::has_name(input, "POS")) {
       marker.meta <- dplyr::distinct(.data = input, MARKERS, CHROM, LOCUS, POS)
     } else {
       marker.meta <- dplyr::distinct(.data = input, MARKERS)
@@ -1223,8 +1223,7 @@ grur_imputations <- function(
 
   # Integrate marker.meta columns and sort
   if (!is.null(marker.meta)) {
-    # if (!is.null(marker.meta)) {
-    columns.required <- c( "MARKERS", "CHROM", "LOCUS", "POS", "POP_ID",
+    want <- c( "MARKERS", "CHROM", "LOCUS", "POS", "POP_ID",
                            "INDIVIDUALS", "REF", "ALT", "GT", "GT_VCF",
                            "GT_VCF_NUC", "GT_BIN", "GL")
 
@@ -1232,15 +1231,13 @@ grur_imputations <- function(
       input.imp <- suppressWarnings(dplyr::left_join(
         dplyr::rename(input.imp, NEW_MARKERS = MARKERS),
         marker.meta, by = "NEW_MARKERS") %>%
-          dplyr::select(dplyr::one_of(columns.required)) %>%
-          dplyr::arrange(CHROM, LOCUS, POS, POP_ID, INDIVIDUALS))
+          dplyr::select(dplyr::one_of(want)))
     } else {
-      input.imp <- suppressWarnings(
-        dplyr::left_join(input.imp, marker.meta, by = "MARKERS") %>%
-          dplyr::select(dplyr::one_of(columns.required)) %>%
-          dplyr::arrange(CHROM, LOCUS, POS, POP_ID, INDIVIDUALS))
+      input.imp <- suppressWarnings(dplyr::left_join(
+        input.imp, marker.meta, by = "MARKERS") %>%
+          dplyr::select(dplyr::one_of(want)))
     }
-    columns.required <- marker.meta <- NULL
+    want <- marker.meta <- NULL
   } else {
     input.imp <- dplyr::arrange(.data = input.imp, MARKERS, POP_ID, INDIVIDUALS)
   }
@@ -1715,7 +1712,7 @@ encoding_snp <- function(locus.list = NULL, data = NULL) {
     dplyr::mutate(
       GT = stringi::stri_replace_all_fixed(
         str = GT, pattern = "NA", replacement = NA, vectorize_all = FALSE),
-      MARKERS = rep(binded.markers, n(.))
+      MARKERS = rep(binded.markers, n())
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::select(MARKERS, CHROM_LOCUS, POP_ID, INDIVIDUALS, GT)

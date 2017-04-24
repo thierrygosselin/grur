@@ -2,7 +2,7 @@
 #' @title Visualize missing genotypes in genomic data set
 #' @description Use this function to visualize pattern of missing data.
 #'  \itemize{
-#'    \item \strong{Imput file:} various file format are supported
+#'    \item \strong{Input file:} various file formats are supported
 #'    (see \code{data} argument below).
 #'    \item \strong{Filters:} genotypes, markers, individuals and populations can be
 #'   filtered and/or selected in several ways using blacklist,
@@ -390,9 +390,12 @@ missing_visualization <- function(
       panel.grid.major.y = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
-      axis.text.y = ggplot2::element_blank()
-    )
+      axis.text.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_blank()
+    ) +
+    ggplot2::facet_grid(~POP_ID, scales = "free", space = "free_x")
   # heatmap
   heatmap.data <- NULL # no longer needed
   # Missing summary ------------------------------------------------------------
@@ -568,7 +571,7 @@ missing_visualization <- function(
 
   # Results --------------------------------------------------------------------
   timing <- proc.time() - timing
-  message(stringi::stri_join("Computation time: ", round(timing[[3]]), " sec"))
+  message("Computation time: ", round(timing[[3]]), " sec")
   cat("############################## completed ##############################\n")
   res$tidy.data <- input
   res$tidy.data.binary <- input.prep

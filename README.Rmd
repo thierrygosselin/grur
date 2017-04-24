@@ -104,6 +104,10 @@ citation("grur")
 ## New features
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
+**v.0.0.2 2017-04-23**
+
+* work on `generate_missing` function. Still not as I wish.
+
 **v.0.0.1 2017-04-07**
 
 * **grur** package launch!

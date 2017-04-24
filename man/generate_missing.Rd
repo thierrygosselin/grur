@@ -4,8 +4,9 @@
 \alias{generate_missing}
 \title{Generate missing data}
 \usage{
-generate_missing(data, output, filename = NULL, average.read.depth = 10,
-  min.reads = 6, alpha.individuals = 5, alpha.markers = c(5, 10),
+generate_missing(data, output, filename = NULL, memorize.missing = NULL,
+  missing.data.type = "MCAR", prop.missing.overall = 0.3,
+  average.read.depth = 10, min.reads = 6, alpha.beta.markers = c(5, 40),
   random.seed = NULL, imputation.method = NULL,
   hierarchical.levels = "populations", verbose = TRUE,
   parallel.core = parallel::detectCores() - 1)
@@ -30,23 +31,50 @@ Default: \code{output = NULL}.}
 or the working directory. Default: \code{filename = NULL}. A default name will be used,
 customized with the output file(s) selected.}
 
+\item{memorize.missing}{(optional, string) To use missing pattern
+taken from the function \code{\link[grur]{memorize_missing}}. The argument
+require 2 values: the path to the file or the name of the object in the
+global environment and the column selected to introduce missingness.
+e.g. \code{memorize.missing = c("~/missing_analysis/missing.memory", "MISSING_INDIVIDUALS_MIX")}.
+See function documentation for more details on columns naming scheme.
+Default: \code{memorize.missing = NULL}.}
+
+\item{missing.data.type}{(character) Three options 
+(based on Little, R. J., & Rubin, D. B., 2002):
+\enumerate{
+\item \strong{MCAR} (Missing Completely At Random): the missingness
+probability does not depend on any observed or unobserved data
+(independent of any covariates).
+The risk of introducing biais during imputations is very very low.
+
+\item \strong{MAR} (Missing At Random): the missingness probability
+depends only on the observed data.
+
+\item \strong{NMAR} (Not Missing At Random): the missingness probability
+depends on both the observed and unobserved data.
+}
+Default: \code{missing.data.type = "MCAR"}.}
+
+\item{prop.missing.overall}{(double) The overall proportion of missing genotypes
+generated.
+Default: \code{prop.missing.overall = 0.3}.}
+
 \item{average.read.depth}{(integer) Desired average read depth at a marker in an individual.
 Default: \code{average.read.depth = 10}.}
 
 \item{min.reads}{(integer) Minimum number of simulated reads to call a SNP.
+Everything below will results in missing genotypes.
 Default: \code{min.reads = 6}.}
 
-\item{alpha.individuals}{(integer) Shape parameter for gamma distribution over individuals.
-Default: \code{alpha.individuals = 5}.}
-
-\item{alpha.markers}{(integer) Shape parameter for gamma distribution over loci.
-Default: \code{alpha.markers = c(5,10)}.}
+\item{alpha.beta.markers}{(string of 2 integers) The shape and scale parameter
+for the gamma distribution over markers.
+Default: \code{alpha.beta.markers = c(5,40)}.}
 
 \item{random.seed}{(integer) Random seed number for reproducibility.
 With default: \code{random.seed = NULL} the number is generated automatically and randomly.
 for the input file and \code{\link[stackr]{genomic_converter}} for the output file parameter.}
 
-\item{imputation.method}{(character, optional) 
+\item{imputation.method}{(character, optional)
 Methods available for map-independent imputations of missing genotype:
 
 (1) \code{imputation.method = "max"} Strawman imputation,
@@ -100,6 +128,9 @@ output = "genepop"
 )
 }
 }
+\references{
+Little, R. J., & Rubin, D. B. (2002) Statistical analysis with missing data.
+}
 \author{
-Eric C. Anderson \email{eric.anderson@noaa.gov}, Greg L. Owens \email{gregory.owens@alumni.ubc.ca} and Thierry Gosselin \email{thierrygosselin@icloud.com}
+Thierry Gosselin \email{thierrygosselin@icloud.com}, Eric C. Anderson \email{eric.anderson@noaa.gov} and Greg L. Owens \email{gregory.owens@alumni.ubc.ca}
 }

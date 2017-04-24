@@ -4,7 +4,7 @@
 \alias{reads_per_markers}
 \title{reads_per_markers}
 \usage{
-reads_per_markers(total.reads, pop.loc.dirichlet, markers.list, pop)
+reads_per_markers(total.reads, markers.cdm, markers.list)
 }
 \description{
 Function to apply to each ind and markers
