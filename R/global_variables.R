@@ -55,7 +55,7 @@ if (getRversion() >= "2.15.1") {
       "INDIVIDUALS_REP", "KEEP", "GT_VCF_NUC", "INTEGERS", "GOF", "NR", "NV",
       "A1_NUC", "A2_NUC", "RANK", "MAF_P", "MAF_L", "CHROM", "POS", "n",
       "POP_ID_PERM", "MISSING_ORIGINAL", "MARKERS_PERM", "INDIVIDUALS_PERM",
-      "MISSING_MIX", "MAR", "MCAR", "value", "GROUPS", "IMP", "OBS", "SQUARE_ERROR"
+      "MISSING_MIX", "MAR", "MCAR", "value", "GROUPS", "IMP", "OBS", "ME"
     )
   )
 }

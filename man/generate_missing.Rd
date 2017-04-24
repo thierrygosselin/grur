@@ -111,7 +111,8 @@ In the global environment, a list with the tidy data set, the random.seed and fu
 In the working directory, the output file with format selected.
 }
 \description{
-Generate missing genotypes following a compound Dirichlet-multinomial distribution.
+Artificially induce missing genotypes by generating
+a compound Dirichlet-multinomial distribution.
 The input and out files see
 \href{https://github.com/thierrygosselin/stackr}{stackr} for more details.
 Input files are recognized through \code{\link[stackr]{tidy_genomic_data}}

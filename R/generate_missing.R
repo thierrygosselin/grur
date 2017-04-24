@@ -3,7 +3,8 @@
 #' @title Generate missing data
 
 #' @description
-#' Generate missing genotypes following a compound Dirichlet-multinomial distribution.
+#' Artificially induce missing genotypes by generating
+#' a compound Dirichlet-multinomial distribution.
 #' The input and out files see
 #' \href{https://github.com/thierrygosselin/stackr}{stackr} for more details.
 #' Input files are recognized through \code{\link[stackr]{tidy_genomic_data}}

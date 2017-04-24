@@ -15,8 +15,8 @@ data.}
 \value{
 A list with information that were dropped from the analysis.
 This can be populations, individuals and markers.
-The accuracy measure returned is the Root Mean Square Error (RMSE). 
-The RMSE is provided by populations, individuals, markers and overall.
+The accuracy measure returned the misclassification error (ME). 
+The ME is provided by populations, individuals, markers and overall.
 }
 \description{
 Use this function to measure imputations accuracy and track impact
@@ -24,7 +24,7 @@ of different algorithms on simulated or biological datasets.
 }
 \examples{
 \dontrun{
-rmse.imputations <- imputations_accuracy(
+me.imputations <- imputations_accuracy(
 obs = "sim.data",
 imp = "imputed.data"
 )

@@ -240,7 +240,7 @@
 #' Before conducting the imputations by populations with random forest or extreme
 #' gradient tree boosting, the data is first screened for markers that are
 #' monomorphic within populations. Because for those cases, it's clear what the
-#' missing genotypes should be, the imputations is very simple and missing
+#' missing genotypes should be, the imputations is very \emph{simple} and missing
 #' genotypes are imputed with the only genotype found for the particular population.
 #' The small cost in time is worth it, because the random forest or extreme
 #' gradient tree boosting model will benefit having more complete and
@@ -379,7 +379,7 @@ grur_imputations <- function(
   if (!is.null(boost.dots[["eta"]])) {
     eta <- boost.dots[["eta"]]
   } else {
-    eta = 0.2
+    eta = 0.1
   }
 
   # gamma for minimum loss reduction (larger the number, more conservative the algorithm)
@@ -408,7 +408,7 @@ grur_imputations <- function(
   if (!is.null(boost.dots[["subsample"]])) {
     subsample <- boost.dots[["subsample"]]
   } else {
-    subsample = 0.8
+    subsample = 0.5
   }
 
   # colsample_bytree: subsample ratio of columns when growing each tree
@@ -430,7 +430,7 @@ grur_imputations <- function(
   if (!is.null(boost.dots[["nrounds"]])) {
     nrounds <- boost.dots[["nrounds"]]
   } else {
-    nrounds = 200
+    nrounds = 2000
   }
   # save_name: the name or path for periodically saved model file
   if (!is.null(boost.dots[["save_name"]])) {

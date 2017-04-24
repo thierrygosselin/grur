@@ -248,7 +248,7 @@ the literature
 Before conducting the imputations by populations with random forest or extreme
 gradient tree boosting, the data is first screened for markers that are
 monomorphic within populations. Because for those cases, it's clear what the
-missing genotypes should be, the imputations is very simple and missing
+missing genotypes should be, the imputations is very \emph{simple} and missing
 genotypes are imputed with the only genotype found for the particular population.
 The small cost in time is worth it, because the random forest or extreme
 gradient tree boosting model will benefit having more complete and

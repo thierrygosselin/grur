@@ -11,12 +11,12 @@
 
 #' @return A list with information that were dropped from the analysis.
 #' This can be populations, individuals and markers.
-#' The accuracy measure returned is the Root Mean Square Error (RMSE). 
-#' The RMSE is provided by populations, individuals, markers and overall.
+#' The accuracy measure returned the misclassification error (ME). 
+#' The ME is provided by populations, individuals, markers and overall.
 
 #' @examples
 #' \dontrun{
-#' rmse.imputations <- imputations_accuracy(
+#' me.imputations <- imputations_accuracy(
 #' obs = "sim.data",
 #' imp = "imputed.data"
 #' )
@@ -64,6 +64,8 @@ imputations_accuracy <- function(obs, imp) {
     markers")
     message("Accuracy measure will be calculated on common variables/values")
   }
+  obs.stats <- imp.stats <- NULL
+  
   
   # Merge and compare dataset --------------------------------------------------
   comparison <- dplyr::full_join(
@@ -71,6 +73,7 @@ imputations_accuracy <- function(obs, imp) {
     dplyr::select(imp.data, POP_ID, INDIVIDUALS, MARKERS, IMP = GT),
     by = c("POP_ID", "INDIVIDUALS", "MARKERS")
   )
+  obs.data <- imp.data <- NULL
   
   # dropped missing info not in common between datasets
   dropped.info <- list()
@@ -115,32 +118,30 @@ imputations_accuracy <- function(obs, imp) {
   
   comparison <- comparison %>% 
     dplyr::mutate(
-      SQUARE_ERROR = dplyr::if_else((OBS == IMP), 0, 1) # no ^2 because it's the same
+      #for each genotype compared, is there a misclassification error or not
+      ME = dplyr::if_else((OBS == IMP), 0, 1)
       )
   
-  rmse.pop <- comparison %>% dplyr::group_by(POP_ID) %>%
-    dplyr::summarise(RMSE = sqrt(mean(SQUARE_ERROR, na.rm = TRUE)))
-  # range(rmse.pop$RMSE)
-  
-  rmse.id <- comparison %>% dplyr::group_by(INDIVIDUALS) %>%
-    dplyr::summarise(RMSE = sqrt(mean(SQUARE_ERROR, na.rm = TRUE)))
-  # range(rmse.id$RMSE)
-  
-  rmse.markers <- comparison %>% dplyr::group_by(MARKERS) %>%
-    dplyr::summarise(RMSE = sqrt(mean(SQUARE_ERROR, na.rm = TRUE)))
-  # range(rmse.markers$RMSE)
-  
-  rmse.overall <- comparison %>%
-    dplyr::summarise(RMSE = sqrt(mean(SQUARE_ERROR, na.rm = TRUE))) %>% 
+  me.pop <- comparison %>% dplyr::group_by(POP_ID) %>%
+    dplyr::summarise(ME = mean(ME, na.rm = TRUE))
+    
+  me.id <- comparison %>% dplyr::group_by(INDIVIDUALS) %>%
+    dplyr::summarise(ME = mean(ME, na.rm = TRUE))
+    
+  me.markers <- comparison %>% dplyr::group_by(MARKERS) %>%
+    dplyr::summarise(ME = mean(ME, na.rm = TRUE))
+    
+  me.overall <- comparison %>%
+    dplyr::summarise(ME = mean(ME, na.rm = TRUE)) %>% 
     purrr::flatten_dbl(.)
 
   # Results --------------------------------------------------------------------
-  res <- list(dropped.info, rmse.pop, rmse.id, rmse.markers, rmse.overall)
+  res <- list(dropped.info, me.pop, me.id, me.markers, me.overall)
   names(res)[[1]] <- "Information dropped from the analysis"
-  names(res)[[2]] <- "Root Mean Squared Error: by populations"
-  names(res)[[3]] <- "Root Mean Squared Error: by individuals"
-  names(res)[[4]] <- "Root Mean Squared Error: by markers"
-  names(res)[[5]] <- "Root Mean Squared Error: overall"
+  names(res)[[2]] <- "Misclassification Error: by populations"
+  names(res)[[3]] <- "Misclassification Error: by individuals"
+  names(res)[[4]] <- "Misclassification Error: by markers"
+  names(res)[[5]] <- "Misclassification Error: overall"
   print(res)
   
   timing <- proc.time() - timing
