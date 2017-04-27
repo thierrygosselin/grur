@@ -92,6 +92,11 @@ memorize_missing <- function(
     missing.memories <- dplyr::rename(.data = missing.memories, MARKERS = LOCUS)
   }
   
+  # stats
+  message("Number of populations: ", dplyr::n_distinct(missing.memories$POP_ID))
+  message("Number of individuals: ", dplyr::n_distinct(missing.memories$INDIVIDUALS))
+  message("Number of markers: ", dplyr::n_distinct(missing.memories$MARKERS), "\n")
+  
   missing.memories <- dplyr::select(
     .data = missing.memories, POP_ID, INDIVIDUALS, MARKERS, GT) %>% 
     dplyr::mutate(
@@ -152,6 +157,7 @@ of missing patterns back in R")
   }
   
   # Results --------------------------------------------------------------------
+  
   timing <- proc.time() - timing
   message("\nComputation time: ", round(timing[[3]]), " sec")
   cat("############################## completed ##############################\n")

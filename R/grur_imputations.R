@@ -1138,7 +1138,7 @@ grur_imputations <- function(
         dplyr::ungroup(.) %>%
         dplyr::mutate_all(.tbl = ., .funs = factor)
 
-      test <- impute_mca(x = input, ncp = 2)
+      # test <- impute_mca(x = input, ncp = 2)
 
 
       # Random Forest by pop
@@ -1709,7 +1709,7 @@ encoding_snp <- function(locus.list = NULL, data = NULL) {
     dplyr::group_by(CHROM_LOCUS, POP_ID, INDIVIDUALS) %>%
     tidyr::spread(data = ., key = MARKERS, value = GT) %>%
     tidyr::unite(data = ., col = GT, -CHROM_LOCUS, -POP_ID, -INDIVIDUALS, sep = "_", remove = TRUE) %>%
-    dplyr::mutate(
+    dplyr::mutate(#Haplotype with combination of SNP and NA = NA (up for an argument?)
       GT = stringi::stri_replace_all_fixed(
         str = GT, pattern = "NA", replacement = NA, vectorize_all = FALSE),
       MARKERS = rep(binded.markers, n())

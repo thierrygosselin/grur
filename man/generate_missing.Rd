@@ -4,12 +4,12 @@
 \alias{generate_missing}
 \title{Generate missing data}
 \usage{
-generate_missing(data, output, filename = NULL, memorize.missing = NULL,
-  missing.data.type = "MCAR", prop.missing.overall = 0.3,
-  average.read.depth = 10, min.reads = 6, alpha.beta.markers = c(5, 40),
-  random.seed = NULL, imputation.method = NULL,
-  hierarchical.levels = "populations", verbose = TRUE,
-  parallel.core = parallel::detectCores() - 1)
+generate_missing(data, output = NULL, filename = NULL,
+  memorize.missing = NULL, missing.data.type = "MCAR",
+  prop.missing.overall = 0.3, average.read.depth = 10, min.reads = 6,
+  alpha.beta.markers = c(5, 40), random.seed = NULL,
+  imputation.method = NULL, hierarchical.levels = "populations",
+  verbose = TRUE, parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
 \item{data}{11 options: VCF (SNPs or Haplotypes,
@@ -31,11 +31,18 @@ Default: \code{output = NULL}.}
 or the working directory. Default: \code{filename = NULL}. A default name will be used,
 customized with the output file(s) selected.}
 
-\item{memorize.missing}{(optional, string) To use missing pattern
+\item{memorize.missing}{(optional, list) To use missing pattern
 taken from the function \code{\link[grur]{memorize_missing}}. The argument
-require 2 values: the path to the file or the name of the object in the
-global environment and the column selected to introduce missingness.
-e.g. \code{memorize.missing = c("~/missing_analysis/missing.memory", "MISSING_INDIVIDUALS_MIX")}.
+require 2 values in a named list.
+i) \code{data = } the path to the file or the name of the object in the
+global environment and 
+ii) \code{column = } the column selected to introduce missingness.
+e.g. \code{memorize.missing = list(data = "~/missing_analysis/missing.memory",
+column = "MISSING_INDIVIDUALS_MIX")} or 
+if the memory data frame (mem) is in the global environment and you want to
+use the populations randomized:
+\code{memorize.missing = list(data = mem,
+column = "MISSING_POP_MIX")}
 See function documentation for more details on columns naming scheme.
 Default: \code{memorize.missing = NULL}.}
 

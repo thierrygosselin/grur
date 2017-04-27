@@ -14,11 +14,18 @@
 #' @inheritParams stackr::genomic_converter
 #' @inheritParams grur_imputations
 
-#' @param memorize.missing (optional, string) To use missing pattern
+#' @param memorize.missing (optional, list) To use missing pattern
 #' taken from the function \code{\link[grur]{memorize_missing}}. The argument
-#' require 2 values: the path to the file or the name of the object in the
-#' global environment and the column selected to introduce missingness.
-#' e.g. \code{memorize.missing = c("~/missing_analysis/missing.memory", "MISSING_INDIVIDUALS_MIX")}.
+#' require 2 values in a named list.
+#' i) \code{data = } the path to the file or the name of the object in the
+#' global environment and 
+#' ii) \code{column = } the column selected to introduce missingness.
+#' e.g. \code{memorize.missing = list(data = "~/missing_analysis/missing.memory",
+#' column = "MISSING_INDIVIDUALS_MIX")} or 
+#' if the memory data frame (mem) is in the global environment and you want to
+#' use the populations randomized:
+#' \code{memorize.missing = list(data = mem,
+#' column = "MISSING_POP_MIX")}
 #' See function documentation for more details on columns naming scheme.
 #' Default: \code{memorize.missing = NULL}.
 
@@ -92,7 +99,7 @@
 
 generate_missing <- function(
   data,
-  output,
+  output = NULL,
   filename = NULL,
   memorize.missing = NULL,
   missing.data.type = "MCAR",
@@ -131,8 +138,8 @@ generate_missing <- function(
   
   # import one of 11 genomic file formats with stackr
   if (verbose) message("Importing data...")
-  if (verbose) message("    Keep polymorphic markers common in all populations")
-  tidy <- stackr::tidy_genomic_data(data = data, verbose = FALSE)
+  # if (verbose) message("    Keep polymorphic markers common in all populations")
+  tidy <- stackr::tidy_genomic_data(data = data, monomorphic.out = FALSE, common.markers = FALSE, verbose = FALSE)
   
   # For long tidy format, switch LOCUS to MARKERS column name, if found MARKERS not found
   if (tibble::has_name(tidy, "LOCUS") && !tibble::has_name(tidy, "MARKERS")) {
@@ -175,7 +182,7 @@ generate_missing <- function(
   
   # Missing from memory --------------------------------------------------------
   if (!is.null(memorize.missing)) {
-    if (verbose) message("Generating missing genotypes with missing pattern provided")
+    if (verbose) message("\nGenerating missing genotypes with missing pattern provided")
     tidy <- missing_from_memory(
       memorize.missing,
       tidy, number.populations,number.individuals, number.markers)
@@ -183,21 +190,21 @@ generate_missing <- function(
     
     # MCAR -----------------------------------------------------------------------
     if (missing.data.type == "MCAR") {
-      if (verbose) message("Generating missing genotypes completely at random (MCAR)")
+      if (verbose) message("\nGenerating missing genotypes completely at random (MCAR)")
       tidy <- missing_mcar(tidy, prop.missing.overall)
       
     }#End MCAR
     
     # MAR -----------------------------------------------------------------------
     if (missing.data.type == "MAR") {
-      if (verbose) message("Generating missing genotypes at random (MAR)")
+      if (verbose) message("\nGenerating missing genotypes at random (MAR)")
       tidy <- missing_mar(tidy, prop.missing.overall)
       
     }#End MAR
     
     # NMAR -----------------------------------------------------------------------
     if (missing.data.type == "NMAR") {
-      if (verbose) message("Generating missing genotypes not missing at random (NMAR)")
+      if (verbose) message("\nGenerating missing genotypes not missing at random (NMAR)")
       
       # simulate the number of reads per individual.
       # Note: this is one way to simulate a compound Dirichlet-multinomial.
@@ -232,7 +239,7 @@ generate_missing <- function(
   message("Generating output file(s): ", stringi::stri_join(output, collapse = ", "))
   res$output <- stackr::genomic_converter(
     data = res$tidy.data,
-    output = output,
+    output = output, monomorphic.out = FALSE, common.markers = FALSE,
     filename = filename,
     verbose = FALSE,
     imputation.method = imputation.method,
@@ -309,8 +316,8 @@ reads_per_markers <- function(total.reads, markers.cdm, markers.list) {
 missing_from_memory <- function(
   memorize.missing, tidy, number.populations, number.individuals, number.markers) {
   
-  missing.column <- memorize.missing[2]
-  mem.data <- memorize.missing[1]
+  mem.data <- memorize.missing$data
+  missing.column <- memorize.missing$column
   
   if (is.vector(mem.data)) {
     mem.data <- fst::read.fst(mem.data)
