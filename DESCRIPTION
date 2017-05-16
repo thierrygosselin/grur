@@ -5,7 +5,8 @@ Version: 0.0.2
 Date: 2017-04-23
 Encoding: UTF-8
 Authors@R: c(
-  person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre"))
+  person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
+  person("Eric", "Archer", email = "eric.archer@noaa.gov", role = c("aut"))
   )
 Maintainer: Thierry Gosselin <thierrygosselin@icloud.com>
 Description: grur: an R package tailored for RADseq data imputations.
