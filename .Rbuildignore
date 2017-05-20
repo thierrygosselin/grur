@@ -7,3 +7,4 @@
 ^README\.Rmd$
 ^README-.*\.png$
 ^README_grur_logo\.png$
+.DS_Store

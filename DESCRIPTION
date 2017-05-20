@@ -35,7 +35,9 @@ Imports:
     randomForestSRC,
     pegas,
     stackr,
-    fst (>= 0.7.2)
+    fst (>= 0.7.2),
+    strataG,
+    rmetasim
 Suggests:
     knitr,
     rmarkdown
