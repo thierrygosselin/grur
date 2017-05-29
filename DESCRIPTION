@@ -36,7 +36,9 @@ Imports:
     pegas,
     stackr,
     fst (>= 0.7.2),
-    purrrlyr
+    purrrlyr,
+    strataG,
+    rmetasim
 Suggests:
     knitr,
     rmarkdown
