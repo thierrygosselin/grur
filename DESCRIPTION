@@ -35,7 +35,8 @@ Imports:
     randomForestSRC,
     pegas,
     stackr,
-    fst (>= 0.7.2)
+    fst (>= 0.7.2),
+    purrrlyr
 Suggests:
     knitr,
     rmarkdown
