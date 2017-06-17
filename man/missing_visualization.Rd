@@ -56,7 +56,7 @@ from the strata file to generate the PCoA-IBM plot. More than 1 column you
 want to visualize, use a string of character
 e.g. \code{strata.select = c("POP_ID", "LANES", "SEQUENCER", "WATERSHED")} to test
 4 grouping columns inside the \code{strata} file.
-Default: \code{strata.select = "POP_ID"},}
+Default: \code{strata.select = "POP_ID"}}
 
 \item{distance.method}{(character) The distance measure to be used.
 This must be one of "euclidean", "maximum", "manhattan", "canberra",

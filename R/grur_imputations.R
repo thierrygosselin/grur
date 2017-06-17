@@ -222,9 +222,9 @@
 #' Refer to \code{\link[randomForestSRC]{impute.rfsrc}} for arguments documentation.
 #'
 #'
-#' Multiple Correspondence Analysis option available (upcomming):
-#' \emph{ncp}.
-#' Refer to \code{\link[missMDA]{imputeMCA}} for argument documentation.
+#  Multiple Correspondence Analysis option available (upcomming):
+# \emph{ncp}.
+# Refer to \code{\link[missMDA]{imputeMCA}} for argument documentation.
 
 #' @note
 #'
@@ -275,14 +275,14 @@
 #' @export
 #' @rdname grur_imputations
 #' @importFrom parallel detectCores
-#' @importFrom dplyr distinct group_by ungroup rename arrange tally filter filter_ select select_ one_of mutate mutate_all summarise left_join funs bind_rows
+#' @importFrom dplyr distinct group_by ungroup rename arrange tally filter select select_ one_of mutate mutate_all summarise left_join funs bind_rows
 #' @importFrom tidyr gather unite drop_na
 #' @importFrom purrr map flatten keep discard flatten_chr flatten_dbl flatten_lgl
 #' @importFrom purrrlyr invoke_rows
 #' @importFrom stringi stri_replace_na
 #' @importFrom tibble has_name as_data_frame
 #' @importFrom stats predict reformulate as.formula
-#' @importFrom lazyeval interp
+#' @importFrom rlang .data
 #' @importFrom ranger ranger
 # @importFrom missRanger pmm
 #' @importFrom xgboost xgb.DMatrix cb.early.stop xgb.train
@@ -1414,15 +1414,10 @@ impute_genotypes <- function(
   message("Marker: ", m)# for diagnostic
 
   # Handling complete and missing data ---------------------------------------
-  data.model <- dplyr::filter_(.data = data, lazyeval::interp(~ m != "missing", m = as.name(m))) %>%
+  data.model <- dplyr::filter(.data = data, rlang::.data[[m]] != "missing") %>%
     dplyr::mutate_all(.tbl = ., .funs = factor)
-  data.missing <- dplyr::filter_(.data = data, lazyeval::interp(~ m == "missing", m = as.name(m))) %>%
+  data.missing <- dplyr::filter(.data = data, rlang::.data[[m]] == "missing") %>%
     dplyr::select(-dplyr::one_of(m))
-
-  # data.model <- dplyr::filter_(.data = data, lazyeval::interp(~ !is.na(m), m = as.name(m)))
-  # data.missing <- dplyr::filter_(.data = data, lazyeval::interp(~is.na(m), m = as.name(m))) %>%
-
-  # test <- is.na(data.na)
 
   # If all missing screening # this should be done with marker.list before all this
   # if (nrow(data.missing) > 0) {
@@ -1608,11 +1603,11 @@ grur_boost_imputer <- function(
   # m <- "BINDED_M711_M712"
 
   message("Imputation of marker: ", m)
-  data.complete <- dplyr::filter_(.data = input.wide, lazyeval::interp(~ !is.na(m), m = as.name(m)))
+  data.complete <- dplyr::filter(.data = input.wide, !is.na(rlang::.data[[m]]))
   data.label <- dplyr::select(.data = data.complete, dplyr::one_of(m)) %>% purrr::flatten_dbl(.)
   data.complete <- dplyr::select(.data = data.complete, -dplyr::one_of(m)) %>% as.matrix(.)
   data.complete <- xgboost::xgb.DMatrix(data = data.complete, label = data.label, missing = NA)
-  data.missing <- dplyr::filter_(.data = input.wide, lazyeval::interp(~ is.na(m), m = as.name(m)))
+  data.missing <- dplyr::filter(.data = input.wide, is.na(rlang::.data[[m]]))
 
   if (nrow(data.missing) == 0) stop("code error: email author")
 
@@ -1675,7 +1670,7 @@ grur_boost_imputer <- function(
 
   # test
   # predicted <- stats::predict(boost.res, data.complete, ntreelimit = boost.res$best_ntreelimit, missing = 0)
-  # observed <- dplyr::filter_(.data = input.wide, lazyeval::interp(~m != 0, m = as.name(m))) %>%
+  # observed <- dplyr::filter(.data = input.wide, rlang::.data[[m]] != 0) %>%
   # dplyr::select(dplyr::one_of(m)) %>% purrr::flatten_dbl(.)
   # predicted
   # observed

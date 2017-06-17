@@ -229,11 +229,6 @@ Refer to \code{\link[xgboost]{xgboost}} for arguments documentation.
 Available arguments for Random forests method:
 \emph{nodesize, nsplit, nimpute}.
 Refer to \code{\link[randomForestSRC]{impute.rfsrc}} for arguments documentation.
-
-
-Multiple Correspondence Analysis option available (upcomming):
-\emph{ncp}.
-Refer to \code{\link[missMDA]{imputeMCA}} for argument documentation.
 }
 \note{
 \strong{Reference genome or linkage map available ?}

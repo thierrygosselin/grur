@@ -1,3 +1,9 @@
+# grur v.0.0.3 2017-06-17
+
+* `simulate_rad`: a new function developed by Eric Archer to simulate populations
+of RADseq data following **island** or **stepping** stone models.
+* **grur** works with `dplyr v.0.7.0`
+
 # grur v.0.0.2 2017-04-23
 
 * Work on `generate_missing` function.

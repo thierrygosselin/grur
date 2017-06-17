@@ -1,25 +1,35 @@
-#' @title Simulate SNPs
-#' @description Simulate populations of SNP data following island or stepping 
-#'   stone models
-#'   
-#' @param num.pops number of populations
-#' @param num.loci number of independent SNP loci
-#' @param div.time time since divergence of populations
-#' @param Ne effective populations size
-#' @param Nm number of migrants per generation
-#' @param theta value of theta (= Ne * migration rate)
+#' @title Simulate RADseq data
+#' @description Simulate populations of RADseq data following island or stepping 
+#' stone models
+#' @param num.pops number of populations.
+#' Default: \code{num.pops = 5}.
+#' @param num.loci number of independent RADseq loci.
+#' Default: \code{num.loci = 1000}.
+#' @param div.time time since divergence of populations.
+#' Default: \code{div.time = 25000}.
+#' @param ne effective populations size.
+#' Default: \code{ne = c(50, 500)}.
+#' @param nm number of migrants per generation.
+#' Default: \code{nm = c(0, 0.1, 0.5, 1, 5)}.
+#' @param theta value of theta (= ne * migration rate).
+#' Default: \code{theta = 0.2}.
 #' @param mig.type migration topology type: \code{"island"} or 
-#'   \code{"stepping.stone"}
-#' @param num.reps number of replicates for each scenario
-#' @param num.rms.gens number of \code{rmetasim} generations to establish 
-#'   linkage disequilibrium
-#' @param label label for the output folder. If \code{NULL}, the label will be 
-#'   "\code{sim.results.YYYYMMDD.HHMM}".
-#' @param fsc.exec name of fastsimcoal executable
-#' @param num.cores number of cores to use
-#'   
+#' \code{"stepping.stone"}.
+#' @param num.reps number of replicates for each scenario.
+#' Default: \code{num.reps = 10}.
+#' @param num.rms.gens number of \code{rmetasim} generations to establish
+#' linkage disequilibrium.
+#' Default: \code{num.rms.gens = 5}.
+#' @param label label for the output folder. With default \code{label = NULL},
+#' the label will be "\code{sim.results.YYYYMMDD.HHMM}".
+#' @param fsc.exec name of fastsimcoal executable.
+#' Default: \code{fsc.exec = "fsc252"}.
+#' @param parallel.core (optional) The number of core used for parallel
+#' execution.
+#' Default: \code{parallel::detectCores() - 1}.
+
 #' @note The following arguments can be specified as single values or vectors:
-#'  \code{num.pops, num.loci, div.time, Ne, Nm, theta, mig.type}. One simulation 
+#'  \code{num.pops, num.loci, div.time, ne, nm, theta, mig.type}. One simulation 
 #'  scenario will be generated for each combination of unique values of these 
 #'  arguments.  
 #'  
@@ -46,42 +56,42 @@
 #' @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
 #' @export
 #' 
-simulateSNPs <- function(
+simulate_rad <- function(
   num.pops = 5,
   num.loci = 1000,
   div.time = 25000,
-  Ne = c(50, 500),
-  Nm = c(0, 0.1, 0.5, 1, 5),
+  ne = c(50, 500),
+  nm = c(0, 0.1, 0.5, 1, 5),
   theta = 0.2,
   mig.type = c("island", "stepping.stone"),
   num.reps = 10,
   num.rms.gens = 5,
   label = NULL,
   fsc.exec = "fsc252",
-  num.cores = NULL
+  parallel.core = NULL
 ) {
-  if(is.null(label)) {
+  if (is.null(label)) {
     label <- paste0("sim.results.", format(Sys.time(), "%Y%m%d.%H%M"))
   }
-  if(!dir.exists(label)) dir.create(label)
+  if (!dir.exists(label)) dir.create(label)
   
   num.pops <- sort(unique(num.pops))
   num.loci <- sort(unique(num.loci))
   div.time <- sort(unique(div.time))
-  Ne <- sort(unique(Ne))
-  Nm <- sort(unique(Nm))
+  ne <- sort(unique(ne))
+  nm <- sort(unique(nm))
   theta <- sort(unique(theta))
   mig.type <- sort(unique(mig.type))
   
   # create scenario data.frame
   sc.df <- expand.grid(
-    num.pops = num.pops, num.loci = num.loci, div.time = div.time, Ne = Ne,
-    Ne = Ne, Nm = Nm, theta = theta, mig.type = mig.type,
+    num.pops = num.pops, num.loci = num.loci, div.time = div.time, ne = ne,
+    ne = ne, nm = nm, theta = theta, mig.type = mig.type,
     stringsAsFactors = FALSE
   )
   sc.df <- cbind(scenario = 1:nrow(sc.df), sc.df)
-  sc.df$mut.rate <- sc.df$theta / (4 * sc.df$Ne)
-  sc.df$mig.rate <- sc.df$Nm / sc.df$Ne
+  sc.df$mut.rate <- sc.df$theta / (4 * sc.df$ne)
+  sc.df$mig.rate <- sc.df$nm / sc.df$ne
   sc.df$mig.mat <- lapply(1:nrow(sc.df), function(i) {
     num.pops <- sc.df$num.pops[i]
     mig.rate <- sc.df$mig.rate[i]
@@ -96,7 +106,7 @@ simulateSNPs <- function(
       stepping.stone = {
         mat <- matrix(0, nrow = num.pops, ncol = num.pops)
         m <- mig.rate / 2
-        for(k in 1:(num.pops - 1)) {
+        for (k in 1:(num.pops - 1)) {
           mat[k, k + 1] <- mat[k + 1, k] <- m
         }
         mat[1, num.pops] <- mat[num.pops, 1] <- m
@@ -111,7 +121,7 @@ simulateSNPs <- function(
   # run scenarios
   sapply(1:nrow(sc.df), function(i) {
     fname <- file.path(label, paste("gtypes", i, "rdata", sep = "."))
-    if(file.exists(fname)) next
+    if (file.exists(fname)) next
     
     sc <- as.list(sc.df[i, ])
     sc$mig.mat <- sc$mig.mat[[1]]
@@ -119,25 +129,25 @@ simulateSNPs <- function(
     # run fastsimcoal
     fsc.list <- with(sc, {
       n <- num.pops
-      pi <- fscPopInfo(pop.size = rep(Ne, n), sample.size = rep(Ne, n))
-      lp <- fscLocusParams(locus.type = "snp", num.loci = num.loci, mut.rate = mut.rate)
-      he <- fscHistEv(num.gen = rep(div.time, n - 1), source.deme = 1:(n - 1))
+      pi <- strataG::fscPopInfo(pop.size = rep(ne, n), sample.size = rep(ne, n))
+      lp <- strataG::fscLocusParams(locus.type = "snp", num.loci = num.loci, mut.rate = mut.rate)
+      he <- strataG::fscHistEv(num.gen = rep(div.time, n - 1), source.deme = 1:(n - 1))
       lapply(1:num.reps, function(rep) {
         lbl <- paste0("scenario_", i, ".replicate_", rep)
-        fastsimcoal(
+        strataG::fastsimcoal(
           pi, lp, mig.rates = mig.mat, hist.ev = he, label = lbl, 
-          quiet = FALSE, exec = fsc.exec, num.cores = num.cores
+          quiet = FALSE, exec = fsc.exec, num.cores = parallel.core
         )
       })
     })
     
     # run rmetasim for 'num.gens' generations using fastsimcoal runs as initialization
     rms.list <- lapply(1:length(fsc.list), function(i) {
-      af <- alleleFreqs(fsc.list[[i]], by.strata = T)
+      af <- strataG::alleleFreqs(fsc.list[[i]], by.strata = T)
       rl <- loadLandscape(sc, af, num.rms.gens)
-      for(g in 1:num.rms.gens) {
-        rl <- landscape.simulate(rl, 1)
-        rl <- killExcess(rl, sc$Ne)
+      for (g in 1:num.rms.gens) {
+        rl <- rmetasim::landscape.simulate(rl, 1)
+        rl <- killExcess(rl, sc$ne)
       }
       landscape2gtypes(rl)
     })
