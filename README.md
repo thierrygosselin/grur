@@ -51,30 +51,26 @@ Features
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Patterns of missingness</strong></td>
-<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping</td>
+<td align="left"><strong>Simulate RADseq data</strong></td>
+<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping stone models</td>
 </tr>
 <tr class="even">
-<td align="left">stone models</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
 <td align="left"><strong>Patterns of missingness</strong></td>
 <td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.<br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><strong>Imputations</strong></td>
 <td align="left"><code>grur_imputations</code>: <strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modelling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><strong>Input/Output</strong></td>
 <td align="left">The imputations offered in <strong>grur</strong> are seamlesly integrated in <strong>stackr</strong> and <strong>assigner</strong>. Imputations are also integrated with usefull filters, blacklist and whitelist inside those 2 packages. Genetic formats recognized: <a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>, <a href="https://www.zsl.org/science/software/colony">COLONY</a>, <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a>, <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a>, <a href="http://pritchardlab.stanford.edu/structure.html">structure</a>, <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a>, <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a>, dataframes of genotypes in wide or long/tidy format</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
 <td align="left">Visualization: publication-ready figures of important metrics and statistics.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><strong>Parallel</strong></td>
 <td align="left">Codes designed and optimized for fast computations with progress bars. Works with all OS: Linux, Mac and yes PC!</td>
 </tr>
