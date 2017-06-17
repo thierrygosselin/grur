@@ -141,9 +141,10 @@ missing_visualization <- function(
   common.markers = FALSE,
   filename = NULL
 ) {
-
+  opt.change <- getOption("width")
+  options(width = 70)
   cat("#######################################################################\n")
-  cat("################### grur: missing_visualization #####################\n")
+  cat("#################### grur: missing_visualization ######################\n")
   cat("#######################################################################\n")
   timing <- proc.time()
   # manage missing arguments -----------------------------------------------------
@@ -153,7 +154,7 @@ missing_visualization <- function(
 
   # import data ----------------------------------------------------------------
   if (is.vector(data)) {
-    message("Using input file in your directory")
+    message("Importing input file in your directory...")
   } else {
     message("Using input file from your global environment")
   }
@@ -571,7 +572,7 @@ missing_visualization <- function(
 
   # Results --------------------------------------------------------------------
   timing <- proc.time() - timing
-  message("Computation time: ", round(timing[[3]]), " sec")
+message("\nComputation time: ", round(timing[[3]]), " sec")
   cat("############################## completed ##############################\n")
   res$tidy.data <- input
   res$tidy.data.binary <- input.prep
@@ -585,5 +586,6 @@ missing_visualization <- function(
   res$missing.genotypes.pop.plot <- missing.genotypes.pop.plot
   res$missing.genotypes.markers <- missing.genotypes.markers
   res$missing.genotypes.markers.plot <- missing.genotypes.markers.plot
+  options(width = opt.change)
   return(res)
 }
