@@ -68,7 +68,7 @@ To try out the dev version of **grur**, copy/paste the code below:
 ```r
 if (!require("devtools")) install.packages("devtools") # to install
 devtools::install_github("thierrygosselin/grur")
-library(grur) # to load
+library(grur)
 ```
 
 #### Troubleshooting
