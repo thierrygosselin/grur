@@ -20,7 +20,7 @@ environment:
 build_script:
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_github zhengxwen/SNPRelate
-  - travis-tool.sh github_package thierrygosselin/stackr
+  - travis-tool.sh install_github thierrygosselin/stackr
   - travis-tool.sh install_deps
   - travis-tool.sh install_r R.oo R.utils
 
