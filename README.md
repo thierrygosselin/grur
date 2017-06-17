@@ -52,6 +52,14 @@ Features
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Patterns of missingness</strong></td>
+<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping</td>
+</tr>
+<tr class="even">
+<td align="left">stone models</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Patterns of missingness</strong></td>
 <td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.<br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution</td>
 </tr>
 <tr class="even">
