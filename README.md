@@ -94,7 +94,7 @@ New features
 
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
-\*\*v.0.0.3 2017-06-17
+**v.0.0.3 2017-06-17**
 
 -   `simulate_rad`: a new function developed by Eric Archer to simulate populations of RADseq data following **island** or **stepping** stone models.
 -   **grur** works with `dplyr v.0.7.0`
