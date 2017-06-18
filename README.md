@@ -52,15 +52,15 @@ Features
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Simulate RADseq data</strong></td>
-<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping stone models</td>
+<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with <a href="http://cmpg.unibe.ch/software/fastsimcoal2/">fastsimcoal2</a> and then use inside <a href="https://github.com/stranda/rmetasim">rmetasim</a> simulation engine. <em>Vignette coming soon</em>.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Patterns of missingness</strong></td>
-<td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures.<br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution</td>
+<td align="left"><code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures. Vignette: <a href="https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0">html</a> and <a href="https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0">Rmd</a><br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. <em>Vignette coming soon</em></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Imputations</strong></td>
-<td align="left"><code>grur_imputations</code>: <strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modelling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts.</td>
+<td align="left"><code>grur_imputations</code>: <strong>Map-independent</strong> imputations of missing genotypes with several algorithms:<br> * <strong>Random Forests</strong> (on-the-fly-imputations or using predictive modelling),<br>* <strong>Extreme Gradient Tree Boosting</strong><br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm's model can account for <em>population</em> groupings or not (i.e. <em>overall samples</em>).<br><br><strong>Haplotype: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. <em>Vignette coming soon</em></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Input/Output</strong></td>

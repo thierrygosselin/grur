@@ -147,18 +147,15 @@ missing_visualization <- function(
   cat("#################### grur: missing_visualization ######################\n")
   cat("#######################################################################\n")
   timing <- proc.time()
+  res <- list() #empty list to store results
   # manage missing arguments -----------------------------------------------------
   if (missing(data)) stop("Input file missing")
   if (!is.null(pop.levels) & is.null(pop.labels)) pop.labels <- pop.levels
   if (!is.null(pop.labels) & is.null(pop.levels)) stop("pop.levels is required if you use pop.labels")
 
   # import data ----------------------------------------------------------------
-  if (is.vector(data)) {
-    message("Importing input file in your directory...")
-  } else {
-    message("Using input file from your global environment")
-  }
-  input <- stackr::tidy_genomic_data(
+  message("Importing genotypes...")
+  res$tidy.data <- stackr::tidy_genomic_data(
     data = data,
     vcf.metadata = vcf.metadata,
     blacklist.id = blacklist.id,
@@ -170,20 +167,20 @@ missing_visualization <- function(
     common.markers = common.markers,
     strata = strata,
     pop.select = pop.select,
+    pop.levels = pop.levels,
+    pop.labels = pop.labels,
     filename = filename,
     verbose = FALSE
   )
 
 
-  if (!"MARKERS" %in% colnames(input) & "LOCUS" %in% colnames(input)) {
-    input <- dplyr::rename(.data = input, MARKERS = LOCUS)
-  }
+  # if (!"MARKERS" %in% colnames(res$tidy.data) & "LOCUS" %in% colnames(res$tidy.data)) {
+  #   res$tidy.data <- dplyr::rename(.data = res$tidy.data, MARKERS = LOCUS)
+  # }
 
   # strata.df --------------------------------------------------------
-  message("Including the strata file")
-
-  strata.df <- input %>%
-    dplyr::distinct(INDIVIDUALS, POP_ID) %>%
+  # message("Including the strata file")
+  strata.df <- dplyr::distinct(.data = res$tidy.data, INDIVIDUALS, POP_ID) %>%
     dplyr::arrange(POP_ID, INDIVIDUALS)
 
   if (!is.null(strata)) {
@@ -215,18 +212,13 @@ missing_visualization <- function(
       POP_ID = stringi::stri_replace_all_fixed(POP_ID, pattern = " ", replacement = "_", vectorize_all = FALSE)
     )
 
-  # join with dataset
-  input <- suppressWarnings(dplyr::left_join(x = input, y = strata.df, by = c("INDIVIDUALS", "POP_ID")))
-
+  # res$tidy.data <- suppressWarnings(dplyr::left_join(x = res$tidy.data, y = strata.df, by = c("INDIVIDUALS", "POP_ID")))
   # population names if pop.levels/pop.labels were request
-  input <- stackr::change_pop_names(data = input, pop.levels = pop.labels, pop.labels = pop.labels)
-
-  # create an empty list to store results
-  res <- list()
+  # res$tidy.data <- stackr::change_pop_names(data = res$tidy.data, pop.levels = pop.labels, pop.labels = pop.labels)
 
   # preping data
-  input.prep <- dplyr::mutate(
-    .data = input,
+  res$tidy.data.binary <- dplyr::mutate(
+    .data = res$tidy.data,
     GT = dplyr::if_else(GT == "000000", "0", "1"),
     GT = as.numeric(GT)
   )
@@ -235,14 +227,14 @@ missing_visualization <- function(
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("Principal Coordinate Analysis (PCoA)...")
 
-  input.pcoa <- input.prep %>%
+  input.pcoa <- res$tidy.data.binary %>%
     dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT) %>%
     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
     tidyr::spread(data = ., key = MARKERS, value = GT)
 
   # we need rownames for this
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
-  input.pcoa <- input.pcoa %>% dplyr::ungroup(.) %>% dplyr::select(-POP_ID, -INDIVIDUALS)
+  input.pcoa <-  dplyr::ungroup(input.pcoa) %>% dplyr::select(-POP_ID, -INDIVIDUALS)
 
   # euclidean distances between the rows
   # distance.method <- "euclidean"
@@ -281,19 +273,19 @@ missing_visualization <- function(
 
   # prep the data for figure:
   # for MASS::isoMDS and stats::cmdscale
-  # pcoa.df <- tibble::data_frame(INDIVIDUALS = rownames(ibm$points), V1 = ibm$points[,1], V2 = ibm$points[,2]) %>%
+  # res$vectors <- tibble::data_frame(INDIVIDUALS = rownames(ibm$points), V1 = ibm$points[,1], V2 = ibm$points[,2]) %>%
   #   dplyr::inner_join(strata.df, by = "INDIVIDUALS")
-  # pcoa.df <- tibble::data_frame(INDIVIDUALS = rownames(ibm$vectors), V1 = ibm$vectors[,1], V2 = ibm$vectors[,2]) %>%
+  # res$vectors <- tibble::data_frame(INDIVIDUALS = rownames(ibm$vectors), V1 = ibm$vectors[,1], V2 = ibm$vectors[,2]) %>%
   # dplyr::inner_join(strata.df, by = "INDIVIDUALS")
 
   # with vegan and ape
-  pcoa.df <- dplyr::inner_join(
+  res$vectors <- dplyr::inner_join(
     strata.df,
     tibble::rownames_to_column(df = data.frame(ibm$vectors), var = "INDIVIDUALS")
     , by = "INDIVIDUALS"
   )
   # adjust pop_id
-  pcoa.df <- stackr::change_pop_names(data = pcoa.df, pop.levels = pop.labels, pop.labels = pop.labels)
+  res$vectors <- stackr::change_pop_names(data = res$vectors, pop.levels = pop.labels, pop.labels = pop.labels)
 
   message("Generating Identity by missingness plot")
   # strata.select <- c("POP_ID", "WATERSHED", "BARRIER", "LANES")
@@ -304,7 +296,7 @@ missing_visualization <- function(
     label.x.axis <- stringi::stri_join("PCo1", " [", variance.component[1,2], "]")
     label.y.axis <- stringi::stri_join("PCo2", " [", variance.component[2,2], "]")
 
-    ibm.plot.pco1.pco2 <- ggplot2::ggplot(pcoa.df, ggplot2::aes(x = Axis.1, y = Axis.2), environment = environment()) +
+    ibm.plot.pco1.pco2 <- ggplot2::ggplot(res$vectors, ggplot2::aes(x = Axis.1, y = Axis.2), environment = environment()) +
       ggplot2::geom_point(ggplot2::aes_string(colour = i)) +
       ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
       ggplot2::labs(x = label.x.axis) +
@@ -322,7 +314,7 @@ missing_visualization <- function(
     label.x.axis <- stringi::stri_join("PCo1", " [", variance.component[1,2], "]")
     label.y.axis <- stringi::stri_join("PCo3", " [", variance.component[3,2], "]")
 
-    ibm.plot.pco1.pco3 <- ggplot2::ggplot(pcoa.df, ggplot2::aes(x = Axis.1, y = Axis.3), environment = environment()) +
+    ibm.plot.pco1.pco3 <- ggplot2::ggplot(res$vectors, ggplot2::aes(x = Axis.1, y = Axis.3), environment = environment()) +
       ggplot2::geom_point(ggplot2::aes_string(colour = i)) +
       ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
       ggplot2::labs(x = label.x.axis) +
@@ -340,7 +332,7 @@ missing_visualization <- function(
     label.x.axis <- stringi::stri_join("PCo2", " [", variance.component[2,2], "]")
     label.y.axis <- stringi::stri_join("PCo3", " [", variance.component[3,2], "]")
 
-    ibm.plot.pco2.pco3 <- ggplot2::ggplot(pcoa.df, ggplot2::aes(x = Axis.2, y = Axis.3), environment = environment()) +
+    ibm.plot.pco2.pco3 <- ggplot2::ggplot(res$vectors, ggplot2::aes(x = Axis.2, y = Axis.3), environment = environment()) +
       ggplot2::geom_point(ggplot2::aes_string(colour = i)) +
       ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
       ggplot2::labs(x = label.x.axis) +
@@ -358,7 +350,7 @@ missing_visualization <- function(
     label.x.axis <- stringi::stri_join("PCo3", " [", variance.component[3,2], "]")
     label.y.axis <- stringi::stri_join("PCo4", " [", variance.component[4,2], "]")
 
-    ibm.plot.pco3.pco4 <- ggplot2::ggplot(pcoa.df, ggplot2::aes(x = Axis.3, y = Axis.4), environment = environment()) +
+    ibm.plot.pco3.pco4 <- ggplot2::ggplot(res$vectors, ggplot2::aes(x = Axis.3, y = Axis.4), environment = environment()) +
       ggplot2::geom_point(ggplot2::aes_string(colour = i)) +
       ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
       ggplot2::labs(x = label.x.axis) +
@@ -374,13 +366,15 @@ missing_visualization <- function(
   }
 
   # Heatmap --------------------------------------------------------------------
-  heatmap.data <- input.prep %>%
+  res$heatmap <- res$tidy.data.binary %>%
     dplyr::mutate(
       GT = as.character(GT),
-      Missingness = stringi::stri_replace_all_regex(GT, pattern = c("^0$", "^1$"), replacement = c("missing", "genotyped"), vectorize_all = FALSE)
-    )
-
-  heatmap <- ggplot2::ggplot(heatmap.data,(ggplot2::aes(y = MARKERS, x = as.character(INDIVIDUALS)))) +
+      Missingness = stringi::stri_replace_all_regex(
+        GT,
+        pattern = c("^0$", "^1$"),
+        replacement = c("missing", "genotyped"),
+        vectorize_all = FALSE)) %>% 
+    ggplot2::ggplot(data = .,(ggplot2::aes(y = MARKERS, x = as.character(INDIVIDUALS)))) +
     ggplot2::geom_tile(ggplot2::aes(fill = Missingness)) +
     ggplot2::scale_fill_manual(values = c("grey", "black")) +
     ggplot2::labs(y = "Markers") +
@@ -397,14 +391,14 @@ missing_visualization <- function(
       axis.ticks.y = ggplot2::element_blank()
     ) +
     ggplot2::facet_grid(~POP_ID, scales = "free", space = "free_x")
-  # heatmap
-  heatmap.data <- NULL # no longer needed
+  # res$heatmap
+  
   # Missing summary ------------------------------------------------------------
   message("Generating missing information summary tables and plot")
 
   # Individuals-----------------------------------------------------------------
   message("Missingness per individuals")
-  missing.genotypes.ind <- input.prep %>%
+  res$missing.genotypes.ind <- res$tidy.data.binary %>%
     dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT) %>%
     dplyr::group_by(INDIVIDUALS, POP_ID) %>%
     dplyr::summarise(
@@ -418,7 +412,7 @@ missing_visualization <- function(
 
 
   # Figure Individuals
-  missing.genotypes.ind.plot <- ggplot2::ggplot(data = missing.genotypes.ind, ggplot2::aes(x = INDIVIDUALS, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
+  res$missing.genotypes.ind.plot <- ggplot2::ggplot(data = res$missing.genotypes.ind, ggplot2::aes(x = INDIVIDUALS, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
     ggplot2::geom_jitter() +
     ggplot2::labs(y = "Missing genotypes (proportion)") +
     ggplot2::labs(x = "Individuals") +
@@ -432,13 +426,13 @@ missing_visualization <- function(
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.y = ggplot2::element_text(size = 8, family = "Helvetica")
     )
-  # missing.genotypes.ind.plot
+  # res$missing.genotypes.ind.plot
 
   # Blacklist individuals-------------------------------------------------------
   # ind.missing.geno.threshold <- c(10, 20,30,50,70)
   for (i in ind.missing.geno.threshold) {
     # i <- 30
-    blacklist.id.missing.geno <- missing.genotypes.ind %>%
+    blacklist.id.missing.geno <- res$missing.genotypes.ind %>%
       dplyr::filter(PERC >= i) %>%
       dplyr::ungroup(.) %>%
       dplyr::select(INDIVIDUALS)
@@ -450,18 +444,18 @@ missing_visualization <- function(
   }
 
   # FH -------------------------------------------------------------------------
-  fh <- stackr::ibdg_fh(data = input, verbose = FALSE)
+  fh <- stackr::ibdg_fh(data = res$tidy.data, verbose = FALSE)
 
-  missing.genotypes.ind.fh <- suppressWarnings(
+  res$missing.genotypes.ind.fh <- suppressWarnings(
     dplyr::full_join(
-      missing.genotypes.ind,
+      res$missing.genotypes.ind,
       fh$fh
       # dplyr::select(.data = fh, INDIVIDUALS, FH)
       , by = c("INDIVIDUALS", "POP_ID")
     )
   )
 
-  missing.genotypes.fh.plot <- ggplot2::ggplot(missing.genotypes.ind.fh, ggplot2::aes(y = FH, x = MISSING_GENOTYPE_PROP)) +
+  res$missing.genotypes.fh.plot <- ggplot2::ggplot(res$missing.genotypes.ind.fh, ggplot2::aes(y = FH, x = MISSING_GENOTYPE_PROP)) +
     ggplot2::geom_point() +
     ggplot2::stat_smooth(method = stats::lm, level = 0.99) +
     # labs(title = "Correlation between missingness and inbreeding coefficient") +
@@ -474,11 +468,11 @@ missing_visualization <- function(
       legend.text = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold"),
       strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
     )
-  # missing.genotypes.fh.plot
+  # res$missing.genotypes.fh.plot
 
   # Populations-----------------------------------------------------------------
   message("Missingness per populations")
-  missing.genotypes.pop <- missing.genotypes.ind %>%
+  res$missing.genotypes.pop <- res$missing.genotypes.ind %>%
     dplyr::select(INDIVIDUALS, POP_ID, MISSING_GENOTYPE_PROP, PERC) %>%
     dplyr::group_by(POP_ID) %>%
     dplyr::summarise(
@@ -487,7 +481,7 @@ missing_visualization <- function(
       )
 
   # Figure Populations
-  missing.genotypes.pop.plot <- ggplot2::ggplot(data = missing.genotypes.ind, ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP)) +
+  res$missing.genotypes.pop.plot <- ggplot2::ggplot(data = res$missing.genotypes.ind, ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP)) +
     ggplot2::geom_boxplot() +
     ggplot2::labs(y = "Missing genotypes (proportion)") +
     ggplot2::labs(x = "Populations") +
@@ -500,12 +494,12 @@ missing_visualization <- function(
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.y = ggplot2::element_text(size = 8, family = "Helvetica")
     )
-  # missing.genotypes.pop.plot
+  # res$missing.genotypes.pop.plot
 
   # Markers---------------------------------------------------------------------
   message("Missingness per markers")
 
-  missing.genotypes.markers <- input.prep %>%
+  res$missing.genotypes.markers <- res$tidy.data.binary %>%
     dplyr::select(MARKERS, INDIVIDUALS, GT) %>%
     dplyr::group_by(MARKERS) %>%
     dplyr::summarise(
@@ -520,7 +514,7 @@ missing_visualization <- function(
   markers.missing.geno.threshold <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7)
   for (i in markers.missing.geno.threshold) {
     # i <- 30
-    whitelist.missing.geno <- dplyr::ungroup(missing.genotypes.markers) %>%
+    whitelist.missing.geno <- dplyr::ungroup(res$missing.genotypes.markers) %>%
       dplyr::filter(MISSING_GENOTYPE_PROP <= i) %>%
       dplyr::distinct(MARKERS)
 
@@ -533,7 +527,7 @@ missing_visualization <- function(
 
 
   # Figure markers
-  missing.genotypes.markers.plot <- ggplot2::ggplot(data = missing.genotypes.markers, ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
+  res$missing.genotypes.markers.plot <- ggplot2::ggplot(data = res$missing.genotypes.markers, ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
     ggplot2::geom_histogram() +
     ggplot2::labs(x = "Missing genotypes (proportion)") +
     ggplot2::labs(y = "Markers (number)") +
@@ -544,12 +538,12 @@ missing_visualization <- function(
       axis.text.x = ggplot2::element_text(size = 8, family = "Helvetica", angle = 90, hjust = 1, vjust = 0.5),
       strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
     )
-  # missing.genotypes.markers.plot
+  # res$missing.genotypes.markers.plot
 
   # # Missingness per markers and per populations
   # message("Missingness per markers and populations")
   #
-  # missing.genotypes.markers.pop <- dplyr::ungroup(input.prep) %>%
+  # missing.genotypes.markers.pop <- dplyr::ungroup(res$tidy.data.binary) %>%
   #   dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT) %>%
   #   dplyr::group_by(MARKERS, POP_ID, GT) %>%
   #   dplyr::tally(.) %>%
@@ -566,7 +560,7 @@ missing_visualization <- function(
 
   # # Fis
   # message("Missingness and Fis computation...")
-  # fis.missing <- suppressMessages(fis_summary(data = input))
+  # fis.missing <- suppressMessages(fis_summary(data = res$tidy.data))
   # Using FH instead... it's a better metric for this
 
 
@@ -574,18 +568,6 @@ missing_visualization <- function(
   timing <- proc.time() - timing
 message("\nComputation time: ", round(timing[[3]]), " sec")
   cat("############################## completed ##############################\n")
-  res$tidy.data <- input
-  res$tidy.data.binary <- input.prep
-  res$vectors <- pcoa.df
-  res$heatmap <- heatmap
-  res$missing.genotypes.ind <- missing.genotypes.ind
-  res$missing.genotypes.ind.plot <- missing.genotypes.ind.plot
-  res$missing.genotypes.ind.fh <- missing.genotypes.ind.fh
-  res$missing.genotypes.fh.plot <- missing.genotypes.fh.plot
-  res$missing.genotypes.pop <- missing.genotypes.pop
-  res$missing.genotypes.pop.plot <- missing.genotypes.pop.plot
-  res$missing.genotypes.markers <- missing.genotypes.markers
-  res$missing.genotypes.markers.plot <- missing.genotypes.markers.plot
   options(width = opt.change)
   return(res)
 }
