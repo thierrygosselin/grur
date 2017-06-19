@@ -5,7 +5,7 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.3-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--06--17-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.3-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--06--19-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ Change log, version, new features and bug history lives in the [NEWS.md file](ht
 #### Roadmap of future developments
 
 -   Integrate more imputation method.
--   Workflow tutorial and vignettes to further explore some problems: *in progress*
+-   Workflow tutorial and vignettes to further explore some problems.
 -   Use Shiny and ggvis (when subplots and/or facets becomes available for ggvis).
 -   Until publication **grur** will change rapidly, stay updated with releases and contribute with bug reports.
 -   Suggestions ?
@@ -128,10 +128,4 @@ This package has been developed in the open, and it wouldn’t be nearly as good
 -   If you don’t understand something, please let me know and raise an [issue](https://github.com/thierrygosselin/grur/issues)
 -   Your feedback on what is confusing or hard to understand is valuable.
 -   If you spot a typo, feel free to edit the underlying page and send a pull request.
-
-New to pull request on github ? The process is very easy:
-
--   Click the edit this page on the sidebar.
--   Make the changes using github’s in-page editor and save.
--   Submit a pull request and include a brief description of your changes.
--   “Fixing typos” is perfectly adequate.
+-   New to pull request on github ? [The process is very easy](http://r-pkgs.had.co.nz/git.html#git-pullreq).
