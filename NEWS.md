@@ -1,3 +1,9 @@
+# grur v.0.0.4 2017-08-15
+
+* bug fix: removed the progress bar when using parallel computing.
+This is temporary, while waiting for a fix with `pbmcapply` package.
+
+
 # grur v.0.0.3 2017-06-17
 
 * `simulate_rad`: a new function developed by Eric Archer to simulate populations

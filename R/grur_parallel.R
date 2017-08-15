@@ -130,9 +130,9 @@ grur_mclapply_win <- function(
   Sys.info()[['sysname']],
   Windows = {grur_mclapply_win},
   # Linux   = {mclapply_progress_bar},
-  # Linux   = {parallel::mclapply},
-  Linux   = {pbmcapply::pbmclapply},
+  Linux   = {parallel::mclapply},
+  # Linux   = {pbmcapply::pbmclapply},
   # Darwin  = {mclapply_progress_bar}
-  # Darwin  = {parallel::mclapply}
-  Darwin  = {pbmcapply::pbmclapply}
+  Darwin  = {parallel::mclapply}
+  # Darwin  = {pbmcapply::pbmclapply}
 )

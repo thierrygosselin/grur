@@ -105,6 +105,12 @@ citation("grur")
 ## New features
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
+** v.0.0.4 2017-08-15**
+
+* bug fix: removed the progress bar when using parallel computing.
+This is temporary, while waiting for a fix with `pbmcapply` package.
+
+
 **v.0.0.3 2017-06-17**
 
 * `simulate_rad`: a new function developed by Eric Archer to simulate populations

@@ -180,8 +180,8 @@ missing_visualization <- function(
 
   # strata.df --------------------------------------------------------
   # message("Including the strata file")
-  strata.df <- dplyr::distinct(.data = res$tidy.data, INDIVIDUALS, POP_ID) %>%
-    dplyr::arrange(POP_ID, INDIVIDUALS)
+  # strata.df <- dplyr::distinct(.data = res$tidy.data, INDIVIDUALS, POP_ID) %>%
+    # dplyr::arrange(POP_ID, INDIVIDUALS)
 
   if (!is.null(strata)) {
     if (is.vector(strata)) {
@@ -216,21 +216,21 @@ missing_visualization <- function(
   # population names if pop.levels/pop.labels were request
   # res$tidy.data <- stackr::change_pop_names(data = res$tidy.data, pop.levels = pop.labels, pop.labels = pop.labels)
 
-  # preping data
-  res$tidy.data.binary <- dplyr::mutate(
+  # New column with GT_MISSING_BINARY O for missing 1 for not missing...
+  res$tidy.data <- dplyr::mutate(
     .data = res$tidy.data,
-    GT = dplyr::if_else(GT == "000000", "0", "1"),
-    GT = as.numeric(GT)
+    GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
+    GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
   )
 
   # Identity-by-missingness (IBM) analysis -------------------------------------
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("Principal Coordinate Analysis (PCoA)...")
 
-  input.pcoa <- res$tidy.data.binary %>%
-    dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT) %>%
+  input.pcoa <- res$tidy.data %>%
+    dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-    tidyr::spread(data = ., key = MARKERS, value = GT)
+    tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY)
 
   # we need rownames for this
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
@@ -366,11 +366,11 @@ missing_visualization <- function(
   }
 
   # Heatmap --------------------------------------------------------------------
-  res$heatmap <- res$tidy.data.binary %>%
+  res$heatmap <- res$tidy.data %>%
     dplyr::mutate(
-      GT = as.character(GT),
+      GT_MISSING_BINARY = as.character(GT_MISSING_BINARY),
       Missingness = stringi::stri_replace_all_regex(
-        GT,
+        GT_MISSING_BINARY,
         pattern = c("^0$", "^1$"),
         replacement = c("missing", "genotyped"),
         vectorize_all = FALSE)) %>% 
@@ -398,11 +398,11 @@ missing_visualization <- function(
 
   # Individuals-----------------------------------------------------------------
   message("Missingness per individuals")
-  res$missing.genotypes.ind <- res$tidy.data.binary %>%
-    dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT) %>%
+  res$missing.genotypes.ind <- res$tidy.data %>%
+    dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
     dplyr::group_by(INDIVIDUALS, POP_ID) %>%
     dplyr::summarise(
-      MISSING_GENOTYPE = length(GT[GT == 0]),
+      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
       MARKER_NUMBER = length(MARKERS),
       MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
       PERC = round((MISSING_GENOTYPE_PROP)*100, 2)
@@ -499,11 +499,11 @@ missing_visualization <- function(
   # Markers---------------------------------------------------------------------
   message("Missingness per markers")
 
-  res$missing.genotypes.markers <- res$tidy.data.binary %>%
-    dplyr::select(MARKERS, INDIVIDUALS, GT) %>%
+  res$missing.genotypes.markers <- res$tidy.data %>%
+    dplyr::select(MARKERS, INDIVIDUALS, GT_MISSING_BINARY) %>%
     dplyr::group_by(MARKERS) %>%
     dplyr::summarise(
-      MISSING_GENOTYPE = length(GT[GT == 0]),
+      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
       INDIVIDUALS_NUMBER = length(INDIVIDUALS),
       MISSING_GENOTYPE_PROP = MISSING_GENOTYPE / INDIVIDUALS_NUMBER,
       PERC = round(MISSING_GENOTYPE_PROP * 100, 2)
@@ -543,19 +543,19 @@ missing_visualization <- function(
   # # Missingness per markers and per populations
   # message("Missingness per markers and populations")
   #
-  # missing.genotypes.markers.pop <- dplyr::ungroup(res$tidy.data.binary) %>%
-  #   dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT) %>%
-  #   dplyr::group_by(MARKERS, POP_ID, GT) %>%
+  # missing.genotypes.markers.pop <- dplyr::ungroup(res$tidy.data) %>%
+  #   dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
+  #   dplyr::group_by(MARKERS, POP_ID, GT_MISSING_BINARY) %>%
   #   dplyr::tally(.) %>%
   #   dplyr::ungroup(.) %>%
   #   tidyr::complete(
   #     data = .,
-  #     GT,
+  #     GT_MISSING_BINARY,
   #     nesting(MARKERS, POP_ID),
   #     fill = list(n = 0)
   #   ) %>%
   #   dplyr::group_by(MARKERS, POP_ID) %>%
-  #   dplyr::summarise(MISSING_GENOTYPE_PROP = n[GT == 0] / sum(n))
+  #   dplyr::summarise(MISSING_GENOTYPE_PROP = n[GT_MISSING_BINARY == 0] / sum(n))
 
 
   # # Fis
