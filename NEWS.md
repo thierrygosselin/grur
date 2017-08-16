@@ -1,3 +1,9 @@
+# grur v.0.0.5 2017-08-15
+
+* restored progress bar when using parallel computing by installing the new dev
+version of `pbmcapply` package.
+
+
 # grur v.0.0.4 2017-08-15
 
 * bug fix: removed the progress bar when using parallel computing.
