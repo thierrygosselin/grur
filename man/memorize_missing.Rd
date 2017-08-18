@@ -16,7 +16,7 @@ and a data frame in long/tidy or wide format.
 
 \item{strata}{(optional/required) Required for VCF and haplotypes files,
 optional for the other formats supported.
-See documentation of \code{\link[stackr]{tidy_genomic_data}} for more info.
+See documentation of \code{\link[radiator]{tidy_genomic_data}} for more info.
 Default: \code{strata = NULL}.}
 
 \item{randomize}{(optional, string) To randomize the missingness of specific attributes.

@@ -6,12 +6,12 @@
 #' Artificially induce missing genotypes by generating
 #' a compound Dirichlet-multinomial distribution.
 #' The input and out files see
-#' \href{https://github.com/thierrygosselin/stackr}{stackr} for more details.
-#' Input files are recognized through \code{\link[stackr]{tidy_genomic_data}}
+#' \href{https://github.com/thierrygosselin/radiator}{radiator} for more details.
+#' Input files are recognized through \code{\link[radiator]{tidy_genomic_data}}
 #' and output files are generated with and without imputations through
-#' \code{\link[stackr]{genomic_converter}}.
+#' \code{\link[radiator]{genomic_converter}}.
 
-#' @inheritParams stackr::genomic_converter
+#' @inheritParams radiator::genomic_converter
 #' @inheritParams grur_imputations
 
 #' @param memorize.missing (optional, list) To use missing pattern
@@ -65,8 +65,8 @@
 # Use the extension ".tsv" at the end.
 # Several info will be appended to the name of the file.
 
-# @param ... Other parameters passed to the function \code{\link[stackr]{tidy_genomic_data}}
-#' for the input file and \code{\link[stackr]{genomic_converter}} for the output file parameter.
+# @param ... Other parameters passed to the function \code{\link[radiator]{tidy_genomic_data}}
+#' for the input file and \code{\link[radiator]{genomic_converter}} for the output file parameter.
 
 #' @return In the global environment, a list with the tidy data set, the random.seed and function.call.
 #' In the working directory, the output file with format selected.
@@ -90,7 +90,7 @@
 #' @importFrom tibble data_frame as_data_frame
 #' @importFrom tidyr unnest
 #' @importFrom purrr flatten_chr map
-#' @importFrom stackr tidy_genomic_data genomic_converter detect_biallelic_markers change_alleles detect_all_missing
+#' @importFrom radiator tidy_genomic_data genomic_converter detect_biallelic_markers change_alleles detect_all_missing
 #' @importFrom parallel detectCores
 
 #' @references Little, R. J., & Rubin, D. B. (2002) Statistical analysis with missing data.
@@ -136,10 +136,10 @@ generate_missing <- function(
   # Checking for missing and/or default arguments
   if (missing(data)) stop("Input file is missing")
   
-  # import one of 11 genomic file formats with stackr
+  # import one of 11 genomic file formats with radiator
   if (verbose) message("Importing data...")
   # if (verbose) message("    Keep polymorphic markers common in all populations")
-  tidy <- stackr::tidy_genomic_data(data = data, monomorphic.out = FALSE, common.markers = FALSE, verbose = FALSE)
+  tidy <- radiator::tidy_genomic_data(data = data, monomorphic.out = FALSE, common.markers = FALSE, verbose = FALSE)
   
   # For long tidy format, switch LOCUS to MARKERS column name, if found MARKERS not found
   if (tibble::has_name(tidy, "LOCUS") && !tibble::has_name(tidy, "MARKERS")) {
@@ -178,7 +178,7 @@ generate_missing <- function(
   if (verbose) message("Number of markers: ", number.markers)
   
   # detect biallelic -----------------------------------------------------------
-  biallelic <- stackr::detect_biallelic_markers(tidy, verbose = TRUE)
+  biallelic <- radiator::detect_biallelic_markers(tidy, verbose = TRUE)
   
   # Missing from memory --------------------------------------------------------
   if (!is.null(memorize.missing)) {
@@ -227,7 +227,7 @@ generate_missing <- function(
   }
   
   # Generate REF/ALT and other genotype coding ---------------------------------
-  res$tidy.data <- stackr::change_alleles(data = tidy,
+  res$tidy.data <- radiator::change_alleles(data = tidy,
                                           monomorphic.out = FALSE,
                                           biallelic = biallelic,
                                           parallel.core = parallel.core,
@@ -237,7 +237,7 @@ generate_missing <- function(
   
   #Generate different output ---------------------------------------------------
   message("Generating output file(s): ", stringi::stri_join(output, collapse = ", "))
-  res$output <- stackr::genomic_converter(
+  res$output <- radiator::genomic_converter(
     data = res$tidy.data,
     output = output, monomorphic.out = FALSE, common.markers = FALSE,
     filename = filename,
@@ -453,6 +453,6 @@ missing_nmar <- function(
       # dplyr::select(dplyr::one_of(want)))
   
   # markers with all missing... yes I've seen it... breaks code...
-  tidy <- stackr::detect_all_missing(data = tidy)
+  tidy <- radiator::detect_all_missing(data = tidy)
   return(tidy)
 }#End missing_nmar

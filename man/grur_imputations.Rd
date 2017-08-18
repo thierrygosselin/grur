@@ -13,8 +13,8 @@ grur_imputations(data, imputation.method = "rf",
 \arguments{
 \item{data}{A file in the working directory or object in the global environment
 in wide or long (tidy) formats. To import, the function uses
-\href{https://github.com/thierrygosselin/stackr}{stackr}
-\code{\link[stackr]{tidy_wide}}.
+\href{https://github.com/thierrygosselin/radiator}{radiator}
+\code{\link[radiator]{tidy_wide}}.
 \emph{See details of this function for more info}.}
 
 \item{imputation.method}{(character, optional)
@@ -84,7 +84,7 @@ with \emph{all} or \emph{no} NA.
 }
 \description{
 Used internally in \href{https://github.com/thierrygosselin/assigner}{assigner} and
-\href{https://github.com/thierrygosselin/stackr}{stackr} and
+\href{https://github.com/thierrygosselin/radiator}{radiator} and
 might be of interest for users.
 The goal of this module is to provide a simple solution for
 a complicated problem: missing genotypes in RADseq genomic datasets.
@@ -276,7 +276,7 @@ wolf.imputed <- grur::grur_imputations(data = "wolf.tidy.dataset.tsv")
 # When you start with a vcf file you can use magrittr \%>\% to `pipe` the
 # result. Below, an example with more arguments offered by the functions:
 
-wolf.imp <- stackr::tidy_genomic_data(
+wolf.imp <- radiator::tidy_genomic_data(
     data = "batch_1.vcf",
     strata = "strata.wolf.10pop.tsv",
     vcf.metadata = TRUE,

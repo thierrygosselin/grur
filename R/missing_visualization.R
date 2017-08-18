@@ -20,7 +20,7 @@
 #'    Within this function, we're using a modified version of the measure
 #'    described in (Keller et al., 2011; Kardos et al., 2015).
 #'    The new measure is population-wise and tailored for RADseq data
-#'    (see \code{\link[stackr]{ibdg_fh}} for details).
+#'    (see \code{\link[radiator]{ibdg_fh}} for details).
 #'    \item \strong{Figures and Tables:} figures and summary tables of
 #'    missing information at the marker, individual and population level are
 #'    generated.
@@ -30,7 +30,7 @@
 #'    function also output the data in a tidy format.
 #' }
 
-#' @inheritParams stackr::tidy_genomic_data
+#' @inheritParams radiator::tidy_genomic_data
 #' @param strata (optional/required) Required for VCF and haplotypes files,
 #' optional for the other formats supported.
 #'
@@ -40,7 +40,7 @@
 #' require it, the strata argument will have precedence on the population
 #' groupings used internally in those file formats.
 #' The \code{STRATA} column can be any hierarchical grouping.
-#' To create a strata file see \code{\link[stackr]{individuals2strata}}.
+#' To create a strata file see \code{\link[radiator]{individuals2strata}}.
 #' If you have already run
 #' \href{http://catchenlab.life.illinois.edu/stacks/}{stacks} on your data,
 #' the strata file is similar to a stacks \emph{population map file}, make sure you
@@ -67,7 +67,12 @@
 #' Default:\code{ind.missing.geno.threshold = c(10,20,30,40,50,60,70)}.
 
 #' @param filename (optional) Name of the tidy data set,
-#' written to the working directory.
+#' written to the directory created by the function.
+
+#' @param write.plot (optional, logical) When \code{write.plot = TRUE}, the function
+#' will write to the directory created by the function the plots, except the heatmap
+#' that take longer to generate. For this, do it manually following example below.
+#' Default: \code{write.plot = FALSE}.
 
 #' @return A list is created with several objects: the tidy data,
 #' the principal coordinates
@@ -108,7 +113,7 @@
 
 #' @export
 #' @rdname missing_visualization
-#' @importFrom ggplot2 ggplot aes geom_violin geom_boxplot stat_summary labs theme element_blank element_text geom_jitter scale_colour_manual scale_y_reverse theme_light geom_bar facet_grid geom_histogram aes_string scale_fill_manual theme_bw stat_smooth geom_boxplot
+#' @importFrom ggplot2 ggplot aes geom_violin geom_boxplot stat_summary labs theme element_blank element_text geom_jitter scale_colour_manual scale_y_reverse theme_light geom_bar facet_grid geom_histogram aes_string scale_fill_manual theme_bw stat_smooth geom_boxplot ggsave
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
 #' @importFrom stringi stri_join stri_replace_all_fixed stri_replace_all_regex
 #' @importFrom utils count.fields
@@ -117,7 +122,7 @@
 #' @importFrom ape pcoa
 #' @importFrom stats dist lm
 #' @importFrom tibble data_frame
-#' @importFrom stackr tidy_genomic_data change_pop_names ibdg_fh
+#' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh
 
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
@@ -139,7 +144,8 @@ missing_visualization <- function(
   max.marker = NULL,
   snp.ld = NULL,
   common.markers = FALSE,
-  filename = NULL
+  filename = NULL,
+  write.plot = FALSE
 ) {
   opt.change <- getOption("width")
   options(width = 70)
@@ -153,9 +159,25 @@ missing_visualization <- function(
   if (!is.null(pop.levels) & is.null(pop.labels)) pop.labels <- pop.levels
   if (!is.null(pop.labels) & is.null(pop.levels)) stop("pop.levels is required if you use pop.labels")
 
+  # Date and time --------------------------------------------------------------
+  file.date <- stringi::stri_replace_all_fixed(
+    Sys.time(),
+    pattern = " EDT", replacement = "") %>% 
+    stringi::stri_replace_all_fixed(
+      str = .,
+      pattern = c("-", " ", ":"), replacement = c("", "@", ""),
+      vectorize_all = FALSE) %>% 
+    stringi::stri_sub(str = ., from = 1, to = 13)
+  
+  path.folder <- stringi::stri_join(getwd(),"/", "missing_visualization_", file.date, sep = "")
+  dir.create(file.path(path.folder))
+  
+  message(stringi::stri_join("Folder created: \n", path.folder))
+  file.date <- NULL #unused object
   # import data ----------------------------------------------------------------
   message("Importing genotypes...")
-  res$tidy.data <- stackr::tidy_genomic_data(
+  if (!is.null(filename)) filename <- stringi::stri_join(path.folder, "/", filename)
+  res$tidy.data <- radiator::tidy_genomic_data(
     data = data,
     vcf.metadata = vcf.metadata,
     blacklist.id = blacklist.id,
@@ -198,6 +220,9 @@ missing_visualization <- function(
       )
       strata.df <- strata
     }
+  } else {
+    strata.df <- dplyr::ungroup(res$tidy.data) %>%
+      dplyr::distinct(POP_ID, INDIVIDUALS)
   }
 
   # remove unwanted separators
@@ -214,7 +239,7 @@ missing_visualization <- function(
 
   # res$tidy.data <- suppressWarnings(dplyr::left_join(x = res$tidy.data, y = strata.df, by = c("INDIVIDUALS", "POP_ID")))
   # population names if pop.levels/pop.labels were request
-  # res$tidy.data <- stackr::change_pop_names(data = res$tidy.data, pop.levels = pop.labels, pop.labels = pop.labels)
+  # res$tidy.data <- radiator::change_pop_names(data = res$tidy.data, pop.levels = pop.labels, pop.labels = pop.labels)
 
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
   res$tidy.data <- dplyr::mutate(
@@ -285,7 +310,7 @@ missing_visualization <- function(
     , by = "INDIVIDUALS"
   )
   # adjust pop_id
-  res$vectors <- stackr::change_pop_names(data = res$vectors, pop.levels = pop.labels, pop.labels = pop.labels)
+  res$vectors <- radiator::change_pop_names(data = res$vectors, pop.levels = pop.labels, pop.labels = pop.labels)
 
   message("Generating Identity by missingness plot")
   # strata.select <- c("POP_ID", "WATERSHED", "BARRIER", "LANES")
@@ -308,6 +333,14 @@ missing_visualization <- function(
             strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
       )
     ibm_plot_name <- stringi::stri_join("ibm.plot.pco1.pco2.strata.", i)
+    if (write.plot) {
+      ggplot2::ggsave(
+        filename = stringi::stri_join(path.folder, "/",
+                                      ibm_plot_name, ".pdf"),
+        plot = ibm.plot.pco1.pco2,
+        width = 20, height = 15,
+        dpi = 600, units = "cm", useDingbats = FALSE)
+    }
     res[[ibm_plot_name]] <- ibm.plot.pco1.pco2
 
     # with axis 1 and 3
@@ -326,6 +359,14 @@ missing_visualization <- function(
             strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
       )
     ibm_plot_name <- stringi::stri_join("ibm.plot.pco1.pco3.strata.", i)
+    if (write.plot) {
+      ggplot2::ggsave(
+        filename = stringi::stri_join(path.folder, "/",
+                                      ibm_plot_name, ".pdf"),
+        plot = ibm.plot.pco1.pco3,
+        width = 20, height = 15,
+        dpi = 600, units = "cm", useDingbats = FALSE)
+    }
     res[[ibm_plot_name]] <- ibm.plot.pco1.pco3
 
     # with axis 2 and 3
@@ -344,6 +385,14 @@ missing_visualization <- function(
             strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
       )
     ibm_plot_name <- stringi::stri_join("ibm.plot.pco2.pco3.strata.", i)
+    if (write.plot) {
+      ggplot2::ggsave(
+        filename = stringi::stri_join(path.folder, "/",
+                                      ibm_plot_name, ".pdf"),
+        plot = ibm.plot.pco2.pco3,
+        width = 20, height = 15,
+        dpi = 600, units = "cm", useDingbats = FALSE)
+    }
     res[[ibm_plot_name]] <- ibm.plot.pco2.pco3
 
     # with axis 3 and 4
@@ -362,6 +411,14 @@ missing_visualization <- function(
             strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
       )
     ibm_plot_name <- stringi::stri_join("ibm.plot.pco3.pco4.strata.", i)
+    if (write.plot) {
+      ggplot2::ggsave(
+        filename = stringi::stri_join(path.folder, "/",
+                                      ibm_plot_name, ".pdf"),
+        plot = ibm.plot.pco3.pco4,
+        width = 20, height = 15,
+        dpi = 600, units = "cm", useDingbats = FALSE)
+    }
     res[[ibm_plot_name]] <- ibm.plot.pco3.pco4
   }
 
@@ -426,6 +483,13 @@ missing_visualization <- function(
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.y = ggplot2::element_text(size = 8, family = "Helvetica")
     )
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.plot.pdf"),
+      plot = res$missing.genotypes.ind.plot,
+      width = 20, height = 15,
+      dpi = 600, units = "cm", useDingbats = FALSE)
+  }
   # res$missing.genotypes.ind.plot
 
   # Blacklist individuals-------------------------------------------------------
@@ -439,12 +503,12 @@ missing_visualization <- function(
     if (length(blacklist.id.missing.geno$INDIVIDUALS) > 0) {
       blacklist_name <- stringi::stri_join("blacklist.id.missing.", i)
       res[[blacklist_name]] <- blacklist.id.missing.geno
-      readr::write_tsv(blacklist.id.missing.geno, stringi::stri_join(blacklist_name, ".tsv"))
+      readr::write_tsv(blacklist.id.missing.geno, stringi::stri_join(path.folder, "/", blacklist_name, ".tsv"))
     }
   }
 
   # FH -------------------------------------------------------------------------
-  fh <- stackr::ibdg_fh(data = res$tidy.data, verbose = FALSE)
+  fh <- radiator::ibdg_fh(data = res$tidy.data, verbose = FALSE)
 
   res$missing.genotypes.ind.fh <- suppressWarnings(
     dplyr::full_join(
@@ -468,6 +532,13 @@ missing_visualization <- function(
       legend.text = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold"),
       strip.text.x = ggplot2::element_text(size = 12, family = "Helvetica", face = "bold")
     )
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.fh.plot.pdf"),
+      plot = res$missing.genotypes.fh.plot,
+      width = 20, height = 15,
+      dpi = 600, units = "cm", useDingbats = FALSE)
+  }
   # res$missing.genotypes.fh.plot
 
   # Populations-----------------------------------------------------------------
@@ -494,6 +565,13 @@ missing_visualization <- function(
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.y = ggplot2::element_text(size = 8, family = "Helvetica")
     )
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.pop.plot.pdf"),
+      plot = res$missing.genotypes.pop.plot,
+      width = 20, height = 15,
+      dpi = 600, units = "cm", useDingbats = FALSE)
+  }
   # res$missing.genotypes.pop.plot
 
   # Markers---------------------------------------------------------------------
@@ -521,7 +599,7 @@ missing_visualization <- function(
     if (length(whitelist.missing.geno$MARKERS) > 0) {
       whitelist_name <- stringi::stri_join("whitelist.markers.missing.max.", i)
       res[[whitelist_name]] <- whitelist.missing.geno
-      readr::write_tsv(whitelist.missing.geno, stringi::stri_join(whitelist_name, ".tsv"))
+      readr::write_tsv(whitelist.missing.geno, stringi::stri_join(path.folder, "/", whitelist_name, ".tsv"))
     }
   }
 
@@ -538,6 +616,13 @@ missing_visualization <- function(
       axis.text.x = ggplot2::element_text(size = 8, family = "Helvetica", angle = 90, hjust = 1, vjust = 0.5),
       strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
     )
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.markers.plot.pdf"),
+      plot = res$missing.genotypes.markers.plot,
+      width = 20, height = 15,
+      dpi = 600, units = "cm", useDingbats = FALSE)
+  }
   # res$missing.genotypes.markers.plot
 
   # # Missingness per markers and per populations

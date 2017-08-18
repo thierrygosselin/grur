@@ -79,7 +79,7 @@ Default: \code{alpha.beta.markers = c(5,40)}.}
 
 \item{random.seed}{(integer) Random seed number for reproducibility.
 With default: \code{random.seed = NULL} the number is generated automatically and randomly.
-for the input file and \code{\link[stackr]{genomic_converter}} for the output file parameter.}
+for the input file and \code{\link[radiator]{genomic_converter}} for the output file parameter.}
 
 \item{imputation.method}{(character, optional)
 Methods available for map-independent imputations of missing genotype:
@@ -121,10 +121,10 @@ In the working directory, the output file with format selected.
 Artificially induce missing genotypes by generating
 a compound Dirichlet-multinomial distribution.
 The input and out files see
-\href{https://github.com/thierrygosselin/stackr}{stackr} for more details.
-Input files are recognized through \code{\link[stackr]{tidy_genomic_data}}
+\href{https://github.com/thierrygosselin/radiator}{radiator} for more details.
+Input files are recognized through \code{\link[radiator]{tidy_genomic_data}}
 and output files are generated with and without imputations through
-\code{\link[stackr]{genomic_converter}}.
+\code{\link[radiator]{genomic_converter}}.
 }
 \examples{
 \dontrun{

@@ -19,7 +19,7 @@ environment:
 
 build_script:
   - travis-tool.sh install_bioc_deps
-  - travis-tool.sh install_github thierrygosselin/stackr
+  - travis-tool.sh install_github thierrygosselin/radiator
   - travis-tool.sh install_deps
   - travis-tool.sh install_r R.oo R.utils
 

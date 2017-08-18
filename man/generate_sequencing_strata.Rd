@@ -8,8 +8,8 @@ generate_sequencing_strata(strata, number.ind.per.lanes = 36,
   number.sequencer = NULL, randomize = FALSE, filename = NULL)
 }
 \arguments{
-\item{strata}{The strata file used in \code{grur}, \code{stackr} and
-\code{assigner} is described in \code{\link[stackr]{tidy_genomic_data}}.}
+\item{strata}{The strata file used in \code{grur}, \code{radiator} and
+\code{assigner} is described in \code{\link[radiator]{tidy_genomic_data}}.}
 
 \item{number.ind.per.lanes}{(integer) By giving the number of individuals
 you want to pool per lanes,

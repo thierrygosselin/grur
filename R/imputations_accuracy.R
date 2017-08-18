@@ -25,7 +25,7 @@
 #' @export
 #' @rdname imputations_accuracy
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter full_join
-#' @importFrom stackr tidy_genomic_data
+#' @importFrom radiator tidy_genomic_data
 #' @importFrom purrr flatten_chr flatten_dbl
 #' @importFrom tibble has_name
 #' @importFrom tidyr gather
@@ -45,7 +45,7 @@ imputations_accuracy <- function(obs, imp) {
   # import data ----------------------------------------------------------------
   
   # test
-  # obs <- stackr::tidy_genomic_data(data = data)
+  # obs <- radiator::tidy_genomic_data(data = data)
   # imp <- data.missing$output$tidy.data.imp
   
   obs.data <- import_imputations(obs)
@@ -163,7 +163,7 @@ imputations_accuracy <- function(obs, imp) {
 import_imputations <- function(data) {
   if (is.vector(data)) {
     res <- suppressMessages(
-      stackr::tidy_genomic_data(
+      radiator::tidy_genomic_data(
         data = data,
         vcf.metadata = FALSE,
         monomorphic.out = FALSE,

@@ -8,11 +8,11 @@
 #' of imputation algorithms. A vignette is under construction to leverage this
 #' function.
 
-#' @inheritParams stackr::tidy_genomic_data
+#' @inheritParams radiator::tidy_genomic_data
 
 #' @param strata (optional/required) Required for VCF and haplotypes files,
 #' optional for the other formats supported.
-#' See documentation of \code{\link[stackr]{tidy_genomic_data}} for more info.
+#' See documentation of \code{\link[radiator]{tidy_genomic_data}} for more info.
 #' Default: \code{strata = NULL}.
 
 #' @param randomize (optional, string) To randomize the missingness of specific attributes.
@@ -57,7 +57,7 @@
 #' @export
 #' @rdname memorize_missing
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
-#' @importFrom stackr tidy_genomic_data
+#' @importFrom radiator tidy_genomic_data
 #' @importFrom fst write.fst
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
@@ -79,7 +79,7 @@ memorize_missing <- function(
   
   # import data ----------------------------------------------------------------
   missing.memories <- suppressMessages(
-    stackr::tidy_genomic_data(
+    radiator::tidy_genomic_data(
       data = data,
       vcf.metadata = FALSE,
       strata = strata,

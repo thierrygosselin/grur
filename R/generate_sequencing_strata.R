@@ -6,8 +6,8 @@
 #' no missingness pattern associated with these variables or to generate missing
 #' genotypes based on these variables.
 
-#' @param strata The strata file used in \code{grur}, \code{stackr} and
-#' \code{assigner} is described in \code{\link[stackr]{tidy_genomic_data}}.
+#' @param strata The strata file used in \code{grur}, \code{radiator} and
+#' \code{assigner} is described in \code{\link[radiator]{tidy_genomic_data}}.
 
 #' @param number.ind.per.lanes (integer) By giving the number of individuals
 #' you want to pool per lanes,

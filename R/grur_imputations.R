@@ -4,7 +4,7 @@
 #' @title Map-independent imputations of missing genotypes
 #'
 #' @description Used internally in \href{https://github.com/thierrygosselin/assigner}{assigner} and
-#' \href{https://github.com/thierrygosselin/stackr}{stackr} and
+#' \href{https://github.com/thierrygosselin/radiator}{radiator} and
 #' might be of interest for users.
 #' The goal of this module is to provide a simple solution for
 #' a complicated problem: missing genotypes in RADseq genomic datasets.
@@ -56,8 +56,8 @@
 
 #' @param data A file in the working directory or object in the global environment
 #' in wide or long (tidy) formats. To import, the function uses
-#' \href{https://github.com/thierrygosselin/stackr}{stackr}
-#' \code{\link[stackr]{tidy_wide}}.
+#' \href{https://github.com/thierrygosselin/radiator}{radiator}
+#' \code{\link[radiator]{tidy_wide}}.
 #' \emph{See details of this function for more info}.
 
 #' @param imputation.method (character, optional)
@@ -289,7 +289,7 @@
 # @importFrom base split
 #' @importFrom randomForestSRC impute.rfsrc
 #' @importFrom readr write_lines write_tsv
-#' @importFrom stackr tidy_wide change_alleles detect_biallelic_markers
+#' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
 
 #' @examples
 #' \dontrun{
@@ -303,7 +303,7 @@
 #' # When you start with a vcf file you can use magrittr %>% to `pipe` the
 #' # result. Below, an example with more arguments offered by the functions:
 #'
-#' wolf.imp <- stackr::tidy_genomic_data(
+#' wolf.imp <- radiator::tidy_genomic_data(
 #'     data = "batch_1.vcf",
 #'     strata = "strata.wolf.10pop.tsv",
 #'     vcf.metadata = TRUE,
@@ -528,7 +528,7 @@ grur_imputations <- function(
 
   # Import data ---------------------------------------------------------------
   if (is.vector(data)) {
-    input <- stackr::tidy_wide(data = data, import.metadata = TRUE)
+    input <- radiator::tidy_wide(data = data, import.metadata = TRUE)
   } else {
     input <- data
   }
@@ -575,7 +575,7 @@ grur_imputations <- function(
   } else {
     ref.column <- FALSE
   }
-  biallelic <- stackr::detect_biallelic_markers(data = input)
+  biallelic <- radiator::detect_biallelic_markers(data = input)
 
 
   # Manage Genotype Likelihood -------------------------------------------------
@@ -1215,7 +1215,7 @@ grur_imputations <- function(
   # Compute REF/ALT allele... might have change depending on prop of missing values
   if (ref.column) {
     if (verbose) message("Adjusting REF/ALT alleles to account for imputations...")
-    input.imp <- stackr::change_alleles(
+    input.imp <- radiator::change_alleles(
       data = input.imp,
       monomorphic.out = FALSE, biallelic = biallelic,
       parallel.core = parallel.core,

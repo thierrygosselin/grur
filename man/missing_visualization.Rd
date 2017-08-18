@@ -10,7 +10,8 @@ missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   pop.levels = NULL, pop.labels = NULL, pop.select = NULL,
   blacklist.id = NULL, blacklist.genotype = NULL,
   whitelist.markers = NULL, monomorphic.out = TRUE, max.marker = NULL,
-  snp.ld = NULL, common.markers = FALSE, filename = NULL)
+  snp.ld = NULL, common.markers = FALSE, filename = NULL,
+  write.plot = FALSE)
 }
 \arguments{
 \item{data}{11 options: VCF (SNPs or Haplotypes,
@@ -24,7 +25,7 @@ and a data frame in long/tidy or wide format.
 With \code{logical, TRUE/FALSE}, \code{vcf.metadata = FALSE}, only the genotype
 information is kept (GT field). With \code{vcf.metadata = TRUE},
 all the metadata contained in the \code{FORMAT} field will be kept in
-the tidy data file. stackr is currently keeping/cleaning only these metadata:
+the tidy data file. radiator is currently keeping/cleaning only these metadata:
 \code{"DP", "AD", "GL", "PL", "GQ", "GOF", "NR", "NV"}.
 If you need different one, submit a request.
 With \code{string}, explicitely ask for a particular FORMAT field you want
@@ -41,7 +42,7 @@ If a \code{strata} file is specified with all file formats that don't
 require it, the strata argument will have precedence on the population
 groupings used internally in those file formats.
 The \code{STRATA} column can be any hierarchical grouping.
-To create a strata file see \code{\link[stackr]{individuals2strata}}.
+To create a strata file see \code{\link[radiator]{individuals2strata}}.
 If you have already run
 \href{http://catchenlab.life.illinois.edu/stacks/}{stacks} on your data,
 the strata file is similar to a stacks \emph{population map file}, make sure you
@@ -145,7 +146,12 @@ Default: \code{snp.ld = NULL}.}
 will only keep markers in common (genotyped) between all the populations.}
 
 \item{filename}{(optional) Name of the tidy data set,
-written to the working directory.}
+written to the directory created by the function.}
+
+\item{write.plot}{(optional, logical) When \code{write.plot = TRUE}, the function
+will write to the directory created by the function the plots, except the heatmap
+that take longer to generate. For this, do it manually following example below.
+Default: \code{write.plot = FALSE}.}
 }
 \value{
 A list is created with several objects: the tidy data,
@@ -178,7 +184,7 @@ Use this function to visualize pattern of missing data.
    Within this function, we're using a modified version of the measure
    described in (Keller et al., 2011; Kardos et al., 2015).
    The new measure is population-wise and tailored for RADseq data
-   (see \code{\link[stackr]{ibdg_fh}} for details).
+   (see \code{\link[radiator]{ibdg_fh}} for details).
    \item \strong{Figures and Tables:} figures and summary tables of
    missing information at the marker, individual and population level are
    generated.
