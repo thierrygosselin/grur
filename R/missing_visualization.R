@@ -35,7 +35,7 @@
 #' optional for the other formats supported.
 #'
 #' The strata file is a tab delimited file with a minimum of 2 columns headers:
-#' \code{INDIVIDUALS} and \code{STRATA}. 
+#' \code{INDIVIDUALS} and \code{STRATA}.
 #' If a \code{strata} file is specified with all file formats that don't
 #' require it, the strata argument will have precedence on the population
 #' groupings used internally in those file formats.
@@ -145,6 +145,7 @@ missing_visualization <- function(
   snp.ld = NULL,
   common.markers = FALSE,
   filename = NULL,
+  parallel.core = parallel::detectCores() - 1,
   write.plot = FALSE
 ) {
   opt.change <- getOption("width")
@@ -162,17 +163,18 @@ missing_visualization <- function(
   # Date and time --------------------------------------------------------------
   file.date <- stringi::stri_replace_all_fixed(
     Sys.time(),
-    pattern = " EDT", replacement = "") %>% 
+    pattern = " EDT", replacement = "") %>%
     stringi::stri_replace_all_fixed(
       str = .,
       pattern = c("-", " ", ":"), replacement = c("", "@", ""),
-      vectorize_all = FALSE) %>% 
+      vectorize_all = FALSE) %>%
     stringi::stri_sub(str = ., from = 1, to = 13)
-  
+
+  path.folder.message <- stringi::stri_join("missing_visualization_", file.date, sep = "")
   path.folder <- stringi::stri_join(getwd(),"/", "missing_visualization_", file.date, sep = "")
   dir.create(file.path(path.folder))
-  
-  message(stringi::stri_join("Folder created: \n", path.folder))
+
+  message("Folder created: \n", path.folder.message)
   file.date <- NULL #unused object
   # import data ----------------------------------------------------------------
   message("Importing genotypes...")
@@ -192,6 +194,7 @@ missing_visualization <- function(
     pop.levels = pop.levels,
     pop.labels = pop.labels,
     filename = filename,
+    parallel.core = parallel.core,
     verbose = FALSE
   )
 
@@ -430,7 +433,7 @@ missing_visualization <- function(
         GT_MISSING_BINARY,
         pattern = c("^0$", "^1$"),
         replacement = c("missing", "genotyped"),
-        vectorize_all = FALSE)) %>% 
+        vectorize_all = FALSE)) %>%
     ggplot2::ggplot(data = .,(ggplot2::aes(y = MARKERS, x = as.character(INDIVIDUALS)))) +
     ggplot2::geom_tile(ggplot2::aes(fill = Missingness)) +
     ggplot2::scale_fill_manual(values = c("grey", "black")) +
@@ -449,7 +452,7 @@ missing_visualization <- function(
     ) +
     ggplot2::facet_grid(~POP_ID, scales = "free", space = "free_x")
   # res$heatmap
-  
+
   # Missing summary ------------------------------------------------------------
   message("Generating missing information summary tables and plot")
 
@@ -651,7 +654,7 @@ missing_visualization <- function(
 
   # Results --------------------------------------------------------------------
   timing <- proc.time() - timing
-message("\nComputation time: ", round(timing[[3]]), " sec")
+  message("\nComputation time: ", round(timing[[3]]), " sec")
   cat("############################## completed ##############################\n")
   options(width = opt.change)
   return(res)

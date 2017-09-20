@@ -12,16 +12,17 @@ generate_missing(data, output = NULL, filename = NULL,
   verbose = TRUE, parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
-\item{data}{11 options: VCF (SNPs or Haplotypes,
+\item{data}{12 options: VCF (SNPs or Haplotypes,
 to make the vcf population ready, see details below),
 plink, stacks haplotype file, genind (library(adegenet)),
-genlight (library(adegenet)), gtypes (library(strataG)), genepop,
+genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
 and a data frame in long/tidy or wide format.
-\emph{See details} of \code{\link{tidy_genomic_data}}.}
+\emph{See details} of \code{\link[radiator]{tidy_genomic_data}}.}
 
-\item{output}{16 genomic data formats can be exported: tidy (by default),
+\item{output}{19 genomic data formats can be exported: tidy (by default),
 genind, genlight, vcf (for file format version, see details below), plink, genepop,
-structure, arlequin, hierfstat, gtypes (strataG), betadiv, snprelate (for SNPRelate's GDS).
+structure, arlequin, hierfstat, gtypes (strataG), bayescan, betadiv, pcadapt,
+hzar, snprelate (for SNPRelate's GDS).
 Use a character string,
 e.g. \code{output = c("genind", "genepop", "structure")}, to have preferred
 output formats generated. The tidy format is generated automatically.

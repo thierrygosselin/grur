@@ -339,8 +339,7 @@ grur_imputations <- function(
   filename = NULL,
   ...
 ) {
-  # for timing
-  timing <- proc.time()
+  timing <- proc.time() #for timing
 
   if (verbose) {
     cat("\n\n")

@@ -11,15 +11,15 @@ missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   blacklist.id = NULL, blacklist.genotype = NULL,
   whitelist.markers = NULL, monomorphic.out = TRUE, max.marker = NULL,
   snp.ld = NULL, common.markers = FALSE, filename = NULL,
-  write.plot = FALSE)
+  parallel.core = parallel::detectCores() - 1, write.plot = FALSE)
 }
 \arguments{
-\item{data}{11 options: VCF (SNPs or Haplotypes,
+\item{data}{12 options: VCF (SNPs or Haplotypes,
 to make the vcf population ready, see details below),
 plink, stacks haplotype file, genind (library(adegenet)),
-genlight (library(adegenet)), gtypes (library(strataG)), genepop,
+genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
 and a data frame in long/tidy or wide format.
-\emph{See details} of \code{\link{tidy_genomic_data}}.}
+\emph{See details} of \code{\link[radiator]{tidy_genomic_data}}.}
 
 \item{vcf.metadata}{(optional, logical or string) For VCF files only.
 With \code{logical, TRUE/FALSE}, \code{vcf.metadata = FALSE}, only the genotype
@@ -37,7 +37,7 @@ Default: \code{vcf.metadata = FALSE}.}
 optional for the other formats supported.
 
 The strata file is a tab delimited file with a minimum of 2 columns headers:
-\code{INDIVIDUALS} and \code{STRATA}. 
+\code{INDIVIDUALS} and \code{STRATA}.
 If a \code{strata} file is specified with all file formats that don't
 require it, the strata argument will have precedence on the population
 groupings used internally in those file formats.
@@ -134,7 +134,7 @@ subsampled randomly from the 200000 markers. If you need specific markers,
 use \code{whitelist.markers} argument.
 Default: \code{max.marker = NULL}.}
 
-\item{snp.ld}{(optional) \strong{For VCF file only}.
+\item{snp.ld}{(optional) \strong{For data with locus and SNP info, like VCF and DArT file}.
 SNP short distance linkage disequilibrium pruning. With anonymous markers from
 RADseq/GBS de novo discovery, you can minimize linkage disequilibrium (LD) by
 choosing among these 3 options: \code{"random"} selection, \code{"first"} or
@@ -147,6 +147,10 @@ will only keep markers in common (genotyped) between all the populations.}
 
 \item{filename}{(optional) Name of the tidy data set,
 written to the directory created by the function.}
+
+\item{parallel.core}{(optional) The number of core used for parallel
+execution during vcf import.
+Default: \code{parallel::detectCores() - 1}.}
 
 \item{write.plot}{(optional, logical) When \code{write.plot = TRUE}, the function
 will write to the directory created by the function the plots, except the heatmap
