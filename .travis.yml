@@ -13,6 +13,3 @@ notifications:
 
 apt_packages:
   - libgsl0-dev
-
-use_bioc: true
-bioc_required: true

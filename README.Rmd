@@ -109,6 +109,7 @@ Change log, version, new features and bug history lives in the [NEWS.md file](ht
 **grur v.0.0.7 2017-10-02**
 
 worked on `missing_visualization`
+
 * added Eric Archer's work on detecting patterns
 * figures are now combined under themes (e.g. all PCoA for the same strata are together, etc)
 
