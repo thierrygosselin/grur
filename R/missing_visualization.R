@@ -226,10 +226,10 @@ missing_visualization <- function(
   )
   
   # strata.df --------------------------------------------------------
-  strata.df <- dplyr::ungroup(res$tidy.data) %>%
+  strata.df <- suppressWarnings(dplyr::ungroup(res$tidy.data) %>%
     dplyr::select(-dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
                                    "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
-    dplyr::distinct(INDIVIDUALS, .keep_all = TRUE)
+    dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
   
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
   res$tidy.data <- dplyr::mutate(
@@ -247,8 +247,10 @@ missing_visualization <- function(
   
   duplicate.id <- nrow(strata.df) - length(unique(strata.df$INDIVIDUALS))
   
-  n.chrom = dplyr::n_distinct(res$tidy.data$CHROM)
-  n.locus = dplyr::n_distinct(res$tidy.data$LOCUS)
+  if (tibble::has_name(res$tidy.data, "CHROM")) {
+    n.chrom = dplyr::n_distinct(res$tidy.data$CHROM)
+    n.locus = dplyr::n_distinct(res$tidy.data$LOCUS)
+  }
   n.snp = dplyr::n_distinct(res$tidy.data$MARKERS)
   
   # output the proportion of missing genotypes
@@ -272,8 +274,10 @@ missing_visualization <- function(
   message("Number of individuals: ", n.ind)
   message("Number of ind/pop:\n", stringi::stri_join(strata.stats$STRATA, collapse = "\n"))
   message("\nNumber of duplicate id: ", duplicate.id)
-  message("Number of chrom/scaffolds: ", n.chrom)
-  message("Number of locus: ", n.locus)
+  if (tibble::has_name(res$tidy.data, "CHROM")) {
+    message("Number of chrom/scaffolds: ", n.chrom)
+    message("Number of locus: ", n.locus)
+  }
   message("Number of SNPs: ", n.snp)
   
   message("\nProportion of missing genotypes: ", na.before)
