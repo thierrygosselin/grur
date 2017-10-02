@@ -24,12 +24,12 @@
 #'    \item \strong{Figures and Tables:} figures and summary tables of
 #'    missing information at the marker, individual and population level are
 #'    generated.
-#'    \item \strong{Whitelist:} create whitelists of markers based on
+#'    \item \strong{Whitelists:} create whitelists of markers based on
 #'    desired thresholds of missing genotypes.
 #'    \item \strong{Blacklists:} create blacklists of individuals based on
 #'    desired thresholds of missing genotypes.
 #'    \item \strong{Tidy data:} if the filename argument is used, the
-#'    function also output the data in a tidy format.
+#'    function also output the data in the directory in a tidy format (see details).
 #' }
 
 #' @inheritParams radiator::tidy_genomic_data
@@ -87,17 +87,39 @@
 #' general overview of the missing data. The heatmap is usually long to generate,
 #' and thus, it's just included as an object in the list and not written in the folder.
 
+#' @details
+#' \strong{filename}
+#' 
+#' The function uses \code{\link[fst]{write.fst}},
+#' to write the tidy data frame in the directory.
+#' The file extension appended to
+#' the \code{filename} provided is \code{.rad}.
+#' The file is written with the
+#' \href{https://github.com/fstpackage/fst}{Lightning Fast Serialization of Data Frames for R} package.
+#' To read the tidy data file back in R use \code{\link[fst]{read.fst}}.
+
 #' @examples
 #' \dontrun{
-#' Using a  VCF file, the simplest for of the function:
+#' #Using a  VCF file, the simplest for of the function:
 #' ibm.koala <- missing_visualization(
 #' data = "batch_1.vcf",
 #' strata = "population.map.strata.tsv"
 #' )
+#' 
 #' # To see what's inside the list
 #' names(ibm.koala)
+#' 
 #' # To view the heatmap:
 #' ibm.koala$heatmap
+#' 
+#' # To save the heatmap
+#' # move to the appropriate directory
+#' ggplot2::ggsave(
+#' filename = "heatmap.missing.pdf",
+#' plot = ibm.koala$heatmap,
+#' width = 15, height = 20,
+#' dpi = 600, units = "cm", useDingbats = FALSE)
+#' 
 #' # To view the IBM analysis plot:
 #' ibm.koala$ibm_plot
 #' }
@@ -255,7 +277,7 @@ missing_visualization <- function(
   message("Number of SNPs: ", n.snp)
   
   message("\nProportion of missing genotypes: ", na.before)
-
+  
   # Identity-by-missingness (IBM) analysis -------------------------------------
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("\n\nIdentity-by-missingness (IBM) analysis using\n    Principal Coordinate Analysis (PCoA)...")
@@ -280,7 +302,7 @@ missing_visualization <- function(
   # ibm <- ape::pcoa(D = d) 
   ibm <- ape::pcoa(
     D = stats::dist(
-    x = input.pcoa, method = distance.method)) #Legendre's ape
+      x = input.pcoa, method = distance.method)) #Legendre's ape
   input.pcoa <- NULL
   
   # ibm$correction # test
@@ -335,8 +357,8 @@ missing_visualization <- function(
     strata.df,
     dplyr::select(res$missing.genotypes.ind, INDIVIDUALS, MISSING_GENOTYPE_PERCENT = PERCENT),
     by = "INDIVIDUALS")
-    
-    
+  
+  
   res$vectors <- dplyr::inner_join(
     strata.missing,
     tibble::rownames_to_column(df = data.frame(ibm$vectors), var = "INDIVIDUALS")
@@ -348,65 +370,55 @@ missing_visualization <- function(
   # adjust pop_id
   res$vectors <- radiator::change_pop_names(data = res$vectors, pop.levels = pop.labels, pop.labels = pop.labels)
   
-  
-  
-  
   message("Generating Identity by missingness plot")
   pc.to.do <- utils::combn(1:4, 2, simplify = FALSE)
   
-  # if (length(strata.select) > 1) {
-    res$ibm.plots <- purrr::map(
-      .x = strata.select, 
-      .f = generate_pcoa_plot,
-      pc.to.do = pc.to.do,
-      vectors = res$vectors,
-      variance.component = variance.component,
-      path.folder = path.folder, write.plot = write.plot) %>%
-      purrr::flatten(.)
-  # } else {
-  #   res$ibm.plots <- generate_pcoa_plot(
-  #     strata.select = strata.select,
-  #     pc.to.do = pc.to.do,
-  #     vectors = res$vectors,
-  #     variance.component = variance.component,
-  #     path.folder = path.folder, write.plot = write.plot)
-  # }
-    variance.component <- pc.to.do <- NULL
+  res$ibm.plots <- purrr::map(
+    .x = strata.select, 
+    .f = generate_pcoa_plot,
+    pc.to.do = pc.to.do,
+    vectors = res$vectors,
+    variance.component = variance.component,
+    path.folder = path.folder, write.plot = write.plot) %>%
+    purrr::flatten(.)
+  
+  variance.component <- pc.to.do <- NULL
   
   # Eric's code here -----------------------------------------------------------
-    # Note to Eric: I think it's fits very here ...
-    # This is a refinement of the previous summaries where we want to see if the
-    # percent missing for each level of a given factor
-    # (population, plate, region, etc) is related to the number missing at a
-    # locus. I’m starting to see the issue of missingness as being decomposable
-    # into influences from external factors and from the loci themselves.
-    
-    # For instance, if a given population tends to have missing data
-    # (say due to poor quality samples), then when there is missing data at a
-    # locus, it should be attributable to a population regardless of how many
-    # samples are missing and the frequency should be about the same.
-    # If there is something about a locus, it should be missing at the same
-    # rate across all populations, and there should be more missing than normal.
-    # This function looks only at loci where there are missing data and calculates
-    # the median percent missing for all loci with a given total number of
-    # samples missing (e.g., all loci where 1 sample is missing, all loci
-    # where 2 samples are missing, etc.). It calculates this for each level of
-    # a given factor (i.e., population). This median is plotted as a function of
-    # the total number missing. Overlayed on that plot is the percent expected
-    # at random (black line) and the overall percent missing in that population
-    # (red line). Note that these two values are percents of missing genotypes
-    # (# of genotypes missing in population / total number of missing genotypes).
-    message("Analysing percentage missing ...") # I'll leave better message to you
-    res$pct.missing.total <- purrr::map(
-      .x = strata.select,
-      .f = pct_missing_by_total,
-      data = res$tidy.data,
-      ci = 0.95,
-      path.folder = path.folder,
-      write.plot = write.plot) %>%
-      purrr::flatten(.)
-    
-    # Heatmap --------------------------------------------------------------------
+  # Note to Eric: I think it's fits very here ...
+  # This is a refinement of the previous summaries where we want to see if the
+  # percent missing for each level of a given factor
+  # (population, plate, region, etc) is related to the number missing at a
+  # locus. I’m starting to see the issue of missingness as being decomposable
+  # into influences from external factors and from the loci themselves.
+  
+  # For instance, if a given population tends to have missing data
+  # (say due to poor quality samples), then when there is missing data at a
+  # locus, it should be attributable to a population regardless of how many
+  # samples are missing and the frequency should be about the same.
+  # If there is something about a locus, it should be missing at the same
+  # rate across all populations, and there should be more missing than normal.
+  # This function looks only at loci where there are missing data and calculates
+  # the median percent missing for all loci with a given total number of
+  # samples missing (e.g., all loci where 1 sample is missing, all loci
+  # where 2 samples are missing, etc.). It calculates this for each level of
+  # a given factor (i.e., population). This median is plotted as a function of
+  # the total number missing. Overlayed on that plot is the percent expected
+  # at random (black line) and the overall percent missing in that population
+  # (red line). Note that these two values are percents of missing genotypes
+  # (# of genotypes missing in population / total number of missing genotypes).
+  message("Analysing percentage missing ...") # I'll leave better message to you
+  
+  res$pct.missing.total <- purrr::map(
+    .x = strata.select,
+    .f = pct_missing_by_total,
+    data = res$tidy.data,
+    ci = 0.95,
+    path.folder = path.folder,
+    write.plot = write.plot) %>%
+    purrr::flatten(.)
+  
+  # Heatmap --------------------------------------------------------------------
   res$heatmap <- res$tidy.data %>%
     dplyr::mutate(
       GT_MISSING_BINARY = as.character(GT_MISSING_BINARY),
@@ -456,45 +468,45 @@ missing_visualization <- function(
     size = 12, family = "Helvetica", face = "bold")
   axis.text.element.text.fig <- ggplot2::element_text(
     size = 10, family = "Helvetica")
-
+  
   # manhattan and violin plots
   missing.genotypes.ind.plots <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.ind,
     ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
-    ggplot2::geom_jitter(alpha = 0.5) +
-    ggplot2::geom_violin(trim = TRUE, fill = NA) +
-    ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
-    ggplot2::labs(y = "Individual's missing genotypes (proportion)") +
-    ggplot2::labs(x = "Populations") +
-    ggplot2::labs(colour = "Populations") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      panel.grid.minor.x = ggplot2::element_blank(),
-      panel.grid.major.y = ggplot2::element_blank(),
-      axis.title.x = axis.title.element.text.fig,
-      axis.text.x = axis.text.element.text.fig,
-      axis.title.y = axis.title.element.text.fig,
-      axis.text.y = axis.text.element.text.fig
-    ) +
-    ggplot2::coord_flip())
+      ggplot2::geom_jitter(alpha = 0.5) +
+      ggplot2::geom_violin(trim = TRUE, fill = NA) +
+      ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
+      ggplot2::labs(y = "Individual's missing genotypes (proportion)") +
+      ggplot2::labs(x = "Populations") +
+      ggplot2::labs(colour = "Populations") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        legend.position = "none",
+        panel.grid.minor.x = ggplot2::element_blank(),
+        panel.grid.major.y = ggplot2::element_blank(),
+        axis.title.x = axis.title.element.text.fig,
+        axis.text.x = axis.text.element.text.fig,
+        axis.title.y = axis.title.element.text.fig,
+        axis.text.y = axis.text.element.text.fig
+      ) +
+      ggplot2::coord_flip())
   # missing.genotypes.ind.plots
   
   # histogram
   missing.genotypes.ind.histo <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.ind,
     ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
-    ggplot2::geom_histogram() +
-    ggplot2::labs(x = "Individual's missing genotypes (proportion)") +
-    ggplot2::labs(y = "Individuals (number)") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      axis.title.x = axis.title.element.text.fig,
-      axis.title.y = axis.title.element.text.fig,
-      axis.text.x = axis.text.element.text.fig,
-      axis.text.y = axis.text.element.text.fig,
-    ))
+      ggplot2::geom_histogram() +
+      ggplot2::labs(x = "Individual's missing genotypes (proportion)") +
+      ggplot2::labs(y = "Individuals (number)") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.title.x = axis.title.element.text.fig,
+        axis.title.y = axis.title.element.text.fig,
+        axis.text.x = axis.text.element.text.fig,
+        axis.text.y = axis.text.element.text.fig,
+      ))
   # missing.genotypes.ind.histo
   
   # helper plot for individual's genotyped threshold
@@ -538,23 +550,6 @@ missing_visualization <- function(
   message("    Number of individual(s) blacklisted per blacklist generated:\n", stringi::stri_join("    ", blacklists.stats$BLACKLIST, collapse = "\n"))
   res <- c(res, blacklists)
   blacklists.stats <- blacklists <- NULL
-  
-  # for (i in ind.missing.geno.threshold) {
-  #   # i <- 30
-  #   blacklist.id.missing.geno <- res$missing.genotypes.ind %>%
-  #     dplyr::filter(PERCENT >= i) %>%
-  #     dplyr::ungroup(.) %>%
-  #     dplyr::select(INDIVIDUALS)
-  #   if (length(blacklist.id.missing.geno$INDIVIDUALS) > 0) {
-  #     blacklist_name <- stringi::stri_join("blacklist.id.missing.", i)
-  #     res[[blacklist_name]] <- blacklist.id.missing.geno
-  #     readr::write_tsv(
-  #       blacklist.id.missing.geno,
-  #       stringi::stri_join(path.folder, "/", blacklist_name, ".tsv"))
-  #   }
-  # }
-  
-  
   
   # FH -------------------------------------------------------------------------
   message("Calulation of FH: a measure of IBDg")
@@ -665,38 +660,38 @@ missing_visualization <- function(
   missing.genotypes.markers.plots <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.markers.pop,
     ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
-    # ggplot2::geom_jitter(alpha = 0.5) +
-    ggplot2::geom_violin(trim = TRUE, fill = NA) +
-    ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
-    ggplot2::labs(y = "Marker's missing genotypes (proportion)") +
-    ggplot2::labs(x = "Populations") +
-    ggplot2::labs(colour = "Populations") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      panel.grid.minor.x = ggplot2::element_blank(),
-      panel.grid.major.y = ggplot2::element_blank(),
-      axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
-      axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
-      axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
-      axis.text.y = ggplot2::element_text(size = 10, family = "Helvetica")
-    ) +
-    ggplot2::coord_flip())
+      # ggplot2::geom_jitter(alpha = 0.5) +
+      ggplot2::geom_violin(trim = TRUE, fill = NA) +
+      ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
+      ggplot2::labs(y = "Marker's missing genotypes (proportion)") +
+      ggplot2::labs(x = "Populations") +
+      ggplot2::labs(colour = "Populations") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        legend.position = "none",
+        panel.grid.minor.x = ggplot2::element_blank(),
+        panel.grid.major.y = ggplot2::element_blank(),
+        axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+        axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
+        axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+        axis.text.y = ggplot2::element_text(size = 10, family = "Helvetica")
+      ) +
+      ggplot2::coord_flip())
   # missing.genotypes.markers.plots
   
   markers.histo <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.markers.overall, ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
-    ggplot2::geom_histogram() +
-    ggplot2::labs(x = "Marker's missing genotypes (proportion)") +
-    ggplot2::labs(y = "Markers (number)") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
-      axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
-      axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
-      strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
-    ))
+      ggplot2::geom_histogram() +
+      ggplot2::labs(x = "Marker's missing genotypes (proportion)") +
+      ggplot2::labs(y = "Markers (number)") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+        axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+        axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
+        strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
+      ))
   # markers.histo
   
   # helper plot for markers's genotyped threshold

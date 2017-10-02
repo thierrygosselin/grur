@@ -200,7 +200,7 @@ ind_genotyped_helper <- function(x) {
     ggplot2::geom_line() +
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
     ggplot2::scale_x_continuous(name = "Individual's missing genotyped threshold (percent)") +
-    ggplot2::scale_y_continuous(name = "Individuals (number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
+    ggplot2::scale_y_continuous(name = "Individuals\n(blacklisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
     ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = axis.title.element.text.fig,
@@ -343,7 +343,7 @@ markers_genotyped_helper <- function(x, y) {
     ggplot2::geom_line() +
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
     ggplot2::scale_x_continuous(name = "Marker's missing genotyped threshold (percent)") +
-    ggplot2::scale_y_continuous(name = "Markers (number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
+    ggplot2::scale_y_continuous(name = "Markers\n(whitelisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
     ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
@@ -506,17 +506,21 @@ generate_pcoa_plot <- function(
 #' @keywords internal
 
 pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
-  res <- list()
-  # strata.select <- "POP_ID"
-
+  res <- list() # to store results
+  
+  data <- dplyr::rename(
+    .data = data,
+    STRATA_SELECT = .data[[rlang::UQ(strata.select)]])
+  
   # the expected % missing by random (1 / number of factor levels)
-  ran.pct.miss <- 1 / length(unique((data[[strata.select]])))
+  ran.pct.miss <- 1 / length(unique(data$STRATA_SELECT))
   
   # convert GT_BIN to missing or not
   data$is.missing <- data$GT_MISSING_BINARY == 0
   
+  
   # summarize missingness by locus and factor column
-  miss.smry <- dplyr::group_by(.data = data, MARKERS, .data[[rlang::UQ(strata.select)]]) %>% 
+  miss.smry <- dplyr::group_by(.data = data, MARKERS, STRATA_SELECT) %>% 
     dplyr::summarise(num.missing.col = sum(is.missing)) %>%
     dplyr::left_join(
       data %>%
@@ -532,23 +536,21 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
   
   # summarize overall percent missing by factor column
   pct.miss.col <- miss.smry %>%
-    dplyr::group_by(.data[[rlang::UQ(strata.select)]]) %>%
+    dplyr::group_by(STRATA_SELECT) %>%
     dplyr::summarise(pct.missing = sum(num.missing.col) / sum(num.missing.total)) %>%
-    dplyr::ungroup(.)
+    dplyr::ungroup(.) %>% 
+    dplyr::arrange(dplyr::desc(pct.missing)) %>% 
+    dplyr::mutate(STRATA_SELECT = as.character(STRATA_SELECT))
   
-  
-  # reorder factor label levels based on marginal % missingness
-  level.miss <- pct.miss.col[[(rlang::UQ(strata.select))]][order(pct.miss.col$pct.missing, decreasing = TRUE)]
-  
-  pct.miss.col <- pct.miss.col %>%
-    dplyr::mutate(rlang::UQ(strata.select),
-                  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
-                                     levels = level.miss, ordered = TRUE)))
-  
-  
+  # Keep string to reorder factor based on marginal % missingness
+  level.miss <- pct.miss.col$STRATA_SELECT
+  pct.miss.col <- dplyr::mutate(
+    .data = pct.miss.col,
+    STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE))
+
   # summarize % missing for each total number missing in each factor level (label)
   miss.smry <- miss.smry %>%
-    dplyr::group_by(.data[[rlang::UQ(strata.select)]], num.missing.total) %>%
+    dplyr::group_by(STRATA_SELECT, num.missing.total) %>%
     dplyr::summarize(
       n = length(pct.missing),
       mean.miss = mean(pct.missing),
@@ -556,28 +558,27 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
       uci = stats::quantile(pct.missing, (1 + ci) / 2)
     ) %>%
     dplyr::ungroup(.) %>%
-    dplyr::mutate(rlang::UQ(strata.select),
-                  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
-                                           levels = level.miss, ordered = TRUE)))
+    dplyr::mutate(
+      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE))
   
   # Tidy result of lm
   lm.res <- miss.smry %>% 
-    split(x = ., f = .[[rlang::UQ(strata.select)]]) %>% 
+    split(x = ., f = .$STRATA_SELECT) %>% 
     purrr::map_df(~ broom::tidy(stats::lm(
-      mean.miss ~ log10(num.missing.total), weights = n, data = .)), .id = rlang::UQ(strata.select))
+      mean.miss ~ log10(num.missing.total), weights = n, data = .)), .id = "STRATA_SELECT")
   
   lm.res.name <- stringi::stri_join(
     "pct.missing.lm.", "strata.", strata.select)
   res[[lm.res.name]] <- lm.res
   
   
-  miss.lm.coefs <- lm.res %>% dplyr::select(-c(std.error, statistic, p.value)) %>% 
+  miss.lm.coefs <- lm.res %>%
+    dplyr::select(-c(std.error, statistic, p.value)) %>% 
     tidyr::spread(data = ., key = term, value = estimate) %>% 
     dplyr::rename(a = `(Intercept)`, b = `log10(num.missing.total)`) %>% 
     dplyr::mutate(
-      rlang::UQ(strata.select),  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
-                               levels = level.miss, ordered = TRUE))) %>% 
-    dplyr::arrange(.data[[rlang::UQ(strata.select)]])
+      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)) %>% 
+    dplyr::arrange(STRATA_SELECT)
   
   axis.title.element <- ggplot2::element_text(
     size = 12, family = "Helvetica", face = "bold")
@@ -613,7 +614,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
       legend.title = axis.title.element,
       legend.text = axis.text.element
     ) +
-    ggplot2::facet_wrap(rlang::UQ(strata.select))
+    ggplot2::facet_wrap(~ STRATA_SELECT)
   # fig
   
   fig.name <- stringi::stri_join(

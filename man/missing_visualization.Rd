@@ -194,25 +194,47 @@ Use this function to visualize pattern of missing data.
    \item \strong{Figures and Tables:} figures and summary tables of
    missing information at the marker, individual and population level are
    generated.
-   \item \strong{Whitelist:} create whitelists of markers based on
+   \item \strong{Whitelists:} create whitelists of markers based on
    desired thresholds of missing genotypes.
    \item \strong{Blacklists:} create blacklists of individuals based on
    desired thresholds of missing genotypes.
    \item \strong{Tidy data:} if the filename argument is used, the
-   function also output the data in a tidy format.
+   function also output the data in the directory in a tidy format (see details).
 }
+}
+\details{
+\strong{filename}
+
+The function uses \code{\link[fst]{write.fst}},
+to write the tidy data frame in the directory.
+The file extension appended to
+the \code{filename} provided is \code{.rad}.
+The file is written with the
+\href{https://github.com/fstpackage/fst}{Lightning Fast Serialization of Data Frames for R} package.
+To read the tidy data file back in R use \code{\link[fst]{read.fst}}.
 }
 \examples{
 \dontrun{
-Using a  VCF file, the simplest for of the function:
+#Using a  VCF file, the simplest for of the function:
 ibm.koala <- missing_visualization(
 data = "batch_1.vcf",
 strata = "population.map.strata.tsv"
 )
+
 # To see what's inside the list
 names(ibm.koala)
+
 # To view the heatmap:
 ibm.koala$heatmap
+
+# To save the heatmap
+# move to the appropriate directory
+ggplot2::ggsave(
+filename = "heatmap.missing.pdf",
+plot = ibm.koala$heatmap,
+width = 15, height = 20,
+dpi = 600, units = "cm", useDingbats = FALSE)
+
 # To view the IBM analysis plot:
 ibm.koala$ibm_plot
 }
