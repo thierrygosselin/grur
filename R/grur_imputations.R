@@ -54,10 +54,12 @@
 #' for more info.
 
 
-#' @param data A file in the working directory or object in the global environment
-#' in wide or long (tidy) formats. To import, the function uses
+#' @param data A tidy genomic dataset.
+#' It can be file in the working directory or
+#' an object in the global environment.
+#' To get a tidy dataset from various genomic format, see
 #' \href{https://github.com/thierrygosselin/radiator}{radiator}
-#' \code{\link[radiator]{tidy_wide}}.
+#' \code{\link[radiator]{tidy_genomic_data}}.
 #' \emph{See details of this function for more info}.
 
 #' @param imputation.method (character, optional)
@@ -93,7 +95,7 @@
 #' Number of candidate non-missing
 #' value to sample from during the predictive mean matching step.
 #' A fast k-nearest neighbor searching algorithms is used with this approach.
-#' \code{pred.mean.matching = 3} will use 3 nighbors.
+#' \code{pred.mean.matching = 3} will use 3 neighbors.
 #' Default: \code{pred.mean.matching = 0}, avoids this step.
 
 #' @param random.seed (integer, optional) For reproducibility, set an integer

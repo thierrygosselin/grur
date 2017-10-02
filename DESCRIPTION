@@ -1,8 +1,8 @@
 Package: grur
 Type: Package
 Title: grur: an R package tailored for RADseq data imputations
-Version: 0.0.6
-Date: 2017-08-18
+Version: 0.0.7
+Date: 2017-10-02
 Encoding: UTF-8
 Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
@@ -38,14 +38,17 @@ Imports:
     purrrlyr,
     strataG,
     rmetasim,
-    rlang
+    rlang,
+    cowplot,
+    ggpubr,
+    broom
 Suggests:
     knitr,
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
     github::kvnkuang/pbmcapply
-biocViews:
+biocViews: 
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr

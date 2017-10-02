@@ -5,7 +5,7 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.6-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--09--20-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.7-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--10--02-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -98,28 +98,9 @@ New features
 
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
-**v.0.0.5 2017-08-15**
+**grur v.0.0.7 2017-10-02**
 
--   restored progress bar when using parallel computing by installing the new dev version of `pbmcapply` package.
-
-**v.0.0.4 2017-08-15**
-
--   bug fix: removed the progress bar when using parallel computing. This is temporary, while waiting for a fix with `pbmcapply` package.
-
-**v.0.0.3 2017-06-17**
-
--   `simulate_rad`: a new function developed by Eric Archer to simulate populations of RADseq data following **island** or **stepping** stone models.
--   **grur** works with `dplyr v.0.7.0`
-
-**v.0.0.2 2017-04-23**
-
--   Work on `generate_missing` function.
--   Still not as I wish. But getting there.
--   2 new functions: `imputations_accuracy` and `memorize_missing`. Check functions documentations for more info.
-
-**v.0.0.1 2017-04-07**
-
--   **grur** package launch!
+worked on `missing_visualization` \* added Eric Archer's work on detecting patterns \* figures are now combined under themes (e.g. all PCoA for the same strata are together, etc)
 
 #### Roadmap of future developments
 

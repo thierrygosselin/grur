@@ -1,0 +1,86 @@
+---
+title: "rmetasim installation"
+output: html_notebook
+---
+
+`grur` RADseq-based simulation framework will almost always require more markers
+than the default built-in threshold in `rmetasim`, the `R` simulation engine
+used by `grur`.
+
+This vignette purposes is to show users how to modify/install
+`rmetasim` to allow it to use more markers during simulations, than the 
+latest default set to 2000 markers. 
+
+
+**Time to allow: ETA < 5 min**
+
+
+1. Download the latest github release of Allan Strand's `rmetasim`
+```{r download rmetasim, echo=TRUE}
+utils::download.file(
+  url = "https://github.com/stranda/rmetasim/archive/master.zip",
+  destfile = "grur_rmetasim.zip")
+```
+
+2. unzip the file
+```{r unzip rmetasim, echo=TRUE}
+utils::unzip(zipfile = "grur_rmetasim.zip")
+```
+
+3. Modify the `const.h` file in the `src` folder: `rmetasim-master/src/const.h`.
+Navigate to lane 33 and change the integer to the maximum markers your likely to use.
+
+
+    e.g. in the **Terminal** with *nano* (this can be done in *TextWrangler*):
+```{r edit in nano}
+sudo nano ~/rmetasim-master/src/const.h
+# change
+
+#define MAXLOCI               2000
+
+# to
+
+#define MAXLOCI               200000
+
+```
+4. Save and exit *nano*
+```{r save and exit nano}
+ctrl-o
+enter
+ctrl-x
+```
+
+5. Install from the Terminal
+```{r}
+R CMD INSTALL "rmetasim-master"
+```
+
+**Note:**
+There sould be some warning messages, not to worry, Allan says it's normal.
+However, at the end you should see something like this:
+```{r}
+** R
+** inst
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+   ‘ApplyCarryToStage.Rmd’ using ‘UTF-8’ 
+   ‘CreatingLandscapes.Rmd’ using ‘UTF-8’ 
+   ‘Sexuality-and-mating.Rmd’ using ‘UTF-8’ 
+   ‘Simulating.Rmd’ using ‘UTF-8’ 
+   ‘rmetasim.Rmd’ using ‘UTF-8’ 
+** testing if installed package can be loaded
+* DONE (rmetasim)
+
+```
+
+
+6. Remove folders
+```{r removing downloaded folders}
+cd ..
+sudo rm -R grur_rmetasim.zip rmetasim-master
+```
+
+

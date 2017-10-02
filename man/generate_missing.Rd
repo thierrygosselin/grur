@@ -28,7 +28,7 @@ e.g. \code{output = c("genind", "genepop", "structure")}, to have preferred
 output formats generated. The tidy format is generated automatically.
 Default: \code{output = NULL}.}
 
-\item{filename}{(optional) The filename prefix for the objet in the global environment
+\item{filename}{(optional) The filename prefix for the object in the global environment
 or the working directory. Default: \code{filename = NULL}. A default name will be used,
 customized with the output file(s) selected.}
 
@@ -36,10 +36,10 @@ customized with the output file(s) selected.}
 taken from the function \code{\link[grur]{memorize_missing}}. The argument
 require 2 values in a named list.
 i) \code{data = } the path to the file or the name of the object in the
-global environment and 
+global environment and
 ii) \code{column = } the column selected to introduce missingness.
 e.g. \code{memorize.missing = list(data = "~/missing_analysis/missing.memory",
-column = "MISSING_INDIVIDUALS_MIX")} or 
+column = "MISSING_INDIVIDUALS_MIX")} or
 if the memory data frame (mem) is in the global environment and you want to
 use the populations randomized:
 \code{memorize.missing = list(data = mem,
@@ -47,7 +47,7 @@ column = "MISSING_POP_MIX")}
 See function documentation for more details on columns naming scheme.
 Default: \code{memorize.missing = NULL}.}
 
-\item{missing.data.type}{(character) Three options 
+\item{missing.data.type}{(character) Three options
 (based on Little, R. J., & Rubin, D. B., 2002):
 \enumerate{
 \item \strong{MCAR} (Missing Completely At Random): the missingness
@@ -95,9 +95,8 @@ Random Forests algorithm.
 
 (4) \code{imputation.method = "mca"} Multiple Correspondence Analysis.
 
-\code{imputation.method = NULL} will return the original dataset, without
-imputation.
-Default: \code{imputation.method = "rf"}.}
+\code{imputation.method = NULL} the function will stop.
+Default: \code{imputation.method = NULL}.}
 
 \item{hierarchical.levels}{(character, optional) \code{c("global", "populations")}.
 Should the imputations be computed globally or by populations. Note that

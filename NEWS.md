@@ -1,3 +1,21 @@
+# grur v.0.0.7 2017-10-02
+
+worked on `missing_visualization`
+* added Eric Archer's work on detecting patterns
+* figures are now combined under themes (e.g. all PCoA for the same strata are together, etc)
+
+# grur v.0.0.6 2017-08-18
+
+* several typos fixed
+* work on `missing_visualization`
+
+# grur v.0.0.5 2017-08-15
+
+* restored progress bar when using parallel computing by installing the new dev
+version of `pbmcapply` package.
+
+
+
 # grur v.0.0.5 2017-08-15
 
 * restored progress bar when using parallel computing by installing the new dev

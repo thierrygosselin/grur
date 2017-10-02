@@ -6,12 +6,12 @@
 \usage{
 missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   strata.select = "POP_ID", distance.method = "euclidean",
-  ind.missing.geno.threshold = c(10, 20, 30, 40, 50, 60, 70),
+  ind.missing.geno.threshold = c(10, 20, 30, 40, 50, 60, 70, 80, 90),
   pop.levels = NULL, pop.labels = NULL, pop.select = NULL,
   blacklist.id = NULL, blacklist.genotype = NULL,
   whitelist.markers = NULL, monomorphic.out = TRUE, max.marker = NULL,
   snp.ld = NULL, common.markers = FALSE, filename = NULL,
-  parallel.core = parallel::detectCores() - 1, write.plot = FALSE)
+  parallel.core = parallel::detectCores() - 1, write.plot = TRUE)
 }
 \arguments{
 \item{data}{12 options: VCF (SNPs or Haplotypes,
@@ -65,8 +65,8 @@ This must be one of "euclidean", "maximum", "manhattan", "canberra",
 Default: \code{distance.method = "euclidean"}.}
 
 \item{ind.missing.geno.threshold}{(string) Percentage of missing genotype
-allowed per individuals.
-Default:\code{ind.missing.geno.threshold = c(10,20,30,40,50,60,70)}.}
+allowed per individuals (to create the blacklists).
+Default:\code{ind.missing.geno.threshold = c(10, 20, 30, 40, 50, 60, 70, 80, 90)}.}
 
 \item{pop.levels}{(optional, string) This refers to the levels in a factor. In this
 case, the id of the pop.
@@ -155,17 +155,19 @@ Default: \code{parallel::detectCores() - 1}.}
 \item{write.plot}{(optional, logical) When \code{write.plot = TRUE}, the function
 will write to the directory created by the function the plots, except the heatmap
 that take longer to generate. For this, do it manually following example below.
-Default: \code{write.plot = FALSE}.}
+Default: \code{write.plot = TRUE}.}
 }
 \value{
 A list is created with several objects: the tidy data,
 the principal coordinates
 with eigenvalues of the PCoA, the identity-by-missingness plot, several
 summary tables and plots of missing information
-per individuals, populations and markers. Blacklisted id are also included.
-Whitelists of markers with different level of missingness are also created.
+per individuals, populations and markers. Blacklisted ids are also included.
+Whitelists of markers with different level of missingness are also generated
+automatically.
 A heatmap showing the missing values in black and genotypes in grey provide a
-general overview of the missing data.
+general overview of the missing data. The heatmap is usually long to generate,
+and thus, it's just included as an object in the list and not written in the folder.
 }
 \description{
 Use this function to visualize pattern of missing data.
@@ -192,7 +194,9 @@ Use this function to visualize pattern of missing data.
    \item \strong{Figures and Tables:} figures and summary tables of
    missing information at the marker, individual and population level are
    generated.
-   \item \strong{Blacklist:} create blacklist of individuals based on
+   \item \strong{Whitelist:} create whitelists of markers based on
+   desired thresholds of missing genotypes.
+   \item \strong{Blacklists:} create blacklists of individuals based on
    desired thresholds of missing genotypes.
    \item \strong{Tidy data:} if the filename argument is used, the
    function also output the data in a tidy format.

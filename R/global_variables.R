@@ -56,7 +56,10 @@ if (getRversion() >= "2.15.1") {
       "A1_NUC", "A2_NUC", "RANK", "MAF_P", "MAF_L", "CHROM", "POS", "n",
       "POP_ID_PERM", "MISSING_ORIGINAL", "MARKERS_PERM", "INDIVIDUALS_PERM",
       "MISSING_MIX", "MAR", "MCAR", "value", "GROUPS", "IMP", "OBS", "ME",
-      "GT_MISSING_BINARY"
+      "GT_MISSING_BINARY", "GENOTYPED_THRESHOLD", "NUMBER_INDIVIDUALS",
+      "NUMBER_MARKERS", "path.folder", "(Intercept)", "log10(num.missing.total)",
+      "num.missing.col", "num.missing.total", "p.value", "pct.missing", "statistic",
+      "std.error", "term", "estimate", "a", "b", "is.missing"
     )
   )
 }

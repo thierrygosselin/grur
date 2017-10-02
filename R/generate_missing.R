@@ -18,10 +18,10 @@
 #' taken from the function \code{\link[grur]{memorize_missing}}. The argument
 #' require 2 values in a named list.
 #' i) \code{data = } the path to the file or the name of the object in the
-#' global environment and 
+#' global environment and
 #' ii) \code{column = } the column selected to introduce missingness.
 #' e.g. \code{memorize.missing = list(data = "~/missing_analysis/missing.memory",
-#' column = "MISSING_INDIVIDUALS_MIX")} or 
+#' column = "MISSING_INDIVIDUALS_MIX")} or
 #' if the memory data frame (mem) is in the global environment and you want to
 #' use the populations randomized:
 #' \code{memorize.missing = list(data = mem,
@@ -29,14 +29,14 @@
 #' See function documentation for more details on columns naming scheme.
 #' Default: \code{memorize.missing = NULL}.
 
-#' @param missing.data.type (character) Three options 
+#' @param missing.data.type (character) Three options
 #' (based on Little, R. J., & Rubin, D. B., 2002):
 #' \enumerate{
 #' \item \strong{MCAR} (Missing Completely At Random): the missingness
 #' probability does not depend on any observed or unobserved data
 #' (independent of any covariates).
 #' The risk of introducing biais during imputations is very very low.
-#' 
+#'
 #' \item \strong{MAR} (Missing At Random): the missingness probability
 #' depends only on the observed data.
 #'
@@ -86,7 +86,7 @@
 # @keywords internal
 #' @rdname generate_missing
 #' @importFrom dplyr select distinct n_distinct group_by ungroup rename if_else mutate full_join
-#' @importFrom stats rgamma rmultinom runif rnorm 
+#' @importFrom stats rgamma rmultinom runif rnorm
 #' @importFrom tibble data_frame as_data_frame
 #' @importFrom tidyr unnest
 #' @importFrom purrr flatten_chr map
@@ -113,34 +113,34 @@ generate_missing <- function(
   verbose = TRUE,
   parallel.core = parallel::detectCores() - 1
 ) {
-  
+
   # for timing
   timing <- proc.time()
-  
+
   if (verbose) {
     cat("\n\n")
     cat("###############################################################################\n")
     cat("########################## grur::generate_missing #############################\n")
     cat("###############################################################################\n")
   }
-  
+
   # Empty list to store results ------------------------------------------------
   res = list()
-  
+
   # store function call  -------------------------------------------------------
   res$function.call <- match.call()
-  
+
   # Import data ----------------------------------------------------------------
   if (verbose) message("WARNING: This function is still under testing, use with caution and report bugs\n\n")
-  
+
   # Checking for missing and/or default arguments
   if (missing(data)) stop("Input file is missing")
-  
+
   # import one of 11 genomic file formats with radiator
   if (verbose) message("Importing data...")
   # if (verbose) message("    Keep polymorphic markers common in all populations")
   tidy <- radiator::tidy_genomic_data(data = data, monomorphic.out = FALSE, common.markers = FALSE, verbose = FALSE)
-  
+
   # For long tidy format, switch LOCUS to MARKERS column name, if found MARKERS not found
   if (tibble::has_name(tidy, "LOCUS") && !tibble::has_name(tidy, "MARKERS")) {
     tidy <- dplyr::rename(.data = tidy, MARKERS = LOCUS)
@@ -155,31 +155,31 @@ generate_missing <- function(
   }
   res$random.seed <- random.seed
   random.seed <- NULL
-  
+
   # keep only relevant columns for this function
   want <- c("MARKERS", "CHROM", "LOCUS", "POS", "POP_ID","INDIVIDUALS", "GT")
   tidy <- suppressWarnings(dplyr::select(tidy, dplyr::one_of(want)))
-  
+
   # create a data frame with pop and id ----------------------------------------
   ind.pop.list <- dplyr::distinct(tidy, INDIVIDUALS, POP_ID) %>%
     dplyr::mutate(POP_ID = as.character(POP_ID))
-  
+
   # Number of populations ------------------------------------------------------
   number.populations <- dplyr::n_distinct(ind.pop.list$POP_ID)
   if (verbose) message("Number of populations: ", number.populations)
-  
+
   # Individuals ----------------------------------------------------------------
   number.individuals <- dplyr::n_distinct(ind.pop.list$INDIVIDUALS)
   if (verbose) message("Number of individuals: ", number.individuals)
-  
+
   # Number of markers ----------------------------------------------------------
   number.markers <- dplyr::n_distinct(tidy$MARKERS)
   markers.list <- dplyr::distinct(tidy, MARKERS) %>% purrr::flatten_chr(.)
   if (verbose) message("Number of markers: ", number.markers)
-  
+
   # detect biallelic -----------------------------------------------------------
   biallelic <- radiator::detect_biallelic_markers(tidy, verbose = TRUE)
-  
+
   # Missing from memory --------------------------------------------------------
   if (!is.null(memorize.missing)) {
     if (verbose) message("\nGenerating missing genotypes with missing pattern provided")
@@ -187,32 +187,32 @@ generate_missing <- function(
       memorize.missing,
       tidy, number.populations,number.individuals, number.markers)
   } else {# Missingness Simulations---------------------------------------------
-    
+
     # MCAR -----------------------------------------------------------------------
     if (missing.data.type == "MCAR") {
       if (verbose) message("\nGenerating missing genotypes completely at random (MCAR)")
       tidy <- missing_mcar(tidy, prop.missing.overall)
-      
+
     }#End MCAR
-    
+
     # MAR -----------------------------------------------------------------------
     if (missing.data.type == "MAR") {
       if (verbose) message("\nGenerating missing genotypes at random (MAR)")
       tidy <- missing_mar(tidy, prop.missing.overall)
-      
+
     }#End MAR
-    
+
     # NMAR -----------------------------------------------------------------------
     if (missing.data.type == "NMAR") {
       if (verbose) message("\nGenerating missing genotypes not missing at random (NMAR)")
-      
+
       # simulate the number of reads per individual.
       # Note: this is one way to simulate a compound Dirichlet-multinomial.
       # Trick is to simulate the Dirichlet as a bunch of gammas scaled by their sum
       # Then, set that as the cell probs in a multinomial.
       # The scale is set here only so things are large enough that there
       # is not a likely chance of underflow
-      
+
       tidy <- missing_nmar(
         tidy = tidy,
         number.individuals = number.individuals,
@@ -222,10 +222,10 @@ generate_missing <- function(
         ind.pop.list = ind.pop.list,
         alpha.beta.markers = alpha.beta.markers,
         markers.list = markers.list)
-      
+
     }#End NMAR
   }
-  
+
   # Generate REF/ALT and other genotype coding ---------------------------------
   res$tidy.data <- radiator::change_alleles(data = tidy,
                                           monomorphic.out = FALSE,
@@ -234,7 +234,7 @@ generate_missing <- function(
                                           verbose = TRUE)$input
   # res$tidy.data <- tidy
   tidy <- NULL # no longer needed
-  
+
   #Generate different output ---------------------------------------------------
   message("Generating output file(s): ", stringi::stri_join(output, collapse = ", "))
   res$output <- radiator::genomic_converter(
@@ -245,11 +245,11 @@ generate_missing <- function(
     imputation.method = imputation.method,
     hierarchical.levels = hierarchical.levels,
     parallel.core = parallel.core)
-  
+
   if (is.null(imputation.method)) {
     res$output$tidy.data.imp <- "Imputations: not selected"
   }
-  
+
   # results --------------------------------------------------------------------
   if (verbose) {
     timing <- proc.time() - timing
@@ -289,7 +289,7 @@ markers_dirichlet <- function(number.markers, alpha.beta.markers) {
 #' @export
 
 reads_per_markers <- function(total.reads, markers.cdm, markers.list) {
-  
+
   if (total.reads > 0) {
     res <- stats::rmultinom(
       n = 1,
@@ -315,10 +315,10 @@ reads_per_markers <- function(total.reads, markers.cdm, markers.list) {
 
 missing_from_memory <- function(
   memorize.missing, tidy, number.populations, number.individuals, number.markers) {
-  
+
   mem.data <- memorize.missing$data
   missing.column <- memorize.missing$column
-  
+
   if (is.vector(mem.data)) {
     mem.data <- fst::read.fst(mem.data)
     if (!tibble::has_name(mem.data, missing.column)) stop("Check column naming in missing pattern dataframe")
@@ -329,21 +329,21 @@ missing_from_memory <- function(
   want <- c("POP_ID", "INDIVIDUALS", "MARKERS", missing.column)
   mem.data <- suppressWarnings(dplyr::select(mem.data, dplyr::one_of(want)))
   colnames(mem.data) <- c("POP_ID", "INDIVIDUALS", "MARKERS", "MISSING")
-  
-  # Check that mem.data as the same number of ind, pop and markers 
+
+  # Check that mem.data as the same number of ind, pop and markers
   mem.pop <- dplyr::n_distinct(mem.data$POP_ID)
   if (mem.pop != number.populations) stop("Not the same number of populations between data and missing pattern memorized")
-  
+
   mem.ind <- dplyr::n_distinct(mem.data$INDIVIDUALS)
   if (mem.ind != number.individuals) stop("Not the same number of individuals between data and missing pattern memorized")
-  
+
   mem.markers <- dplyr::n_distinct(mem.data$MARKERS)
   if (mem.markers != number.markers) stop("Not the same number of markers between data and missing pattern memorized")
-  
+
   which.missing <- which(mem.data$MISSING == 0)
   tidy <- dplyr::arrange(tidy, POP_ID, INDIVIDUALS, MARKERS)
   tidy$GT[which.missing] <- "000000"
-  
+
   mem.data <- missing.column <- mem.markers <- mem.ind <- NULL
   mem.pop <- want <- which.missing <- NULL
   return(tidy)
@@ -359,11 +359,11 @@ missing_from_memory <- function(
 
 missing_mcar <- function(tidy, prop.missing.overall) {
   # Note to myself: could also use stats::rbinom... speedtest required
-  tidy <- tidy %>% 
+  tidy <- tidy %>%
     dplyr::mutate(
       MCAR = stats::runif(n = nrow(.), min = 0, max = 1),
       GT = dplyr::if_else(MCAR < prop.missing.overall, "000000", GT)
-    ) %>% 
+    ) %>%
     dplyr::select(-MCAR)
   return(tidy)
 }#End missing_mcar
@@ -377,30 +377,30 @@ missing_mcar <- function(tidy, prop.missing.overall) {
 #' @export
 
 missing_mar <- function(tidy, prop.missing.overall) {
-  
-  
+
+
   # here we use the pop id as covariate (the variable that creates the pattern of missing)
   # Next update could use any variables found in the dataset
   missing.cov <- dplyr::select(tidy, POP_ID) %>%
-    dplyr::mutate(POP_ID = as.numeric(POP_ID)) %>% 
+    dplyr::mutate(POP_ID = as.numeric(POP_ID)) %>%
     as.matrix(.)
-  
+
   beta <- 1
   f <- function(y) mean(1 / (1 + exp(-y - missing.cov %*% beta)))
-  
+
   # find alpha
   alpha <- stats::uniroot(function(t) f(t) - prop.missing.overall, c(-1e6, 1e6),
                           tol = .Machine$double.eps^0.5)$root
   # Test to check that correct proportion of missing is used
   # f(alpha)
-  
+
   logistic <- function(x) exp(x)/(1 + exp(x))
-  
+
   prob.log <- 1 - logistic(alpha + as.numeric(tidy$POP_ID))
   mar <-  1 - stats::rbinom(tidy$GT, 1, prob.log)
   which.missing <- which(mar == 1)
   tidy$GT[which.missing] <- "000000"
-  
+
   # Check
   # nm <- length(tidy.missing$MAR[tidy.missing$MAR == 0])
   # m <- length(tidy.missing$MAR[tidy.missing$MAR == 1])
@@ -419,10 +419,10 @@ missing_nmar <- function(
   tidy, number.individuals, number.markers, average.read.depth, min.reads,
   ind.pop.list, alpha.beta.markers, markers.list
   ){
-  
+
   # Get  the total number of reads per individuals
   # Here we use a normal distribution
-  
+
   total.reads.per.individuals <- stats::rnorm(
     n = number.individuals,
     mean = number.markers * average.read.depth,
@@ -431,10 +431,10 @@ missing_nmar <- function(
     tibble::as_data_frame(.) %>%
     dplyr::rename(TOTAL_READ = value) %>%
     dplyr::bind_cols(ind.pop.list)
-  
+
   # Compound Dirichlet-Multinomial (cdm) for each markers
   markers.cdm <- markers_dirichlet(number.markers, alpha.beta.markers)
-  
+
   # Link everything here to generate the information
   tidy <- suppressWarnings(
     total.reads.per.individuals %>%
@@ -445,14 +445,20 @@ missing_nmar <- function(
           markers.cdm = markers.cdm,
           markers.list = markers.list)
       ) %>%
-      tidyr::unnest(.) %>% 
+      tidyr::unnest(.) %>%
       dplyr::full_join(tidy, by = c("MARKERS", "INDIVIDUALS", "POP_ID")) %>%
       dplyr::mutate(GT = dplyr::if_else(READ_DEPTH < min.reads, "000000", GT)) %>%
       dplyr::ungroup(.) %>%
       dplyr::select(POP_ID, INDIVIDUALS, MARKERS, GT))
       # dplyr::select(dplyr::one_of(want)))
-  
+
   # markers with all missing... yes I've seen it... breaks code...
-  tidy <- radiator::detect_all_missing(data = tidy)
+  # tidy <- radiator::detect_all_missing(data = tidy)
+
+  marker.problem <- radiator::detect_all_missing(data = tidy)
+  if (marker.problem$marker.problem) {
+    tidy <- marker.problem$data
+  }
+  marker.problem <-  NULL
   return(tidy)
 }#End missing_nmar

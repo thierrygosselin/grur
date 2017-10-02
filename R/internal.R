@@ -112,3 +112,523 @@ killExcess <- function(rl, n) {
   if (length(to.kill) > 0) rl$individuals <- rl$individuals[-to.kill, ]
   rl
 }
+
+#' @title ind_genotyped_helper
+#' @description Help individual's genotyped threshold
+#' @rdname ind_genotyped_helper
+#' @keywords internal
+ind_genotyped_helper <- function(x) {
+  # x <- res$missing.genotypes.ind
+  # Set the breaks for the figure
+  max.ind <- dplyr::n_distinct(x$INDIVIDUALS)
+  
+  
+  threshold.helper.overall <- x %>%
+    dplyr::summarise(
+      `0` = length(PERCENT[PERCENT >= 0]),
+      `10` = length(PERCENT[PERCENT >= 10]),
+      `20` = length(PERCENT[PERCENT >= 20]),
+      `30` = length(PERCENT[PERCENT >= 30]),
+      `40` = length(PERCENT[PERCENT >= 40]),
+      `50` = length(PERCENT[PERCENT >= 50]),
+      `60` = length(PERCENT[PERCENT >= 60]),
+      `70` = length(PERCENT[PERCENT >= 70]),
+      `80` = length(PERCENT[PERCENT >= 80]),
+      `90` = length(PERCENT[PERCENT >= 90]),
+      `100` = length(PERCENT[PERCENT == 100])
+    ) %>%
+    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_INDIVIDUALS) %>%
+    dplyr::mutate(POP_ID = rep("OVERALL", n()))
+  
+  threshold.helper.pop <- x %>%
+    dplyr::group_by(POP_ID) %>%
+    dplyr::summarise(
+      `0` = length(PERCENT[PERCENT >= 0]),
+      `10` = length(PERCENT[PERCENT >= 10]),
+      `20` = length(PERCENT[PERCENT >= 20]),
+      `30` = length(PERCENT[PERCENT >= 30]),
+      `40` = length(PERCENT[PERCENT >= 40]),
+      `50` = length(PERCENT[PERCENT >= 50]),
+      `60` = length(PERCENT[PERCENT >= 60]),
+      `70` = length(PERCENT[PERCENT >= 70]),
+      `80` = length(PERCENT[PERCENT >= 80]),
+      `90` = length(PERCENT[PERCENT >= 90]),
+      `100` = length(PERCENT[PERCENT == 100])
+    ) %>%
+    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_INDIVIDUALS, -POP_ID)
+  
+  mean.pop <- threshold.helper.pop %>%
+    dplyr::group_by(GENOTYPED_THRESHOLD) %>%
+    dplyr::summarise(
+      NUMBER_INDIVIDUALS = round(mean(NUMBER_INDIVIDUALS), 0)
+    ) %>%
+    dplyr::mutate(POP_ID = rep("MEAN_POP", n()))
+  
+  threshold.helper <- suppressWarnings(
+    dplyr::bind_rows(threshold.helper.pop, mean.pop, threshold.helper.overall) %>%
+      dplyr::mutate(
+        GENOTYPED_THRESHOLD = as.numeric(GENOTYPED_THRESHOLD),
+        POP_ID = factor(POP_ID, levels = c(levels(x$POP_ID), "MEAN_POP", "OVERALL"), ordered = TRUE)
+      ))
+  threshold.helper.pop <- mean.pop <- threshold.helper.overall <- x <- NULL
+  
+  
+  
+  #Function to replace plyr::round_any
+  rounder <- function(x, accuracy, f = round) {
+    f(x / accuracy) * accuracy
+  }
+  
+  if (max.ind >= 1000) {
+    y.breaks.by <- rounder(max.ind/10, 100, ceiling)
+    y.breaks.max <- rounder(max.ind, 1000, ceiling)
+    y.breaks <- seq(0, y.breaks.max, by = y.breaks.by)
+  } else {
+    y.breaks.by <- rounder(max.ind/10, 10, ceiling)
+    y.breaks.max <- rounder(max.ind, 100, ceiling)
+    y.breaks <- seq(0, y.breaks.max, by = y.breaks.by)
+  }
+  
+  axis.title.element.text.fig <- ggplot2::element_text(
+    size = 12, family = "Helvetica", face = "bold")
+  axis.text.element.text.fig <- ggplot2::element_text(
+    size = 10, family = "Helvetica")
+  
+  plot.ind.geno.threshold <- ggplot2::ggplot(
+    threshold.helper,
+    ggplot2::aes(x = GENOTYPED_THRESHOLD, y = NUMBER_INDIVIDUALS)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
+    ggplot2::scale_x_continuous(name = "Individual's missing genotyped threshold (percent)") +
+    ggplot2::scale_y_continuous(name = "Individuals (number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      axis.title.x = axis.title.element.text.fig,
+      axis.title.y = axis.title.element.text.fig,
+      axis.text.x = axis.text.element.text.fig,
+      axis.text.y = axis.text.element.text.fig
+    ) +
+    ggplot2::facet_grid(~POP_ID)
+  # plot.ind.geno.threshold
+  return(plot.ind.geno.threshold)
+}#End ind_genotyped_helper
+
+#' @title blacklists_id_generator
+#' @description Generate blacklist of ids
+#' @rdname blacklists_id_generator
+#' @keywords internal
+blacklists_id_generator <- function(x, y, path.folder) {
+  blacklist <- list()
+  blacklist.id.missing.geno <- y %>%
+    dplyr::filter(PERCENT >= x) %>%
+    dplyr::ungroup(.) %>%
+    dplyr::select(INDIVIDUALS)
+  if (length(blacklist.id.missing.geno$INDIVIDUALS) > 0) {
+    blacklist.name <- stringi::stri_join("blacklist.id.missing.", x)
+    readr::write_tsv(
+      blacklist.id.missing.geno,
+      stringi::stri_join(path.folder, "/", as.name(blacklist.name), ".tsv"))
+    blacklist[[blacklist.name]] <- blacklist.id.missing.geno
+  } else {
+    blacklist <- NULL
+  }
+  return(blacklist)
+}#End blacklists_id_generator
+
+
+#' @title whitelists_markers_generator
+#' @description Generate whitelists of markers
+#' @rdname whitelists_markers_generator
+#' @keywords internal
+whitelists_markers_generator <- function(x, y, path.folder) {
+  whitelist <- list()
+  whitelist.missing.geno <- dplyr::ungroup(y) %>%
+    dplyr::filter(MISSING_GENOTYPE_PROP <= x) %>%
+    dplyr::ungroup(.) %>%
+    dplyr::distinct(MARKERS)
+  
+  if (length(whitelist.missing.geno$MARKERS) > 0) {
+    whitelist.name <- stringi::stri_join("whitelist.markers.missing.max.", x)
+    readr::write_tsv(
+      whitelist.missing.geno,
+      stringi::stri_join(path.folder, "/", as.name(whitelist.name), ".tsv"))
+    whitelist[[whitelist.name]] <- whitelist.missing.geno
+  } else {
+    whitelist <- NULL
+  }
+  return(whitelist)
+}#End whitelists_markers_generator
+
+
+#' @title markers_genotyped_helper
+#' @description Help individual's genotyped threshold
+#' @rdname markers_genotyped_helper
+#' @keywords internal
+markers_genotyped_helper <- function(x, y) {
+  # x <- res$missing.genotypes.markers.pop
+  # Set the breaks for the figure
+  max.markers <- dplyr::n_distinct(x$MARKERS)
+  
+  threshold.helper.overall <- y %>% 
+    dplyr::ungroup(.) %>% 
+    dplyr::summarise(
+      `0` = length(PERCENT[PERCENT >= 0]),
+      `10` = length(PERCENT[PERCENT >= 10]),
+      `20` = length(PERCENT[PERCENT >= 20]),
+      `30` = length(PERCENT[PERCENT >= 30]),
+      `40` = length(PERCENT[PERCENT >= 40]),
+      `50` = length(PERCENT[PERCENT >= 50]),
+      `60` = length(PERCENT[PERCENT >= 60]),
+      `70` = length(PERCENT[PERCENT >= 70]),
+      `80` = length(PERCENT[PERCENT >= 80]),
+      `90` = length(PERCENT[PERCENT >= 90]),
+      `100` = length(PERCENT[PERCENT == 100])
+    ) %>%
+    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS) %>%
+    dplyr::mutate(POP_ID = rep("OVERALL", n()))
+  
+  threshold.helper.pop <- x %>%
+    dplyr::group_by(POP_ID) %>%
+    dplyr::summarise(
+      `0` = length(PERCENT[PERCENT >= 0]),
+      `10` = length(PERCENT[PERCENT >= 10]),
+      `20` = length(PERCENT[PERCENT >= 20]),
+      `30` = length(PERCENT[PERCENT >= 30]),
+      `40` = length(PERCENT[PERCENT >= 40]),
+      `50` = length(PERCENT[PERCENT >= 50]),
+      `60` = length(PERCENT[PERCENT >= 60]),
+      `70` = length(PERCENT[PERCENT >= 70]),
+      `80` = length(PERCENT[PERCENT >= 80]),
+      `90` = length(PERCENT[PERCENT >= 90]),
+      `100` = length(PERCENT[PERCENT == 100])
+    ) %>%
+    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS, -POP_ID)
+  
+  mean.pop <- threshold.helper.pop %>%
+    dplyr::group_by(GENOTYPED_THRESHOLD) %>%
+    dplyr::summarise(
+      NUMBER_MARKERS = round(mean(NUMBER_MARKERS), 0)
+    ) %>%
+    dplyr::mutate(POP_ID = rep("MEAN_POP", n()))
+  
+  threshold.helper <- suppressWarnings(
+    dplyr::bind_rows(threshold.helper.pop, mean.pop, threshold.helper.overall) %>%
+      dplyr::mutate(
+        GENOTYPED_THRESHOLD = as.numeric(GENOTYPED_THRESHOLD),
+        POP_ID = factor(POP_ID, levels = c(levels(x$POP_ID), "MEAN_POP", "OVERALL"), ordered = TRUE)
+      ))
+  threshold.helper.pop <- mean.pop <- threshold.helper.overall <- x <- y <- NULL
+  
+  
+  
+  #Function to replace plyr::round_any
+  rounder <- function(x, accuracy, f = round) {
+    f(x / accuracy) * accuracy
+  }
+  
+  if (max.markers >= 1000) {
+    y.breaks.by <- rounder(max.markers / 10, 100, ceiling)
+    y.breaks.max <- rounder(max.markers, 1000, ceiling)
+    y.breaks <- seq(0, y.breaks.max, by = y.breaks.by)
+  } else {
+    y.breaks.by <- rounder(max.markers / 10, 10, ceiling)
+    y.breaks.max <- rounder(max.markers, 100, ceiling)
+    y.breaks <- seq(0, y.breaks.max, by = y.breaks.by)
+  }
+  
+  
+  plot.markers.geno.threshold <- ggplot2::ggplot(
+    threshold.helper,
+    ggplot2::aes(x = GENOTYPED_THRESHOLD, y = NUMBER_MARKERS)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
+    ggplot2::scale_x_continuous(name = "Marker's missing genotyped threshold (percent)") +
+    ggplot2::scale_y_continuous(name = "Markers (number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+      axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
+      axis.text.x = ggplot2::element_text(size = 8, family = "Helvetica"),#, angle = 90, hjust = 1, vjust = 0.5),
+      strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
+    ) +
+    ggplot2::facet_grid(~POP_ID)
+  # plot.markers.geno.threshold
+  return(plot.markers.geno.threshold)
+}#End markers_genotyped_helper
+
+
+#' @title generate_pcoa_plot
+#' @description Generate the PCoA plots
+#' @rdname generate_pcoa_plot
+#' @keywords internal
+#' @importFrom ggpubr ggarrange
+generate_pcoa_plot <- function(
+  strata.select,
+  pc.to.do,
+  vectors,
+  variance.component,
+  path.folder,
+  write.plot
+) {
+  pcoa.plots <- list()
+  
+  pcoa_plot <- function(
+    pc.to.do,
+    vectors,
+    variance.component) {
+    pcoa.plots <- list()
+    
+    # pc.to.do <- pc.to.do[[1]]
+    # vectors <- res$vectors
+    # strata.select <- "POP_ID"
+    
+    pcx <- pc.to.do[1]
+    pcy <- pc.to.do[2]
+    element.text.fig <- ggplot2::element_text(
+      size = 12, family = "Helvetica", face = "bold")
+    
+    # size = MISSING_GENOTYPE_PERCENT,
+    # ggplot2::scale_size_area(name = "Individual's missing\ngenotypes proportion", max_size = 5) +
+      
+    ibm.plot <- ggplot2::ggplot(
+      vectors,
+      ggplot2::aes_string(
+        x = stringi::stri_join("Axis.", pcx),
+        y = stringi::stri_join("Axis.", pcy), size = vectors$MISSING_GENOTYPE_PERCENT),
+      environment = environment()) +
+      ggplot2::geom_point(ggplot2::aes_string(colour = strata.select), alpha = 0.5) +
+      ggplot2::labs(x = stringi::stri_join("PCo", pcx, " [", variance.component[pcx,2], "]")) +
+      ggplot2::labs(y = stringi::stri_join("PCo", pcy, " [", variance.component[pcy,2], "]")) +
+      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 5) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        axis.title.x = element.text.fig,
+        axis.title.y = element.text.fig,
+        legend.title = element.text.fig,
+        legend.text = element.text.fig
+      )
+    ibm_plot_name <- stringi::stri_join(
+      "ibm.plot.pco", pcx, ".pco", pcy, ".strata.", strata.select)
+    pcoa.plots[[ibm_plot_name]] <- ibm.plot
+    return(pcoa.plots)
+  }#End pcoa_plot
+  
+  pcoa.plots.strata <- purrr::map(
+    .x = pc.to.do, .f = pcoa_plot,
+    vectors = vectors,
+    variance.component = variance.component) %>%
+    purrr::flatten(.)
+  
+  # pcoa.plots.strata <- arrange_plots_legend(
+  #   pcoa.plots.strata, ncol = 2, nrow = 3,
+  #   position = "right")
+  # 
+  # ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
+  
+  pcoa.plots.strata <- ggpubr::ggarrange(
+    pcoa.plots.strata[[1]],
+    pcoa.plots.strata[[2]],
+    pcoa.plots.strata[[3]],
+    pcoa.plots.strata[[4]],
+    pcoa.plots.strata[[5]],
+    pcoa.plots.strata[[6]],
+    ncol = 2, nrow = 3, legend = "right", common.legend = TRUE
+  )
+  
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/ibm.plots.strata.", strata.select, ".pdf"),
+      plot = pcoa.plots.strata,
+      width = 20, height = 15,
+      dpi = 600, units = "cm",
+      useDingbats = FALSE)
+  }
+  
+  ibm_strata_name <- stringi::stri_join("ibm.strata.", strata.select)
+  pcoa.plots[[ibm_strata_name]] <- pcoa.plots.strata
+  
+  return(pcoa.plots)
+}#End generate_pcoa_plot
+
+
+# tested alternative to ggpubr or cowplot package to reduce installed packages...
+# the problem is my limited understanding of grid and grid extra 
+# note to myself: you managed to write the combined plots but you failed in
+# keeping the combined plots in an object that can be return in the result list
+
+# arrange_plots_legend <- function(plots, ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
+#   # plots <- list(...)
+#   # plots <- unlist(plots)
+#   position <- match.arg(position)
+#   
+#   g <- ggplot2::ggplotGrob(plots[[1]] + ggplot2::theme(legend.position = position))$grobs
+#   legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+#   lheight <- sum(legend$height)
+#   lwidth <- sum(legend$width)
+#   
+#   # gridExtra::grid.arrange(
+#   #   do.call(gridExtra::arrangeGrob, lapply(plots, function(x)
+#   #     x + ggplot2::theme(legend.position="none"))),
+#   #   legend,
+#   #   ncol = 1,
+#   #   heights = grid::unit.c(grid::unit(1, "npc") - lheight, lheight))
+#   gl <- lapply(plots, function(x) x + ggplot2::theme(legend.position="none"))
+#   gl <- c(gl, ncol = ncol, nrow = nrow)
+#   combined <- switch(
+#     position,
+#     "bottom" = gridExtra::arrangeGrob(
+#       do.call(gridExtra::arrangeGrob, gl),
+#       legend,
+#       ncol = 1,
+#       heights = grid::unit.c(grid::unit(1, "npc") - lheight, lheight)),
+#     "right" = gridExtra::arrangeGrob(
+#       do.call(gridExtra::arrangeGrob, gl),
+#       legend,
+#       ncol = 2,
+#       widths = grid::unit.c(grid::unit(1, "npc") - lwidth, lwidth)))
+#   
+#   grid::grid.newpage()
+#   grid::grid.draw(combined)
+#   return(combined)
+# }
+
+
+#' @title pct_missing_by_total
+#' @description Generates plot missing by total
+#' @rdname pct_missing_by_total
+#' @importFrom rlang .data UQ ":="
+#' @importFrom dplyr group_by left_join summarise mutate filter ungroup select arrange
+#' @importFrom ggplot2 ggplot aes_string geom_segment geom_point geom_abline geom_hline aes scale_x_log10 facet_wrap labs
+#' @importFrom purrr map
+#' @importFrom tidyr nest unnest
+#' @importFrom broom tidy
+#' @importFrom stats lm
+#' @keywords internal
+
+pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
+  res <- list()
+  # strata.select <- "POP_ID"
+
+  # the expected % missing by random (1 / number of factor levels)
+  ran.pct.miss <- 1 / length(unique((data[[strata.select]])))
+  
+  # convert GT_BIN to missing or not
+  data$is.missing <- data$GT_MISSING_BINARY == 0
+  
+  # summarize missingness by locus and factor column
+  miss.smry <- dplyr::group_by(.data = data, MARKERS, .data[[rlang::UQ(strata.select)]]) %>% 
+    dplyr::summarise(num.missing.col = sum(is.missing)) %>%
+    dplyr::left_join(
+      data %>%
+        dplyr::group_by(MARKERS) %>%
+        dplyr::summarise(num.missing.total = sum(is.missing)),
+      by = "MARKERS"
+    ) %>%
+    dplyr::filter(num.missing.total > 0) %>%
+    dplyr::mutate(
+      pct.missing = num.missing.col / num.missing.total
+    ) %>%
+    dplyr::ungroup(.)
+  
+  # summarize overall percent missing by factor column
+  pct.miss.col <- miss.smry %>%
+    dplyr::group_by(.data[[rlang::UQ(strata.select)]]) %>%
+    dplyr::summarise(pct.missing = sum(num.missing.col) / sum(num.missing.total)) %>%
+    dplyr::ungroup(.)
+  
+  
+  # reorder factor label levels based on marginal % missingness
+  level.miss <- pct.miss.col[[(rlang::UQ(strata.select))]][order(pct.miss.col$pct.missing, decreasing = TRUE)]
+  
+  pct.miss.col <- pct.miss.col %>%
+    dplyr::mutate(rlang::UQ(strata.select),
+                  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
+                                     levels = level.miss, ordered = TRUE)))
+  
+  
+  # summarize % missing for each total number missing in each factor level (label)
+  miss.smry <- miss.smry %>%
+    dplyr::group_by(.data[[rlang::UQ(strata.select)]], num.missing.total) %>%
+    dplyr::summarize(
+      n = length(pct.missing),
+      mean.miss = mean(pct.missing),
+      lci = stats::quantile(pct.missing, (1 - ci) / 2),
+      uci = stats::quantile(pct.missing, (1 + ci) / 2)
+    ) %>%
+    dplyr::ungroup(.) %>%
+    dplyr::mutate(rlang::UQ(strata.select),
+                  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
+                                           levels = level.miss, ordered = TRUE)))
+  
+  # Tidy result of lm
+  lm.res <- miss.smry %>% 
+    split(x = ., f = .[[rlang::UQ(strata.select)]]) %>% 
+    purrr::map_df(~ broom::tidy(stats::lm(
+      mean.miss ~ log10(num.missing.total), weights = n, data = .)), .id = rlang::UQ(strata.select))
+  
+  lm.res.name <- stringi::stri_join(
+    "pct.missing.lm.", "strata.", strata.select)
+  res[[lm.res.name]] <- lm.res
+  
+  
+  miss.lm.coefs <- lm.res %>% dplyr::select(-c(std.error, statistic, p.value)) %>% 
+    tidyr::spread(data = ., key = term, value = estimate) %>% 
+    dplyr::rename(a = `(Intercept)`, b = `log10(num.missing.total)`) %>% 
+    dplyr::mutate(
+      rlang::UQ(strata.select),  rlang::":="(factor(.data[[rlang::UQ(strata.select)]],
+                               levels = level.miss, ordered = TRUE))) %>% 
+    dplyr::arrange(.data[[rlang::UQ(strata.select)]])
+  
+  axis.title.element <- ggplot2::element_text(
+    size = 12, family = "Helvetica", face = "bold")
+  axis.text.element <- ggplot2::element_text(
+    size = 10, family = "Helvetica")
+  fig <- ggplot2::ggplot(
+    miss.smry, ggplot2::aes_string(x = "num.missing.total")) +
+    ggplot2::geom_segment(
+      ggplot2::aes_string(xend = "num.missing.total", y = "lci", yend = "uci"),
+      color = "gray50") +
+    ggplot2::geom_point(ggplot2::aes_string(y = "mean.miss", size = "n")) +
+    ggplot2::scale_size(breaks = c(0, 10, 100, 1000, 10000)) +
+    ggplot2::geom_abline(data = miss.lm.coefs,
+                         ggplot2::aes(intercept = a, slope = b),
+                         color = "yellow") +
+    ggplot2::geom_hline(ggplot2::aes_string(yintercept = "ran.pct.miss")) +
+    ggplot2::geom_hline(data = pct.miss.col,
+                        ggplot2::aes_string(yintercept = "pct.missing"),
+                        color = "red") +
+    ggplot2::scale_x_log10() +
+    ggplot2::labs(
+      title = stringi::stri_join("Strata: ", strata.select),
+      x = expression(paste("Total number of missing genotypes (", log[10], ")")),
+      y = "Missing genotypes (mean percentage)",
+      size = "Markers missing (number)"
+    ) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      axis.title.x = axis.title.element,
+      axis.text.x = axis.text.element,
+      axis.title.y = axis.title.element,
+      axis.text.y = axis.text.element,
+      legend.title = axis.title.element,
+      legend.text = axis.text.element
+    ) +
+    ggplot2::facet_wrap(rlang::UQ(strata.select))
+  # fig
+  
+  fig.name <- stringi::stri_join(
+    "pct.missing.plot", ".strata.", strata.select)
+  
+  if (write.plot) {
+    ggplot2::ggsave(
+      filename = stringi::stri_join(path.folder, "/", fig.name, ".pdf"),
+      plot = fig,
+      width = 20, height = 15,
+      dpi = 600, units = "cm",
+      useDingbats = FALSE)
+  }
+  
+  res[[fig.name]] <- fig
+  
+  return(res)
+}#End pct_missing_by_total
