@@ -242,10 +242,15 @@ blacklists_id_generator <- function(x, y, path.folder) {
 #' @keywords internal
 whitelists_markers_generator <- function(x, y, path.folder) {
   whitelist <- list()
+  tidy.col <- colnames(y)
+  markers.meta <- purrr::keep(
+    .x = tidy.col,
+    .p = tidy.col %in% c("MARKERS", "CHROM", "LOCUS", "POS"))
+  
   whitelist.missing.geno <- dplyr::ungroup(y) %>%
     dplyr::filter(MISSING_GENOTYPE_PROP <= x) %>%
-    dplyr::ungroup(.) %>%
-    dplyr::distinct(MARKERS)
+    dplyr::select(dplyr::one_of(markers.meta)) %>% 
+    dplyr::distinct(MARKERS, .keep_all = TRUE)
   
   if (length(whitelist.missing.geno$MARKERS) > 0) {
     whitelist.name <- stringi::stri_join("whitelist.markers.missing.max.", x)

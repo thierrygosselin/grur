@@ -282,6 +282,26 @@ missing_visualization <- function(
   
   message("\nProportion of missing genotypes: ", na.before)
   
+  
+  # missingness per individuals (required now in the IBM with PCoA) ------------
+  res$missing.genotypes.ind <- res$tidy.data %>%
+    dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
+    dplyr::group_by(INDIVIDUALS, POP_ID) %>%
+    dplyr::summarise(
+      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
+      MARKER_NUMBER = length(MARKERS),
+      MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
+      PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
+    ) %>%
+    dplyr::ungroup(.) %>%
+    dplyr::arrange(POP_ID, INDIVIDUALS)
+  
+  strata.missing <- dplyr::inner_join(
+    strata.df,
+    dplyr::select(res$missing.genotypes.ind, INDIVIDUALS, MISSING_GENOTYPE_PERCENT = PERCENT),
+    by = "INDIVIDUALS")
+  
+  
   # Identity-by-missingness (IBM) analysis -------------------------------------
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("\n\nIdentity-by-missingness (IBM) analysis using\n    Principal Coordinate Analysis (PCoA)...")
@@ -343,25 +363,6 @@ missing_visualization <- function(
   # dplyr::inner_join(strata.df, by = "INDIVIDUALS")
   
   # with vegan and ape
-  
-  # integrate missingness per individuals
-  res$missing.genotypes.ind <- res$tidy.data %>%
-    dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
-    dplyr::group_by(INDIVIDUALS, POP_ID) %>%
-    dplyr::summarise(
-      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
-      MARKER_NUMBER = length(MARKERS),
-      MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
-      PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
-    ) %>%
-    dplyr::ungroup(.) %>%
-    dplyr::arrange(POP_ID, INDIVIDUALS)
-  
-  strata.missing <- dplyr::inner_join(
-    strata.df,
-    dplyr::select(res$missing.genotypes.ind, INDIVIDUALS, MISSING_GENOTYPE_PERCENT = PERCENT),
-    by = "INDIVIDUALS")
-  
   
   res$vectors <- dplyr::inner_join(
     strata.missing,
@@ -451,21 +452,21 @@ missing_visualization <- function(
   # res$heatmap
   
   # Missing summary ------------------------------------------------------------
-  message("Generating missing information summary tables and plot")
+  message("Generating missing information summary tables and plots")
   
   # Individuals-----------------------------------------------------------------
   message("Missingness per individuals")
-  res$missing.genotypes.ind <- res$tidy.data %>%
-    dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
-    dplyr::group_by(INDIVIDUALS, POP_ID) %>%
-    dplyr::summarise(
-      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
-      MARKER_NUMBER = length(MARKERS),
-      MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
-      PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
-    ) %>%
-    dplyr::ungroup(.) %>%
-    dplyr::arrange(POP_ID, INDIVIDUALS)
+  # res$missing.genotypes.ind <- res$tidy.data %>%
+  #   dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
+  #   dplyr::group_by(INDIVIDUALS, POP_ID) %>%
+  #   dplyr::summarise(
+  #     MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
+  #     MARKER_NUMBER = length(MARKERS),
+  #     MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
+  #     PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
+  #   ) %>%
+  #   dplyr::ungroup(.) %>%
+  #   dplyr::arrange(POP_ID, INDIVIDUALS)
   
   # Figures
   axis.title.element.text.fig <- ggplot2::element_text(
@@ -618,9 +619,14 @@ missing_visualization <- function(
   # Markers---------------------------------------------------------------------
   message("Missingness per markers")
   
+  want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "GT_MISSING_BINARY")
+  tidy.col <- colnames(res$tidy.data)
+  markers.meta <- purrr::keep(
+    .x = tidy.col,
+    .p = tidy.col %in% c("MARKERS", "CHROM", "LOCUS", "POS"))
   res$missing.genotypes.markers.overall <- res$tidy.data %>%
-    dplyr::select(MARKERS, INDIVIDUALS, GT_MISSING_BINARY) %>%
-    dplyr::group_by(MARKERS) %>%
+    dplyr::select(dplyr::one_of(want)) %>% 
+    dplyr::group_by_if(.tbl = ., .predicate = colnames(x = .) %in% markers.meta) %>% 
     dplyr::summarise(
       MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
       INDIVIDUALS_NUMBER = length(INDIVIDUALS),
@@ -629,6 +635,18 @@ missing_visualization <- function(
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::arrange(MARKERS)
+  
+  # res$missing.genotypes.markers.overall <- res$tidy.data %>%
+  #   dplyr::select(MARKERS, INDIVIDUALS, GT_MISSING_BINARY) %>%
+  #   dplyr::group_by(markers.meta) %>%
+  #   dplyr::summarise(
+  #     MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
+  #     INDIVIDUALS_NUMBER = length(INDIVIDUALS),
+  #     MISSING_GENOTYPE_PROP = MISSING_GENOTYPE / INDIVIDUALS_NUMBER,
+  #     PERCENT = round(MISSING_GENOTYPE_PROP * 100, 2)
+  #   ) %>%
+  #   dplyr::ungroup(.) %>%
+  #   dplyr::arrange(MARKERS)
   
   res$missing.genotypes.markers.pop <- res$tidy.data %>%
     dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
@@ -642,13 +660,13 @@ missing_visualization <- function(
     dplyr::ungroup(.) %>%
     dplyr::arrange(POP_ID, MARKERS)
   
+  # test <- res$missing.genotypes.markers.overall
   markers.missing.geno.threshold <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ,0.8, 0.9)
   whitelists <- purrr::map(
     .x = markers.missing.geno.threshold,
     .f = whitelists_markers_generator,
     y = res$missing.genotypes.markers.overall,
     path.folder = path.folder) %>% purrr::flatten(.)
-  
   
   message("Whitelist(s) of markers generated: ", length(whitelists))
   whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 

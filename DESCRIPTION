@@ -48,7 +48,6 @@ Suggests:
 Remotes:
     github::thierrygosselin/radiator,
     github::kvnkuang/pbmcapply
-biocViews: 
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr
