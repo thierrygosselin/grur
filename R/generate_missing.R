@@ -227,11 +227,11 @@ generate_missing <- function(
   }
 
   # Generate REF/ALT and other genotype coding ---------------------------------
-  res$tidy.data <- radiator::change_alleles(data = tidy,
-                                          monomorphic.out = FALSE,
-                                          biallelic = biallelic,
-                                          parallel.core = parallel.core,
-                                          verbose = TRUE)$input
+  res$tidy.data <- radiator::change_alleles(
+    data = tidy,
+    biallelic = biallelic,
+    parallel.core = parallel.core,
+    verbose = TRUE)$input
   # res$tidy.data <- tidy
   tidy <- NULL # no longer needed
 

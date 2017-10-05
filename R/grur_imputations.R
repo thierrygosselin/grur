@@ -1218,7 +1218,7 @@ grur_imputations <- function(
     if (verbose) message("Adjusting REF/ALT alleles to account for imputations...")
     input.imp <- radiator::change_alleles(
       data = input.imp,
-      monomorphic.out = FALSE, biallelic = biallelic,
+      biallelic = biallelic,
       parallel.core = parallel.core,
       verbose = verbose)$input
   } # end computing REF/ALT
