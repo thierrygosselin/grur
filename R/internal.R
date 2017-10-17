@@ -392,9 +392,6 @@ generate_pcoa_plot <- function(
     element.text.fig <- ggplot2::element_text(
       size = 12, family = "Helvetica", face = "bold")
     
-    # size = MISSING_GENOTYPE_PERCENT,
-    # ggplot2::scale_size_area(name = "Individual's missing\ngenotypes proportion", max_size = 5) +
-      
     ibm.plot <- ggplot2::ggplot(
       vectors,
       ggplot2::aes_string(
@@ -404,7 +401,7 @@ generate_pcoa_plot <- function(
       ggplot2::geom_point(ggplot2::aes_string(colour = strata.select), alpha = 0.5) +
       ggplot2::labs(x = stringi::stri_join("PCo", pcx, " [", variance.component[pcx,2], "]")) +
       ggplot2::labs(y = stringi::stri_join("PCo", pcy, " [", variance.component[pcy,2], "]")) +
-      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 5) +
+      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 3) +
       ggplot2::theme_bw() +
       ggplot2::theme(
         axis.title.x = element.text.fig,

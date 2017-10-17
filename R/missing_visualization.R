@@ -144,12 +144,12 @@
 #' @importFrom stringi stri_join stri_replace_all_fixed stri_replace_all_regex
 #' @importFrom utils count.fields
 #' @importFrom readr read_tsv write_tsv
-#' @importFrom data.table fread melt.data.table as.data.table
 #' @importFrom ape pcoa
 #' @importFrom stats dist lm
 #' @importFrom tibble data_frame
 #' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh detect_all_missing
 #' @importFrom cowplot plot_grid align_plots
+#' @importFrom tidyr spread gather
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
@@ -624,7 +624,7 @@ missing_visualization <- function(
   markers.meta <- purrr::keep(
     .x = tidy.col,
     .p = tidy.col %in% c("MARKERS", "CHROM", "LOCUS", "POS"))
-  res$missing.genotypes.markers.overall <- res$tidy.data %>%
+  res$missing.genotypes.markers.overall <- suppressWarnings(res$tidy.data %>%
     dplyr::select(dplyr::one_of(want)) %>% 
     dplyr::group_by_if(.tbl = ., .predicate = colnames(x = .) %in% markers.meta) %>% 
     dplyr::summarise(
@@ -634,7 +634,7 @@ missing_visualization <- function(
       PERCENT = round(MISSING_GENOTYPE_PROP * 100, 2)
     ) %>%
     dplyr::ungroup(.) %>%
-    dplyr::arrange(MARKERS)
+    dplyr::arrange(MARKERS))
   
   # res$missing.genotypes.markers.overall <- res$tidy.data %>%
   #   dplyr::select(MARKERS, INDIVIDUALS, GT_MISSING_BINARY) %>%
