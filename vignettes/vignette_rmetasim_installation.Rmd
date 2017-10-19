@@ -1,6 +1,9 @@
 ---
 title: "rmetasim installation"
-output: html_notebook
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
 ---
 
 `grur` RADseq-based simulation framework will almost always require more markers
@@ -12,28 +15,108 @@ This vignette purposes is to show users how to modify/install
 latest default set to 2000 markers. 
 
 
-**Time to allow: ETA < 5 min**
+**Time to allow: ETA ~10 min**
+
+#Update [clang](https://en.wikipedia.org/wiki/Clang) 
+
+##macOS
+We want clang with openmp
+```{r}
+#Terminal
+cd Downloads
+wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+```
+
+**Rename clang:** if you have a *programs* folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time), move the clang folder inside that folder and at the same time, rename it:
+```{r}
+#Terminal
+sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang
+```
+
+**Delete** downloaded files:
+```{r}
+sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+```
+
+##Linux
+Several flavors available, check for the proper [link](http://releases.llvm.org/download.html)
 
 
-1. Download the latest github release of Allan Strand's `rmetasim`
+#Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)
+
+Open the [`.bash_profile`](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=bash_profile#save-time) file with Terminal *nano* or [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) or another text editor:
+```{r}
+export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/clang-c:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/c++:$CPLUS_INCLUDE_PATH
+```
+
+#Modify *R's* `~/.R/Makevars` file
+
+This is exactly the same step required to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and 
+[data.table](https://github.com/Rdatatable/data.table) to work in parallel.
+This is detailed in this vignette: [vignette_imputations_parallel](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd)
+
+With macOS use [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) to open the file with `Show hidden items` turned `ON`. You want these lines:
+```{r}
+CC=/usr/local/bin/gcc
+CXX=/usr/local/bin/g++
+FC=/usr/local/bin/gfortran
+F77=/usr/local/bin/gfortran
+PKG_LIBS = -fopenmp -lgomp
+PKG_CFLAGS= -O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
+PKG_CXXFLAGS=-fopenmp -std=c++11
+CFLAGS= -O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
+SHLIB_OPENMP_CFLAGS = -fopenmp
+SHLIB_OPENMP_CXXFLAGS = -fopenmp
+SHLIB_OPENMP_FCFLAGS = -fopenmp
+SHLIB_OPENMP_FFLAGS = -fopenmp
+FLIBS=-L/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/7.1.0/finclude # change according to your computer compiler version
+CFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
+CXXFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
+```
+
+If you don't have the file, use sudo nano in the Terminal to create one:
+```{r}
+cd ~
+sudo mkdir ~/.R
+sudo nano ~/.R/Makevars
+```
+Copy/paste the section above. Save and Exit with: `crt-o`, `enter`, `crt-x`.
+
+#`rmetasim`
+Hang in there it's almost over...
+
+Download the latest github release of Allan Strand's **rmetasim**
+
+##In R
 ```{r download rmetasim, echo=TRUE}
 utils::download.file(
   url = "https://github.com/stranda/rmetasim/archive/master.zip",
   destfile = "grur_rmetasim.zip")
-```
-
-2. unzip the file
-```{r unzip rmetasim, echo=TRUE}
+#unzip the file
 utils::unzip(zipfile = "grur_rmetasim.zip")
 ```
 
-3. Modify the `const.h` file in the `src` folder: `rmetasim-master/src/const.h`.
-Navigate to lane 33 and change the integer to the maximum markers your likely to use.
 
+##in Terminal
+```{r}
+cd Downloads
+wget https://github.com/stranda/rmetasim/archive/master.zip
+unzip master.zip
+```
 
-    e.g. in the **Terminal** with *nano* (this can be done in *TextWrangler*):
+## 1 quick modification
+
+###Using a text editor
+
+With macOS use [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) to modify the `const.h` file in the `src` folder: `rmetasim-master/src/const.h`.
+Navigate to **lane 33** and change the integer to the maximum number of marker
+your likely to use.
+
+###With *nano* in the Terminal
 ```{r edit in nano}
-sudo nano ~/rmetasim-master/src/const.h
+sudo nano rmetasim-master/src/const.h
 # change
 
 #define MAXLOCI               2000
@@ -43,19 +126,31 @@ sudo nano ~/rmetasim-master/src/const.h
 #define MAXLOCI               200000
 
 ```
-4. Save and exit *nano*
+
+Keep lines with `#`. Save and exit *nano*
 ```{r save and exit nano}
 ctrl-o
 enter
 ctrl-x
 ```
 
-5. Install from the Terminal
+###Compile `rmetasim`
+
 ```{r}
+#Terminal
 R CMD INSTALL "rmetasim-master"
 ```
 
-**Note:**
+*Warning*: Using `devtools::install` will not work with current `devtools` CRAN version [details](https://community.rstudio.com/t/difference-between-r-cmd-install-and-devtools-install/1441/3).
+The devel version will work using:
+
+```{r}
+devtools::install_github("hadley/devtools")
+devtools::install("~/Downloads/rmetasim-master")
+```
+
+
+###What to expect
 There sould be some warning messages, not to worry, Allan says it's normal.
 However, at the end you should see something like this:
 ```{r}
@@ -73,12 +168,12 @@ However, at the end you should see something like this:
    ‘rmetasim.Rmd’ using ‘UTF-8’ 
 ** testing if installed package can be loaded
 * DONE (rmetasim)
-
 ```
 
 
-6. Remove folders
+###Remove folders
 ```{r removing downloaded folders}
+#Terminal
 cd ..
 sudo rm -R grur_rmetasim.zip rmetasim-master
 ```

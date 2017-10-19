@@ -43,7 +43,7 @@ SHLIB_OPENMP_CFLAGS = -fopenmp
 SHLIB_OPENMP_CXXFLAGS = -fopenmp
 SHLIB_OPENMP_FCFLAGS = -fopenmp
 SHLIB_OPENMP_FFLAGS = -fopenmp
-FLIBS=-L/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.3.0/finclude # change according to your computer compiler version
+FLIBS=-L/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/7.1.0/finclude # change according to your computer compiler version
 CFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
 CXXFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
 ```
