@@ -72,6 +72,7 @@ library(grur)
 ```
 
 #### Troubleshooting
+  * `rmetasim` needs to be modified in order to simulate more than 2000 markers [see vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd)
   * **Parallel computing**: [Follow these steps (~ 5 min)](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
   * [Installation problems.](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
   * **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
