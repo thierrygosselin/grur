@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Thierry Gosselin" />
 
-<meta name="date" content="2017-04-08" />
+<meta name="date" content="2017-10-20" />
 
 <title>Imputations in Parallel</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Imputations in Parallel</h1>
 <h4 class="author"><em>Thierry Gosselin</em></h4>
-<h4 class="date"><em>2017-04-08</em></h4>
+<h4 class="date"><em>2017-10-20</em></h4>
 
 
 
@@ -81,46 +81,46 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3>Option 1: From source (Linux &amp; Mac OSX) <a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">details here</a></h3>
 <ol style="list-style-type: decimal">
 <li><p>Make sure you have gcc with openmp enabled. To check the version of your compiler, in the Terminal:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gcc --version <span class="co"># should be higher than 4.8</span></code></pre></div></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gcc <span class="op">--</span>version <span class="co"># should be higher than 4.8</span></code></pre></div></li>
 <li><p>To update your computer’s compiler follow this <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#update-your-computer-s-compiler">simple tutorial</a> (2-5 min)</p></li>
 <li><p>Update your <code>~/.R/Makevars</code> file. With MAC OSX use <a href="http://www.barebones.com/products/textwrangler/">TextWrangler</a> to open the file with <code>Show hidden items</code> turned <code>ON</code>. You should have these lines:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CC=<span class="er">/</span>usr/local/bin/gcc
-CXX=<span class="er">/</span>usr/local/bin/g++
-FC=<span class="er">/</span>usr/local/bin/gfortran
-F77=<span class="er">/</span>usr/local/bin/gfortran
-PKG_LIBS =<span class="st"> </span>-fopenmp -lgomp
-PKG_CFLAGS=<span class="st"> </span>-O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
-PKG_CXXFLAGS=-fopenmp -std=c++<span class="dv">11</span>
-CFLAGS=<span class="st"> </span>-O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
-SHLIB_OPENMP_CFLAGS =<span class="st"> </span>-fopenmp
-SHLIB_OPENMP_CXXFLAGS =<span class="st"> </span>-fopenmp
-SHLIB_OPENMP_FCFLAGS =<span class="st"> </span>-fopenmp
-SHLIB_OPENMP_FFLAGS =<span class="st"> </span>-fopenmp
-FLIBS=-L/usr/local/lib/gcc/x86_64-apple-darwin15<span class="fl">.6.0</span>/<span class="fl">6.3.0</span>/finclude <span class="co"># change according to your computer compiler version</span>
-CFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
-CXXFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion</code></pre></div></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CC=<span class="er">/</span>usr<span class="op">/</span>local<span class="op">/</span>bin<span class="op">/</span>gcc
+CXX=<span class="er">/</span>usr<span class="op">/</span>local<span class="op">/</span>bin<span class="op">/</span>g<span class="op">++</span>
+FC=<span class="er">/</span>usr<span class="op">/</span>local<span class="op">/</span>bin<span class="op">/</span>gfortran
+F77=<span class="er">/</span>usr<span class="op">/</span>local<span class="op">/</span>bin<span class="op">/</span>gfortran
+PKG_LIBS =<span class="st"> </span><span class="op">-</span>fopenmp <span class="op">-</span>lgomp
+PKG_CFLAGS=<span class="st"> </span><span class="op">-</span>O3 <span class="op">-</span>Wall <span class="op">-</span>pipe <span class="op">-</span>pedantic <span class="op">-</span>std=gnu99 <span class="op">-</span>fopenmp
+PKG_CXXFLAGS=<span class="op">-</span>fopenmp <span class="op">-</span>std=c<span class="op">++</span><span class="dv">11</span>
+CFLAGS=<span class="st"> </span><span class="op">-</span>O3 <span class="op">-</span>Wall <span class="op">-</span>pipe <span class="op">-</span>pedantic <span class="op">-</span>std=gnu99 <span class="op">-</span>fopenmp
+SHLIB_OPENMP_CFLAGS =<span class="st"> </span><span class="op">-</span>fopenmp
+SHLIB_OPENMP_CXXFLAGS =<span class="st"> </span><span class="op">-</span>fopenmp
+SHLIB_OPENMP_FCFLAGS =<span class="st"> </span><span class="op">-</span>fopenmp
+SHLIB_OPENMP_FFLAGS =<span class="st"> </span><span class="op">-</span>fopenmp
+FLIBS=<span class="op">-</span>L<span class="op">/</span>usr<span class="op">/</span>local<span class="op">/</span>lib<span class="op">/</span>gcc<span class="op">/</span>x86_<span class="dv">64</span><span class="op">-</span>apple<span class="op">-</span>darwin15.<span class="fl">6.0</span><span class="op">/</span><span class="fl">7.1</span>.<span class="dv">0</span><span class="op">/</span>finclude <span class="co"># change according to your computer compiler version</span>
+CFLAGS=<span class="op">-</span>mtune=native <span class="op">-</span>g <span class="op">-</span>O2 <span class="op">-</span>Wall <span class="op">-</span>pedantic <span class="op">-</span>Wconversion
+CXXFLAGS=<span class="op">-</span>mtune=native <span class="op">-</span>g <span class="op">-</span>O2 <span class="op">-</span>Wall <span class="op">-</span>pedantic <span class="op">-</span>Wconversion</code></pre></div></li>
 <li><p>You don’t have the file ? Use sudo nano in the Terminal to create one:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cd ~
-sudo mkdir ~<span class="er">/</span>.R
-sudo nano ~<span class="er">/</span>.R/Makevars</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cd <span class="op">~</span>
+sudo mkdir <span class="op">~</span><span class="er">/</span>.R
+sudo nano <span class="op">~</span><span class="er">/</span>.R<span class="op">/</span>Makevars</code></pre></div>
 <p>Copy/paste the section in step 3. Save and Exit with: <code>crt-o</code>, <code>enter</code>, <code>crt-x</code>.</p></li>
 <li><p>Download and compile randomForestSRC, from the Terminal:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cd ~<span class="er">/</span>Downloads
-curl -O https:<span class="er">//</span>cran.r-project.org/src/contrib/randomForestSRC_2<span class="fl">.4.2</span>.tar.gz
-tar -zxvf randomForestSRC_2<span class="fl">.4.2</span>.tar.gz
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cd <span class="op">~</span><span class="er">/</span>Downloads
+curl <span class="op">-</span>O https<span class="op">:</span><span class="er">//</span>cran.r<span class="op">-</span>project.org<span class="op">/</span>src<span class="op">/</span>contrib<span class="op">/</span>randomForestSRC_<span class="fl">2.4</span>.<span class="fl">2.</span>tar.gz
+tar <span class="op">-</span>zxvf randomForestSRC_<span class="fl">2.4</span>.<span class="fl">2.</span>tar.gz
 cd randomForestSRC
 autoconf</code></pre></div></li>
 <li><p>Install and load randomForestSRC, from R console/RStudio console:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_local</span>(<span class="dt">path =</span> <span class="st">&quot;~/Downloads/randomForestSRC&quot;</span>)</code></pre></div></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">path =</span> <span class="st">&quot;~/Downloads/randomForestSRC&quot;</span>)</code></pre></div></li>
 </ol>
 </div>
 <div id="option-2-mac-osx-windows-use-the-pre-compiled-binary-instructions-here" class="section level3">
 <h3>Option 2 (Mac OSX &amp; Windows): Use the pre-compiled binary <a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">instructions here</a></h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># NOTES: their is currently a bug with pre-compiled binaries below. Use option 1 until further notice</span>
 <span class="co"># Mac OSX</span>
-devtools::<span class="kw">install_url</span>(<span class="dt">url =</span> <span class="st">&quot;http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.4.2.tgz&quot;</span>)
+devtools<span class="op">::</span><span class="kw">install_url</span>(<span class="dt">url =</span> <span class="st">&quot;http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.4.2.tgz&quot;</span>)
 <span class="co"># Windows</span>
-devtools::<span class="kw">install_url</span>(<span class="dt">url =</span> <span class="st">&quot;http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.4.2.zip&quot;</span>)</code></pre></div>
+devtools<span class="op">::</span><span class="kw">install_url</span>(<span class="dt">url =</span> <span class="st">&quot;http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.4.2.zip&quot;</span>)</code></pre></div>
 <p>If you opted for option 2 and are still having problems, please use Option 1 …</p>
 </div>
 </div>
@@ -136,7 +136,7 @@ devtools::<span class="kw">install_url</span>(<span class="dt">url =</span> <spa
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

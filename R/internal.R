@@ -1,5 +1,8 @@
+#' @title landscape.new.ind.genos
+#' @description landscape.new.ind.genos
+#' @rdname landscape.new.ind.genos
+#' @export
 #' @keywords internal
-#' 
 landscape.new.ind.genos <- function(rland, PopulationSizes, AlleleFreqs = NULL) {
   if (!is.null(AlleleFreqs))
     if (length(AlleleFreqs) != length(rland$loci)) {
@@ -54,8 +57,12 @@ landscape.new.ind.genos <- function(rland, PopulationSizes, AlleleFreqs = NULL) 
   rland
 }
 
+
+#' @title loadLandscape
+#' @description loadLandscape
+#' @rdname loadLandscape
+#' @export
 #' @keywords internal
-#' 
 loadLandscape <- function(sc, AlleleFreqs, num.gens) {
   rl <- rmetasim::landscape.new.intparam(
     rmetasim::landscape.new.empty(), h = sc$num.pops, 
@@ -74,7 +81,7 @@ loadLandscape <- function(sc, AlleleFreqs, num.gens) {
   R <- rmetasim::landscape.mig.matrix(
     h = nrow(sc$mig.mat), s = 2, mig.model = "custom", R.custom = sc$mig.mat
   )$R
-  rl <- rmetasim::landscape.new.epoch(rl, R = R, carry = rep(sc$Ne, sc$num.pops))
+  rl <- rmetasim::landscape.new.epoch(rl, R = R, carry = rep(sc$ne, sc$num.pops))
   
   #just make loci that have the correct type and ploidy
   for (i in 1:length(AlleleFreqs)) {
@@ -84,11 +91,14 @@ loadLandscape <- function(sc, AlleleFreqs, num.gens) {
     )
   }
   
-  landscape.new.ind.genos(rl, rep(c(sc$Ne, 0), sc$num.pops), AlleleFreqs)
+  landscape.new.ind.genos(rl, rep(c(sc$ne, 0), sc$num.pops), AlleleFreqs)
 }
 
+#' @title landscape2gtypes
+#' @description landscape2gtypes
+#' @rdname landscape2gtypes
+#' @export
 #' @keywords internal
-#' 
 landscape2gtypes <- function(Rland) {
   pl <- rmetasim::landscape.ploidy(Rland)
   strata <- Rland$individuals[, 1] %/% Rland$intparam$stages + 1
@@ -100,8 +110,11 @@ landscape2gtypes <- function(Rland) {
   strataG::df2gtypes(gen.data, ploidy = pl[1], id.col = NULL, strata.col = 1, loc.col = 2)
 }
 
+#' @title killExcess
+#' @description killExcess
+#' @export
+#' @rdname killExcess
 #' @keywords internal
-#' 
 killExcess <- function(rl, n) {
   to.kill <- tapply(1:nrow(rl$individuals), rl$individuals[, 1], function(i) {
     if (length(i) > n) {
@@ -116,6 +129,7 @@ killExcess <- function(rl, n) {
 #' @title ind_genotyped_helper
 #' @description Help individual's genotyped threshold
 #' @rdname ind_genotyped_helper
+#' @export
 #' @keywords internal
 ind_genotyped_helper <- function(x) {
   # x <- res$missing.genotypes.ind
@@ -216,6 +230,7 @@ ind_genotyped_helper <- function(x) {
 #' @title blacklists_id_generator
 #' @description Generate blacklist of ids
 #' @rdname blacklists_id_generator
+#' @export
 #' @keywords internal
 blacklists_id_generator <- function(x, y, path.folder) {
   blacklist <- list()
@@ -239,6 +254,7 @@ blacklists_id_generator <- function(x, y, path.folder) {
 #' @title whitelists_markers_generator
 #' @description Generate whitelists of markers
 #' @rdname whitelists_markers_generator
+#' @export
 #' @keywords internal
 whitelists_markers_generator <- function(x, y, path.folder) {
   whitelist <- list()
@@ -268,6 +284,7 @@ whitelists_markers_generator <- function(x, y, path.folder) {
 #' @title markers_genotyped_helper
 #' @description Help individual's genotyped threshold
 #' @rdname markers_genotyped_helper
+#' @export
 #' @keywords internal
 markers_genotyped_helper <- function(x, y) {
   # x <- res$missing.genotypes.markers.pop
@@ -366,6 +383,7 @@ markers_genotyped_helper <- function(x, y) {
 #' @description Generate the PCoA plots
 #' @rdname generate_pcoa_plot
 #' @keywords internal
+#' @export
 #' @importFrom ggpubr ggarrange
 generate_pcoa_plot <- function(
   strata.select,
@@ -506,6 +524,7 @@ generate_pcoa_plot <- function(
 #' @importFrom broom tidy
 #' @importFrom stats lm
 #' @keywords internal
+#' @export
 
 pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
   res <- list() # to store results

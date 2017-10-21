@@ -113,17 +113,16 @@ generate_missing <- function(
   verbose = TRUE,
   parallel.core = parallel::detectCores() - 1
 ) {
-
-  # for timing
-  timing <- proc.time()
-
+  opt.change <- getOption("width")
+  options(width = 70)
   if (verbose) {
-    cat("\n\n")
-    cat("###############################################################################\n")
-    cat("########################## grur::generate_missing #############################\n")
-    cat("###############################################################################\n")
-  }
-
+    cat("#######################################################################\n")
+    cat("####################### grur::generate_missing ########################\n")
+    cat("#######################################################################\n")
+  } 
+  timing <- proc.time()
+  
+  
   # Empty list to store results ------------------------------------------------
   res = list()
 
@@ -254,7 +253,7 @@ generate_missing <- function(
   if (verbose) {
     timing <- proc.time() - timing
     message("\nComputation time: ", round(timing[[3]]), " sec")
-    cat("############################## completed ##############################\n")
+    cat("################## grur::generate_missing completed ###################\n")
   }
   return(res)
 } # End of generate_missing function
@@ -377,8 +376,6 @@ missing_mcar <- function(tidy, prop.missing.overall) {
 #' @export
 
 missing_mar <- function(tidy, prop.missing.overall) {
-
-
   # here we use the pop id as covariate (the variable that creates the pattern of missing)
   # Next update could use any variables found in the dataset
   missing.cov <- dplyr::select(tidy, POP_ID) %>%

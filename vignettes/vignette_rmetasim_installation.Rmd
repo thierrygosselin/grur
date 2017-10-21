@@ -20,7 +20,7 @@ latest default set to 2000 markers.
 #Update [clang](https://en.wikipedia.org/wiki/Clang) 
 
 ##macOS
-We want clang with openmp
+We want clang compiler with OpenMP enabled
 ```{r}
 #Terminal
 cd Downloads

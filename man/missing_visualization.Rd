@@ -277,5 +277,5 @@ Trends in Ecology and Evolution. 2016;31: 940-952.
 doi:10.1016/j.tree.2016.09.005
 }
 \author{
-Thierry Gosselin \email{thierrygosselin@icloud.com}
+Thierry Gosselin \email{thierrygosselin@icloud.com} and Eric Archer \email{eric.archer@noaa.gov}
 }

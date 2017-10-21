@@ -7,53 +7,68 @@
 simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000, ne = c(50,
   500), nm = c(0, 0.1, 0.5, 1, 5), theta = 0.2, mig.type = c("island",
   "stepping.stone"), num.reps = 10, num.rms.gens = 5, label = NULL,
-  fsc.exec = "fsc252", parallel.core = NULL)
+  fsc.exec = "fsc26", parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
-\item{num.pops}{number of populations.
+\item{num.pops}{(integer) Number of populations.
 Default: \code{num.pops = 5}.}
 
-\item{num.loci}{number of independent RADseq loci.
+\item{num.loci}{(integer) Number of independent RADseq loci.
+To use more than 2000 loci, \pkg{rmetasim} needs to be modified
+\href{https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd}{vignette}.
 Default: \code{num.loci = 1000}.}
 
-\item{div.time}{time since divergence of populations.
+\item{div.time}{(integer) Time since divergence of populations.
 Default: \code{div.time = 25000}.}
 
-\item{ne}{effective populations size.
+\item{ne}{(integer) Effective populations size.
 Default: \code{ne = c(50, 500)}.}
 
-\item{nm}{number of migrants per generation.
+\item{nm}{(integer) Number of migrants per generation.
 Default: \code{nm = c(0, 0.1, 0.5, 1, 5)}.}
 
-\item{theta}{value of theta (= ne * migration rate).
+\item{theta}{(integer) Value of theta (= ne * migration rate).
 Default: \code{theta = 0.2}.}
 
-\item{mig.type}{migration topology type: \code{"island"} or 
+\item{mig.type}{(integer) Migration topology type: \code{"island"} or 
 \code{"stepping.stone"}.}
 
-\item{num.reps}{number of replicates for each scenario.
+\item{num.reps}{(integer) Number of replicates for each scenario.
 Default: \code{num.reps = 10}.}
 
-\item{num.rms.gens}{number of \code{rmetasim} generations to establish
+\item{num.rms.gens}{(integer) Number of \code{rmetasim} generations to establish
 linkage disequilibrium.
 Default: \code{num.rms.gens = 5}.}
 
-\item{label}{label for the output folder. With default \code{label = NULL},
+\item{label}{(integer) Label for the output folder. With default \code{label = NULL},
 the label will be "\code{sim.results.YYYYMMDD.HHMM}".}
 
-\item{fsc.exec}{name of fastsimcoal executable.
-Default: \code{fsc.exec = "fsc252"}.}
+\item{fsc.exec}{(character) Name of fastsimcoal executable. See details.
+Default: \code{fsc.exec = "fsc26"} (for latest version: v.2.6.0.3 - 14.10.17)}
 
-\item{parallel.core}{(optional) The number of core used for parallel
+\item{parallel.core}{(optional, integer) The number of core used for parallel
 execution.
-Default: \code{parallel::detectCores() - 1}.}
+Default: \code{parallel.core = parallel::detectCores() - 1}.}
 }
 \value{
 invisibly, the label used to name output files
 }
 \description{
 Simulate populations of RADseq data following island or stepping 
-stone models
+stone models.
+Inside the function, allele frequency can be created with
+\href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal2} and then used
+inside \href{https://github.com/stranda/rmetasim}{rmetasim} simulation engine.
+}
+\details{
+\strong{fastsimcoal2: }
+ The function requires that the executable for 
+ \href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal} be installed 
+ in a location where it can be executed from the current working directory.
+ 
+ \href{http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time}{How to set up your PATH}.
+ 
+ \href{http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html#install-gbs-radseq-software-time-required-30min}{How to install fastsimcoal2 v.2.6.0.3}
 }
 \note{
 The following arguments can be specified as single values or vectors:
@@ -61,8 +76,6 @@ The following arguments can be specified as single values or vectors:
  scenario will be generated for each combination of unique values of these 
  arguments.  
  
- The function requires that the executable for \code{fastsimcoal} be installed 
- in a location where it can be executed from the current working directory.  
  
  The function will create a folder in the current working directory with the 
  name provided by \code{label}. Within this folder there will be an R 
@@ -76,6 +89,9 @@ The following arguments can be specified as single values or vectors:
  the parameters that generated the data and a "\code{label}" attribute which 
  is the label of the set of scenarios that were run.
 }
+\seealso{
+\code{\link[strataG]{strataG}}
+}
 \author{
-Eric Archer <eric.archer@noaa.gov>
+Eric Archer \email{eric.archer@noaa.gov} and Thierry Gosselin \email{thierrygosselin@icloud.com}
 }

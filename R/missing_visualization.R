@@ -151,7 +151,7 @@
 #' @importFrom cowplot plot_grid align_plots
 #' @importFrom tidyr spread gather
 
-#' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
+#' @author Thierry Gosselin \email{thierrygosselin@@icloud.com} and Eric Archer \email{eric.archer@@noaa.gov}
 
 missing_visualization <- function(
   data,
@@ -188,15 +188,7 @@ missing_visualization <- function(
   if (!is.null(pop.labels) & is.null(pop.levels)) stop("pop.levels is required if you use pop.labels")
   
   # Date and time --------------------------------------------------------------
-  file.date <- stringi::stri_replace_all_fixed(
-    Sys.time(),
-    pattern = " EDT", replacement = "") %>%
-    stringi::stri_replace_all_fixed(
-      str = .,
-      pattern = c("-", " ", ":"), replacement = c("", "@", ""),
-      vectorize_all = FALSE) %>%
-    stringi::stri_sub(str = ., from = 1, to = 13)
-  
+  file.date <- format(Sys.time(), "%Y%m%d@%H%M")
   path.folder.message <- stringi::stri_join("missing_visualization_", file.date, sep = "")
   path.folder <- stringi::stri_join(getwd(),"/", "missing_visualization_", file.date, sep = "")
   dir.create(file.path(path.folder))

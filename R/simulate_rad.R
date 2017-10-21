@@ -1,40 +1,57 @@
 #' @title Simulate RADseq data
 #' @description Simulate populations of RADseq data following island or stepping 
-#' stone models
-#' @param num.pops number of populations.
+#' stone models.
+#' Inside the function, allele frequency can be created with
+#' \href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal2} and then used
+#' inside \href{https://github.com/stranda/rmetasim}{rmetasim} simulation engine.
+#' @param num.pops (integer) Number of populations.
 #' Default: \code{num.pops = 5}.
-#' @param num.loci number of independent RADseq loci.
+
+#' @param num.loci (integer) Number of independent RADseq loci.
+#' To use more than 2000 loci, \pkg{rmetasim} needs to be modified
+#' \href{https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd}{vignette}.
 #' Default: \code{num.loci = 1000}.
-#' @param div.time time since divergence of populations.
+
+#' @param div.time  (integer) Time since divergence of populations.
 #' Default: \code{div.time = 25000}.
-#' @param ne effective populations size.
+#' @param ne (integer) Effective populations size.
 #' Default: \code{ne = c(50, 500)}.
-#' @param nm number of migrants per generation.
+#' @param nm (integer) Number of migrants per generation.
 #' Default: \code{nm = c(0, 0.1, 0.5, 1, 5)}.
-#' @param theta value of theta (= ne * migration rate).
+#' @param theta (integer) Value of theta (= ne * migration rate).
 #' Default: \code{theta = 0.2}.
-#' @param mig.type migration topology type: \code{"island"} or 
+#' @param mig.type (integer) Migration topology type: \code{"island"} or 
 #' \code{"stepping.stone"}.
-#' @param num.reps number of replicates for each scenario.
+#' @param num.reps  (integer) Number of replicates for each scenario.
 #' Default: \code{num.reps = 10}.
-#' @param num.rms.gens number of \code{rmetasim} generations to establish
+#' @param num.rms.gens (integer) Number of \code{rmetasim} generations to establish
 #' linkage disequilibrium.
 #' Default: \code{num.rms.gens = 5}.
-#' @param label label for the output folder. With default \code{label = NULL},
+#' @param label (integer) Label for the output folder. With default \code{label = NULL},
 #' the label will be "\code{sim.results.YYYYMMDD.HHMM}".
-#' @param fsc.exec name of fastsimcoal executable.
-#' Default: \code{fsc.exec = "fsc252"}.
-#' @param parallel.core (optional) The number of core used for parallel
+#' @param fsc.exec (character) Name of fastsimcoal executable. See details.
+#' Default: \code{fsc.exec = "fsc26"} (for latest version: v.2.6.0.3 - 14.10.17)
+#' @param parallel.core (optional, integer) The number of core used for parallel
 #' execution.
-#' Default: \code{parallel::detectCores() - 1}.
+#' Default: \code{parallel.core = parallel::detectCores() - 1}.
+
+
+#' @details 
+#' \strong{fastsimcoal2: }
+#'  The function requires that the executable for 
+#'  \href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal} be installed 
+#'  in a location where it can be executed from the current working directory.
+#'  
+#'  \href{http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time}{How to set up your PATH}.
+#'  
+#'  \href{http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html#install-gbs-radseq-software-time-required-30min}{How to install fastsimcoal2 v.2.6.0.3}
+
 
 #' @note The following arguments can be specified as single values or vectors:
 #'  \code{num.pops, num.loci, div.time, ne, nm, theta, mig.type}. One simulation 
 #'  scenario will be generated for each combination of unique values of these 
 #'  arguments.  
 #'  
-#'  The function requires that the executable for \code{fastsimcoal} be installed 
-#'  in a location where it can be executed from the current working directory.  
 #'  
 #'  The function will create a folder in the current working directory with the 
 #'  name provided by \code{label}. Within this folder there will be an R 
@@ -47,15 +64,17 @@
 #'  has a "\code{scenario}" attribute which is a one row data.frame providing 
 #'  the parameters that generated the data and a "\code{label}" attribute which 
 #'  is the label of the set of scenarios that were run. 
-#'   
+
 #' @return invisibly, the label used to name output files
-#'
-#' @author Eric Archer <eric.archer@@noaa.gov>
+
+#' @seealso \code{\link[strataG]{strataG}}
+
+#' @author Eric Archer \email{eric.archer@@noaa.gov} and Thierry Gosselin \email{thierrygosselin@@icloud.com}
 #' 
 #' @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
-#' @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
+# @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
+#' @import rmetasim
 #' @export
-#' 
 simulate_rad <- function(
   num.pops = 5,
   num.loci = 1000,
@@ -67,13 +86,15 @@ simulate_rad <- function(
   num.reps = 10,
   num.rms.gens = 5,
   label = NULL,
-  fsc.exec = "fsc252",
-  parallel.core = NULL
+  fsc.exec = "fsc26",
+  parallel.core = parallel::detectCores() - 1
 ) {
-  if (is.null(label)) {
-    label <- paste0("sim.results.", format(Sys.time(), "%Y%m%d.%H%M"))
-  }
-  if (!dir.exists(label)) dir.create(label)
+  opt.change <- getOption("width")
+  options(width = 70)
+  cat("#######################################################################\n")
+  cat("######################### grur::simulate_rad ##########################\n")
+  cat("#######################################################################\n")
+  timing <- proc.time()
   
   num.pops <- sort(unique(num.pops))
   num.loci <- sort(unique(num.loci))
@@ -82,6 +103,22 @@ simulate_rad <- function(
   nm <- sort(unique(nm))
   theta <- sort(unique(theta))
   mig.type <- sort(unique(mig.type))
+  
+  if (is.null(label)) {
+    sim.arguments <- paste0(
+      "pop_", paste0(num.pops, collapse = ":"),
+      ".loc_", paste0(num.loci, collapse = ":"),
+      ".div_", paste0(div.time, collapse = ":"),
+      ".ne_", paste0(ne, collapse = ":"),
+      ".nm_", paste0(nm, collapse = ":"),
+      ".the_", paste0(theta, collapse = ":"),
+      ".mig_", paste0(mig.type, collapse = ":"),
+      ".rep_", num.reps,
+      ".gen_", num.rms.gens, collapse = "_")
+    label <- paste0("sims_", sim.arguments, "__", format(Sys.time(), "%Y%m%d@%H%M"))
+  }
+  if (!dir.exists(label)) dir.create(label)
+  
   
   # create scenario data.frame
   sc.df <- expand.grid(
@@ -120,6 +157,7 @@ simulate_rad <- function(
   
   # run scenarios
   sapply(1:nrow(sc.df), function(i) {
+    # i <- 1#test
     fname <- file.path(label, paste("gtypes", i, "rdata", sep = "."))
     if (file.exists(fname)) next
     
@@ -160,6 +198,9 @@ simulate_rad <- function(
     save(fsc.list, sim.data, file = fname)
     fname
   })
-  
+  timing <- proc.time() - timing
+  message("\nComputation time: ", round(timing[[3]]), " sec")
+  cat("#################### grur::simulate_rad completed #####################\n")
+  options(width = opt.change)
   invisible(label)
 }

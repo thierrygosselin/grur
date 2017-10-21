@@ -5,7 +5,7 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.7-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--10--18-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.7-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--10--21-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ Features
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Simulate RADseq data</strong></td>
-<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with <a href="http://cmpg.unibe.ch/software/fastsimcoal2/">fastsimcoal2</a> and then use inside <a href="https://github.com/stranda/rmetasim">rmetasim</a> simulation engine. <em>Vignette coming soon</em>.</td>
+<td align="left"><code>simulate_rad</code>: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with <a href="http://cmpg.unibe.ch/software/fastsimcoal2/">fastsimcoal2</a> and then used inside <a href="https://github.com/stranda/rmetasim">rmetasim</a> simulation engine. <em>Vignette coming soon</em>.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Patterns of missingness</strong></td>

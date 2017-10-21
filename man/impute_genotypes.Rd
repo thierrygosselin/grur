@@ -7,7 +7,7 @@
 impute_genotypes(marker.list, data, data.na, data.gl = NULL, data.imp,
   num.tree = 100, pred.mean.matching = 0, random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
-  hierarchical.levels = "populations", pred.error = pred.error)
+  hierarchical.levels = "strata", pred.error = pred.error)
 }
 \description{
 imputations using Ranger package and predictive mean matching of missRanger

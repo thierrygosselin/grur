@@ -5,10 +5,9 @@
 \title{Map-independent imputations of missing genotypes}
 \usage{
 grur_imputations(data, imputation.method = "rf",
-  hierarchical.levels = "populations", num.tree = 50,
-  pred.mean.matching = 0, verbose = TRUE,
-  parallel.core = parallel::detectCores() - 1, random.seed = NULL,
-  filename = NULL, ...)
+  hierarchical.levels = "strata", num.tree = 50, pred.mean.matching = 0,
+  verbose = TRUE, parallel.core = parallel::detectCores() - 1,
+  random.seed = NULL, filename = NULL, ...)
 }
 \arguments{
 \item{data}{A tidy genomic dataset.
@@ -20,28 +19,36 @@ To get a tidy dataset from various genomic format, see
 \emph{See details of this function for more info}.}
 
 \item{imputation.method}{(character, optional)
-Methods available for map-independent imputations of missing genotype:
+Methods available for map-independent imputations of missing genotype
+(see details for more info):
 
-(1) \code{imputation.method = "max"} Strawman imputation,
+\enumerate{
+\item \code{imputation.method = "max"} Strawman imputation,
 the most frequently observed genotypes (ties are broken at random).
 
-(2) \code{imputation.method = "rf"} On-the-fly-imputations using
+\item \code{imputation.method = "rf"} On-the-fly-imputations using
 Random Forests algorithm.
 
-(3) \code{imputation.method = "boost"} extreme gradient boosting trees.
+\item \code{imputation.method = "rf_pred"} Random Forests algorith is used
+as a prediction problem.
 
-(4) \code{imputation.method = "mca"} Multiple Correspondence Analysis.
+\item \code{imputation.method = "boost"} extreme gradient boosting trees.
 
-\code{imputation.method = NULL} will return the original dataset, without
-imputation.
-Default: \code{imputation.method = "rf"}.}
+\item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
 
-\item{hierarchical.levels}{(character, optional) \code{c("global", "populations")}.
-Should the imputations be computed globally or by populations. Note that
-imputing genotype globally in conjunction with \code{imputation.method = "max"}
-can create huge bias for example by
-introducing foreign genotypes in some populations (see note for more info).
-Default: \code{hierarchical.levels = "populations"}.}
+\code{imputation.method = NULL} the function will stop.
+Default: \code{imputation.method = NULL}.
+}}
+
+\item{hierarchical.levels}{(character, optional) \code{c("global", "strata")}.
+Should the imputations be computed by markers globally or by strata.
+Historically, this was \code{"populations"}.
+
+Note that imputing genotype globally in conjunction with
+\code{imputation.method = "max"} can potentially create huge bias.
+e.g. by introducing foreign genotypes/haplotypes in some populations
+(see note for more info).
+Default: \code{hierarchical.levels = "strata"}.}
 
 \item{num.tree}{(integer, optional) The number of trees to grow
 when \code{imputation.method = "rf"} or \code{imputation.method = "rf_pred"}.
@@ -69,11 +76,12 @@ that will be used to initialize the random generator. With default,
 a random number is generated.
 Default: \code{random.seed = NULL}.}
 
-\item{filename}{(optional) The file name for the \strong{imputed}
-tidy data frame written to the working directory.
-With missing argument or default: \code{filename = NULL}, the imputed
-tidy data is in the global environment only
-(i.e. not written in the working directory).}
+\item{filename}{(optional) The function uses \code{\link[fst]{write.fst}},
+to write the tidy data frame in
+the working directory. The file extension appended to
+the \code{filename} provided is \code{.rad}.
+With default: \code{filename = NULL}, the imputed tidy data frame is
+in the global environment only (i.e. not written in the working directory...).}
 
 \item{...}{(optional) To pass further argument for fine-tuning your
 imputations. See details below.}

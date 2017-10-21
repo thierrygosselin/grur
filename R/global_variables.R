@@ -59,7 +59,8 @@ if (getRversion() >= "2.15.1") {
       "GT_MISSING_BINARY", "GENOTYPED_THRESHOLD", "NUMBER_INDIVIDUALS",
       "NUMBER_MARKERS", "path.folder", "(Intercept)", "log10(num.missing.total)",
       "num.missing.col", "num.missing.total", "p.value", "pct.missing", "statistic",
-      "std.error", "term", "estimate", "a", "b", "is.missing", "STRATA_SELECT"
+      "std.error", "term", "estimate", "a", "b", "is.missing", "STRATA_SELECT",
+      "POLYMORPHIC.x", "POLYMORPHIC.y"
     )
   )
 }
