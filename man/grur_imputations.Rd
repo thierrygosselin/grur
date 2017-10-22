@@ -4,7 +4,7 @@
 \alias{grur_imputations}
 \title{Map-independent imputations of missing genotypes}
 \usage{
-grur_imputations(data, imputation.method = "rf",
+grur_imputations(data, imputation.method = NULL,
   hierarchical.levels = "strata", num.tree = 50, pred.mean.matching = 0,
   verbose = TRUE, parallel.core = parallel::detectCores() - 1,
   random.seed = NULL, filename = NULL, ...)
