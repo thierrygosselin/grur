@@ -4,7 +4,7 @@
 \alias{impute_genotypes}
 \title{impute_genotypes}
 \usage{
-impute_genotypes(marker.list, data, data.na, data.gl = NULL, data.imp,
+impute_genotypes(markers.list, data, data.na, data.gl = NULL, data.imp,
   num.tree = 100, pred.mean.matching = 0, random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
   hierarchical.levels = "strata", pred.error = pred.error)

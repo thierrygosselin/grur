@@ -7,7 +7,8 @@
 grur_imputations(data, imputation.method = NULL,
   hierarchical.levels = "strata", num.tree = 50, pred.mean.matching = 0,
   verbose = TRUE, parallel.core = parallel::detectCores() - 1,
-  random.seed = NULL, filename = NULL, ...)
+  cpu.boost = parallel::detectCores()/2, random.seed = NULL,
+  filename = NULL, ...)
 }
 \arguments{
 \item{data}{A tidy genomic dataset.
@@ -29,7 +30,7 @@ the most frequently observed genotypes (ties are broken at random).
 \item \code{imputation.method = "rf"} On-the-fly-imputations using
 Random Forests algorithm.
 
-\item \code{imputation.method = "rf_pred"} Random Forests algorith is used
+\item \code{imputation.method = "rf_pred"} Random Forests algorithm is used
 as a prediction problem.
 
 \item \code{imputation.method = "boost"} extreme gradient boosting trees.
@@ -66,10 +67,17 @@ Default: \code{pred.mean.matching = 0}, avoids this step.}
 the function is a little more chatty during execution.
 Default: \code{verbose = TRUE}.}
 
-\item{parallel.core}{(optional) The number of core used for parallel
-execution when \code{imputation.method = "rf"}.
-Markers are imputed in parallel, populations are processed sequentially.
-Default: \code{parallel::detectCores() - 1}.}
+\item{parallel.core}{(optional, integer) The number of core used for parallel.
+Markers are imputed in parallel, strata are processed sequentially.
+Default: \code{parallel.core = parallel::detectCores() - 1}.}
+
+\item{cpu.boost}{(optional, integer). Number of core for XGBoost and LightGBM.
+For the best speed, set this to the number of real CPU cores,
+not the number of threads. 
+Most CPU using hyper-threading to generate 2 threads per CPU core.
+Be aware that task manager or any CPU monitoring tool might report cores
+not being fully utilized. This is normal.
+Default: \code{cpu_boost = parallel::detectCores() / 2}.}
 
 \item{random.seed}{(integer, optional) For reproducibility, set an integer
 that will be used to initialize the random generator. With default,

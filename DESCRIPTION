@@ -40,7 +40,8 @@ Imports:
     rlang,
     cowplot,
     ggpubr,
-    broom
+    broom,
+    Matrix
 Suggests:
     knitr,
     rmarkdown

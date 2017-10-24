@@ -28,7 +28,7 @@ wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 ```
 
-**Rename clang:** if you have a *programs* folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time), move the clang folder inside that folder and at the same time, rename it:
+**#Move and Rename clang** to a folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time):
 ```{r}
 #Terminal
 sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang

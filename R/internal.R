@@ -533,6 +533,8 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     .data = data,
     STRATA_SELECT = .data[[rlang::UQ(strata.select)]])
   
+  n.strata <- dplyr::n_distinct(data$STRATA_SELECT)
+  
   # the expected % missing by random (1 / number of factor levels)
   ran.pct.miss <- 1 / length(unique(data$STRATA_SELECT))
   
@@ -605,6 +607,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     size = 12, family = "Helvetica", face = "bold")
   axis.text.element <- ggplot2::element_text(
     size = 10, family = "Helvetica")
+  
   fig <- ggplot2::ggplot(
     miss.smry, ggplot2::aes_string(x = "num.missing.total")) +
     ggplot2::geom_segment(
@@ -645,9 +648,9 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     ggplot2::ggsave(
       filename = stringi::stri_join(path.folder, "/", fig.name, ".pdf"),
       plot = fig,
-      width = 20, height = 15,
+      width = n.strata * 1.5, height = n.strata * 1.5,
       dpi = 600, units = "cm",
-      useDingbats = FALSE)
+      useDingbats = FALSE, limitsize = FALSE)
   }
   
   res[[fig.name]] <- fig

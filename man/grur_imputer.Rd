@@ -6,7 +6,7 @@
 \usage{
 grur_imputer(data, num.tree = 100, pred.mean.matching = 0,
   random.seed = NULL, parallel.core = parallel::detectCores() - 1,
-  hierarchical.levels = "strata", marker.list = marker.list,
+  hierarchical.levels = "strata", markers.list = markers.list,
   verbose = verbose)
 }
 \description{

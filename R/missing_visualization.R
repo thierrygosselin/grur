@@ -140,7 +140,7 @@
 #' @export
 #' @rdname missing_visualization
 #' @importFrom ggplot2 ggplot aes geom_violin geom_boxplot stat_summary labs theme element_blank element_text geom_jitter scale_colour_manual scale_y_reverse theme_light geom_bar facet_grid geom_histogram aes_string scale_fill_manual theme_bw stat_smooth geom_boxplot ggsave
-#' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
+#' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join transmute
 #' @importFrom stringi stri_join stri_replace_all_fixed stri_replace_all_regex
 #' @importFrom utils count.fields
 #' @importFrom readr read_tsv write_tsv
@@ -150,6 +150,7 @@
 #' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh detect_all_missing
 #' @importFrom cowplot plot_grid align_plots
 #' @importFrom tidyr spread gather
+#' @importFrom purrr map flatten_dbl flatten keep map_df
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com} and Eric Archer \email{eric.archer@@noaa.gov}
 
@@ -219,9 +220,9 @@ missing_visualization <- function(
   
   # strata.df --------------------------------------------------------
   strata.df <- suppressWarnings(dplyr::ungroup(res$tidy.data) %>%
-    dplyr::select(-dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
-                                   "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
-    dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
+                                  dplyr::select(-dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
+                                                                 "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
+                                  dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
   
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
   res$tidy.data <- dplyr::mutate(
@@ -467,7 +468,7 @@ missing_visualization <- function(
     size = 10, family = "Helvetica")
   
   # manhattan and violin plots
-  missing.genotypes.ind.plots <- suppressMessages(ggplot2::ggplot(
+  res$missing.genotypes.ind.plots <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.ind,
     ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
       ggplot2::geom_jitter(alpha = 0.5) +
@@ -487,10 +488,10 @@ missing_visualization <- function(
         axis.text.y = axis.text.element.text.fig
       ) +
       ggplot2::coord_flip())
-  # missing.genotypes.ind.plots
+  # res$missing.genotypes.ind.plots
   
   # histogram
-  missing.genotypes.ind.histo <- suppressMessages(ggplot2::ggplot(
+  res$missing.genotypes.ind.histo <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.ind,
     ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
       ggplot2::geom_histogram() +
@@ -504,29 +505,37 @@ missing_visualization <- function(
         axis.text.x = axis.text.element.text.fig,
         axis.text.y = axis.text.element.text.fig,
       ))
-  # missing.genotypes.ind.histo
+  # res$missing.genotypes.ind.histo
   
   # helper plot for individual's genotyped threshold
-  ind.genotyped.helper.plot <- ind_genotyped_helper(res$missing.genotypes.ind)
+  res$ind.genotyped.helper.plot <- ind_genotyped_helper(res$missing.genotypes.ind)
   
   
   # merge plots
   plots <- cowplot::align_plots(
-    missing.genotypes.ind.plots, ind.genotyped.helper.plot, align = "v", axis = "l")
+    res$missing.genotypes.ind.plots, res$ind.genotyped.helper.plot, align = "v", axis = "l")
   top.row.plot <- suppressMessages(cowplot::plot_grid(
-    plots[[1]], missing.genotypes.ind.histo, labels = c("A", "B"), align = "h"))
+    plots[[1]], res$missing.genotypes.ind.histo, labels = c("A", "B"), align = "h"))
   
-  res$missing.genotypes.ind.plots <- suppressMessages(cowplot::plot_grid(
+  res$missing.genotypes.ind.combined.plots <- suppressMessages(cowplot::plot_grid(
     top.row.plot, plots[[2]],
     ncol = 1, nrow = 2, labels = c("", "C"), rel_heights = c(1.5, 1)))
-  plots <- top.row.plot <- ind.genotyped.helper.plot <- NULL
+  plots <- top.row.plot <- NULL
   
   if (write.plot) {
-    ggplot2::ggsave(
-      filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.plots.pdf"),
-      plot = res$missing.genotypes.ind.plots,
-      width = n.pop * 4, height = n.pop * 2.5,
-      dpi = 600, units = "cm", useDingbats = FALSE)
+    
+    # cowplot author says it's better to use his save_plot... will try
+    cowplot::save_plot(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.combined.plots.pdf"),
+      plot = res$missing.genotypes.ind.combined.plots, 
+      base_height = n.pop * 0.2,
+      base_aspect_ratio = 2.5, ncol = 2, nrow = 2, limitsize = FALSE)
+    
+    # ggplot2::ggsave(
+    #   filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.plots.pdf"),
+    #   plot = res$missing.genotypes.ind.combined.plots,
+    #   width = n.pop * 2.5, height = n.pop * 1,
+    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
   }
   # res$missing.genotypes.ind.plots
   
@@ -538,7 +547,6 @@ missing_visualization <- function(
     .f = blacklists_id_generator,
     y = res$missing.genotypes.ind,
     path.folder = path.folder) %>% purrr::flatten(.)
-  
   
   message("Blacklist(s) of individuals generated: ", length(blacklists))
   blacklists.stats <- purrr::map_df(.x = blacklists, .f = nrow) %>% 
@@ -561,6 +569,7 @@ missing_visualization <- function(
       , by = c("INDIVIDUALS", "POP_ID")
     )
   )
+  res$fh.manhattan.box.plot <- fh$fh.manhattan.box.plot
   
   res$missing.genotypes.ind.fh.plots <- ggplot2::ggplot(
     res$missing.genotypes.ind.fh, ggplot2::aes(y = FH, x = MISSING_GENOTYPE_PROP)) +
@@ -584,18 +593,24 @@ missing_visualization <- function(
   bottom.row.plot <- suppressMessages(cowplot::plot_grid(
     plots[[2]], fh$fh.distribution.plot, labels = c("B", "C"), align = "h"))
   
-  res$missing.genotypes.ind.fh.plots <- cowplot::plot_grid(
+  res$missing.genotypes.ind.fh.combined.plots <- cowplot::plot_grid(
     plots[[1]], bottom.row.plot,
     ncol = 1, nrow = 2, labels = c("A", ""), rel_heights = c(1.5, 1))
   # res$missing.genotypes.ind.fh.plots
   fh <- plots <- bottom.row.plot <- NULL
   
   if (write.plot) {
-    ggplot2::ggsave(
-      filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.plots.pdf"),
-      plot = res$missing.genotypes.ind.fh.plots,
-      width = n.pop * 4, height = n.pop * 2.5,
-      dpi = 600, units = "cm", useDingbats = FALSE)
+    # ggplot2::ggsave(
+    #   filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.plots.pdf"),
+    #   plot = res$missing.genotypes.ind.fh.plots,
+    #   width = n.pop * 4, height = n.pop * 2.5,
+    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
+    
+    cowplot::save_plot(
+      filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.combined.plots.pdf"),
+      plot = res$missing.genotypes.ind.fh.combined.plots, 
+      base_height = n.pop * 0.2,
+      base_aspect_ratio = 1, ncol = 2, nrow = 2, limitsize = FALSE)
   }
   
   # Populations-----------------------------------------------------------------
@@ -616,29 +631,18 @@ missing_visualization <- function(
   markers.meta <- purrr::keep(
     .x = tidy.col,
     .p = tidy.col %in% c("MARKERS", "CHROM", "LOCUS", "POS"))
-  res$missing.genotypes.markers.overall <- suppressWarnings(res$tidy.data %>%
-    dplyr::select(dplyr::one_of(want)) %>% 
-    dplyr::group_by_if(.tbl = ., .predicate = colnames(x = .) %in% markers.meta) %>% 
-    dplyr::summarise(
-      MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
-      INDIVIDUALS_NUMBER = length(INDIVIDUALS),
-      MISSING_GENOTYPE_PROP = MISSING_GENOTYPE / INDIVIDUALS_NUMBER,
-      PERCENT = round(MISSING_GENOTYPE_PROP * 100, 2)
-    ) %>%
-    dplyr::ungroup(.) %>%
-    dplyr::arrange(MARKERS))
-  
-  # res$missing.genotypes.markers.overall <- res$tidy.data %>%
-  #   dplyr::select(MARKERS, INDIVIDUALS, GT_MISSING_BINARY) %>%
-  #   dplyr::group_by(markers.meta) %>%
-  #   dplyr::summarise(
-  #     MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
-  #     INDIVIDUALS_NUMBER = length(INDIVIDUALS),
-  #     MISSING_GENOTYPE_PROP = MISSING_GENOTYPE / INDIVIDUALS_NUMBER,
-  #     PERCENT = round(MISSING_GENOTYPE_PROP * 100, 2)
-  #   ) %>%
-  #   dplyr::ungroup(.) %>%
-  #   dplyr::arrange(MARKERS)
+  res$missing.genotypes.markers.overall <- suppressWarnings(
+    res$tidy.data %>%
+      dplyr::select(dplyr::one_of(want)) %>% 
+      dplyr::group_by_if(.tbl = ., .predicate = colnames(x = .) %in% markers.meta) %>% 
+      dplyr::summarise(
+        MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
+        INDIVIDUALS_NUMBER = length(INDIVIDUALS),
+        MISSING_GENOTYPE_PROP = MISSING_GENOTYPE / INDIVIDUALS_NUMBER,
+        PERCENT = round(MISSING_GENOTYPE_PROP * 100, 2)
+      ) %>%
+      dplyr::ungroup(.) %>%
+      dplyr::arrange(MARKERS))
   
   res$missing.genotypes.markers.pop <- res$tidy.data %>%
     dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
@@ -671,7 +675,7 @@ missing_visualization <- function(
   # Figure markers
   
   # violin plots
-  missing.genotypes.markers.plots <- suppressMessages(ggplot2::ggplot(
+  res$missing.genotypes.markers.plots <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.markers.pop,
     ggplot2::aes(x = POP_ID, y = MISSING_GENOTYPE_PROP, colour = POP_ID)) +
       # ggplot2::geom_jitter(alpha = 0.5) +
@@ -691,9 +695,9 @@ missing_visualization <- function(
         axis.text.y = ggplot2::element_text(size = 10, family = "Helvetica")
       ) +
       ggplot2::coord_flip())
-  # missing.genotypes.markers.plots
+  # res$missing.genotypes.markers.plots
   
-  markers.histo <- suppressMessages(ggplot2::ggplot(
+  res$markers.histo <- suppressMessages(ggplot2::ggplot(
     data = res$missing.genotypes.markers.overall, ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
       ggplot2::geom_histogram() +
       ggplot2::labs(x = "Marker's missing genotypes (proportion)") +
@@ -706,50 +710,40 @@ missing_visualization <- function(
         axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
         strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
       ))
-  # markers.histo
+  # res$markers.histo
   
   # helper plot for markers's genotyped threshold
-  markers.helper.plot <- markers_genotyped_helper(
+  res$markers.helper.plot <- markers_genotyped_helper(
     x = res$missing.genotypes.markers.pop, y = res$missing.genotypes.markers.overall)
   
   # merge plots
   plots <- cowplot::align_plots(
-    missing.genotypes.markers.plots, markers.helper.plot, align = "v", axis = "l")
+    res$missing.genotypes.markers.plots, res$markers.helper.plot, align = "v", axis = "l")
   top.row.plot <- suppressMessages(cowplot::plot_grid(
-    plots[[1]], markers.histo, labels = c("A", "B"), align = "h"))
+    plots[[1]], res$markers.histo, labels = c("A", "B"), align = "h"))
   
-  res$missing.genotypes.markers.plots <- suppressMessages(cowplot::plot_grid(
+  res$missing.genotypes.markers.combined.plots <- suppressMessages(
+    cowplot::plot_grid(
     top.row.plot, plots[[2]],
     ncol = 1, nrow = 2, labels = c("", "C"), rel_heights = c(1.5, 1)))
   # res$missing.genotypes.markers.plots
-  plots <- top.row.plot <- markers.helper.plot <- markers.histo <- NULL
+  plots <- top.row.plot <- NULL
   
   if (write.plot) {
-    ggplot2::ggsave(
-      filename = stringi::stri_join(path.folder, "/missing.genotypes.markers.plots.pdf"),
-      plot = res$missing.genotypes.markers.plots,
-      width = n.pop * 4, height = n.pop * 2.5,
-      dpi = 600, units = "cm", useDingbats = FALSE)
+    # ggplot2::ggsave(
+    #   filename = stringi::stri_join(
+    #     path.folder, "/missing.genotypes.markers.combined.plots.pdf"),
+    #   plot = res$missing.genotypes.markers.combined.plots,
+    #   width = n.pop * 4, height = n.pop * 2.5,
+    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
+    
+    cowplot::save_plot(
+      filename = stringi::stri_join(
+        path.folder, "/missing.genotypes.markers.combined.plots.pdf"),
+      plot = res$missing.genotypes.markers.combined.plots, 
+      base_height = n.pop * 0.2,
+      base_aspect_ratio = 2.5, ncol = 2, nrow = 2, limitsize = FALSE)
   }
-  
-  # res$missing.genotypes.markers.plot
-  
-  # # Missingness per markers and per populations
-  # message("Missingness per markers and populations")
-  #
-  # missing.genotypes.markers.pop <- dplyr::ungroup(res$tidy.data) %>%
-  #   dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
-  #   dplyr::group_by(MARKERS, POP_ID, GT_MISSING_BINARY) %>%
-  #   dplyr::tally(.) %>%
-  #   dplyr::ungroup(.) %>%
-  #   tidyr::complete(
-  #     data = .,
-  #     GT_MISSING_BINARY,
-  #     nesting(MARKERS, POP_ID),
-  #     fill = list(n = 0)
-  #   ) %>%
-  #   dplyr::group_by(MARKERS, POP_ID) %>%
-  #   dplyr::summarise(MISSING_GENOTYPE_PROP = n[GT_MISSING_BINARY == 0] / sum(n))
   
   # Results --------------------------------------------------------------------
   timing <- proc.time() - timing
