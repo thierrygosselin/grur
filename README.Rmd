@@ -107,12 +107,10 @@ citation("grur")
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
 
-**grur v.0.0.7 2017-10-02**
+** grur v.0.0.8 2017-10-24**
 
-worked on `missing_visualization`
-
-* added Eric Archer's work on detecting patterns
-* figures are now combined under themes (e.g. all PCoA for the same strata are together, etc)
+* worked on `missing_visualization` to get better output figures with large number of pop
+* worked on imputation algorithm to prep for the use of `lightGBM` package
 
 
 

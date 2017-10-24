@@ -1,3 +1,9 @@
+# grur v.0.0.8 2017-10-24
+
+* worked on `missing_visualization` to get better output figures with large number of pop
+* worked on imputation algorithm to prep for the use of `lightGBM` package
+
+
 # grur v.0.0.7 2017-10-02
 
 worked on `missing_visualization`
