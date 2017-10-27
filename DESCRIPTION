@@ -1,8 +1,8 @@
 Package: grur
 Type: Package
 Title: grur: an R package tailored for RADseq data imputations
-Version: 0.0.8
-Date: 2017-10-24
+Version: 0.0.9
+Date: 2017-10-27
 Encoding: UTF-8
 Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
@@ -41,7 +41,8 @@ Imports:
     cowplot,
     ggpubr,
     broom,
-    Matrix
+    Matrix,
+    lightgbm
 Suggests:
     knitr,
     rmarkdown

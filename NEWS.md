@@ -1,3 +1,9 @@
+# grur v.0.0.9 2017-10-27
+
+* `lightGBM` option to conduct the imputations is fully functional
+
+
+
 # grur v.0.0.8 2017-10-24
 
 * worked on `missing_visualization` to get better output figures with large number of pop

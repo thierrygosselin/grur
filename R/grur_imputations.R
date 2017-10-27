@@ -3,10 +3,7 @@
 #' @name grur_imputations
 #' @title Map-independent imputations of missing genotypes
 #'
-#' @description Used internally in \href{https://github.com/thierrygosselin/assigner}{assigner} and
-#' \href{https://github.com/thierrygosselin/radiator}{radiator} and
-#' might be of interest for users.
-#' The goal of this module is to provide a simple solution for
+#' @description The goal of this module is to provide a simple solution for
 #' a complicated problem: missing genotypes in RADseq genomic datasets.
 #' This function will performed \strong{map-independent imputations} of missing
 #' genotypes.
@@ -14,44 +11,42 @@
 #' \strong{Key features:}
 #'
 #' \itemize{
-#' \item \strong{Imputation algorithms/methods: } Random forests (on-the-fly-imputation, ),
-#' Extreme gradient tree boosting,
-#' Multiple Correspondence Analysis (MCA) and
-#' the classic Strawman imputation
+#' \item \strong{Imputation methods: } several machine learning algorithms;
+#' Random forests (predictive and on-the-fly-imputations); 
+#' Extreme gradient tree boosting (XGBoost);
+#' Fast, distributed, high performance gradient
+#' boosting (LightGBM) and
+#' Multiple Correspondence Analysis (MCA). Furthermore, the module allows to
+#' compare these algorithms with the classic Strawman imputation
 #' (~ max/mean/mode: the most frequently observed, i.e. non-missing, genotypes is used).
-#' \item \strong{Hierarchical level: } Imputations conducted by populations or globally.
-#' \item \strong{Haplotype/SNP approach: } Correlation among SNPs is accounted for during
-#' rf and tree boosting imputation, i.e. imputation is automatically conducted by haplotype
-#' when marker meta-information is avaialble (chromosome, locus and position,
-#' usually from VCF files). The alternative, considers all the markers independent
-#' and imputation is conducted by SNPs.
+#' \item \strong{Hierarchical level: } Imputations conducted by strata or globally.
+#' \item \strong{SNP linkage/Haplotypes: } Correlation among SNPs is accounted for during
+#' rf and tree boosting imputations, i.e. the imputations are 
+#' automatically conducted by haplotypes
+#' when marker meta-information is available (chromosome, locus and position,
+#' usually taken from VCF files). The alternative, considers all the markers 
+#' independent and imputation is conducted by SNPs/markers.
 #' \item \strong{Genotype likelihood (GL): } The GL info is detected automatically
 #' (GL column in FORMAT field of VCF files). Genotypes with higher likelihood
 #' will have higher probability during bootstrap samples of trees in Random
-#' forests.
-#' Notes: (1) option only available with Random forests;
-#' (2) the use of genotype likelihoods
-#' in the form of normalized, phred-scaled likelihoods (PL, e.g. from GATK)
-#' are not recognized, yet... it's still under development.
-#' \item \strong{Predictive mean matching: } the rf option uses a fast k-nearest neighbor
-#' (KNN) searching algorithms (see argument documentation and details below).
-#' \item \strong{Optimized for speed: } the package
-#' \href{https://github.com/imbs-hl/ranger}{ranger}
-#' (see Wright and Ziegler, 2016) provides a fast C++ version
-#' of the original implementation of rf from Breiman (2001).
-#' The \href{https://github.com/dmlc/xgboost}{XGBoost} provides the fast C++
-#' implementation for the extreme gradient tree boosting algorithm.
-#' Imputations of genotypes are conducted in parallel across CPUs.
-#' A progress bar is now available to see if you have time for a coffee break!
+#' forests (under devel).
+#' \item \strong{Predictive mean matching: } random forest in prediction mode
+#' uses a fast k-nearest neighbor (KNN) searching algorithms 
+#' (see argument documentation and details below).
+#' \item \strong{Optimized for speed: } There's a
+#' \href{https://github.com/thierrygosselin/grur#troubleshooting}{tutorial} and a
+#' \href{https://github.com/thierrygosselin/grur#vignettes-and-examples}{vignette}
+#' detailing the procedure to install the packages from source to enable OpenMP.
+#' Depending on algorithm used, a progress bar is sometimes available to see 
+#' if you have time for a coffee break!
 #' }
 #'
 #'
 #' Before running this function to populate the original dataset with synthetic
-#' data I highly recommend you look for patterns of missingness
+#' data, I highly recommend you look for patterns of missingness
 #' \code{\link[grur]{missing_visualization}}
-#' and explore the reasons for their presence.
-#' Follow the \href{https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0}{vignette}
-#' for more info.
+#' and explore the reasons for their presence 
+#' (see \href{https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0}{vignette}).
 
 
 #' @param data A tidy genomic dataset.
@@ -63,7 +58,7 @@
 #' \emph{See details of this function for more info}.
 
 #' @param imputation.method (character, optional)
-#' Methods available for map-independent imputations of missing genotype
+#' Methods available for map-independent imputations of missing genotypes
 #' (see details for more info):
 #'
 #' \enumerate{
@@ -77,6 +72,8 @@
 #' as a prediction problem.
 #'
 #' \item \code{imputation.method = "boost"} extreme gradient boosting trees.
+#' 
+#' \item \code{imputation.method = "lightgbm"} for a light and fast gradient boosting tree method.
 #'
 #' \item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
 #'
@@ -89,13 +86,11 @@
 #' Historically, this was \code{"populations"}.
 #'
 #' Note that imputing genotype globally in conjunction with
-#' \code{imputation.method = "max"} can potentially create huge bias.
-#' e.g. by introducing foreign genotypes/haplotypes in some populations
+#' \code{imputation.method = "max" or "strata"} can potentially create huge bias.
+#' e.g. by introducing foreign genotypes/haplotypes in some strata/populations
 #' (see note for more info).
 #' Default: \code{hierarchical.levels = "strata"}.
-#' @param num.tree (integer, optional) The number of trees to grow
-#' when \code{imputation.method = "rf"} or \code{imputation.method = "rf_pred"}.
-#' Default: \code{num.tree = 50}.
+
 
 #' @param pred.mean.matching (integer, optional) Used in conjunction with
 #' random Forests (\code{imputation.method = "rf_pred"}).
@@ -103,7 +98,7 @@
 #' value to sample from during the predictive mean matching step.
 #' A fast k-nearest neighbor searching algorithms is used with this approach.
 #' \code{pred.mean.matching = 3} will use 3 neighbors.
-#' Default: \code{pred.mean.matching = 0}, avoids this step.
+#' Default: \code{pred.mean.matching = 0}, will avoids this step. (in devel)
 
 #' @param random.seed (integer, optional) For reproducibility, set an integer
 #' that will be used to initialize the random generator. With default,
@@ -115,7 +110,8 @@
 #' Default: \code{verbose = TRUE}.
 
 #' @param parallel.core (optional, integer) The number of core used for parallel.
-#' Markers are imputed in parallel, strata are processed sequentially.
+#' For some algorithms, markers will be imputed in parallel and 
+#' strata are processed sequentially.
 #' Default: \code{parallel.core = parallel::detectCores() - 1}.
 
 #' @param cpu.boost (optional, integer). Number of core for XGBoost and LightGBM.
@@ -127,7 +123,6 @@
 #' Default: \code{cpu_boost = parallel::detectCores() / 2}.
 
 
-
 #' @param filename (optional) The function uses \code{\link[fst]{write.fst}},
 #' to write the tidy data frame in
 #' the working directory. The file extension appended to
@@ -135,15 +130,12 @@
 #' With default: \code{filename = NULL}, the imputed tidy data frame is
 #' in the global environment only (i.e. not written in the working directory...).
 
-
-
 #' @param ... (optional) To pass further argument for fine-tuning your
 #' imputations. See details below.
 
 #' @return The output in your global environment is the imputed tidy data frame.
 #' If \code{filename} is provided, the imputed tidy data frame is also
-#' written to the working directory. The original data is returned for markers
-#' with \emph{all} or \emph{no} NA.
+#' written to the working directory.
 
 #' @details
 #' \strong{Predictive mean matching:}
@@ -151,7 +143,7 @@
 #' Random Forests already behave like a nearest neighbor
 #' classifier, with adaptive metric. Now we have the option to conduct
 #' predictive mean matching on top of the prediction based missing value
-#' imputation.PMM tries to raise the variance in the resulting conditional
+#' imputation. PMM tries to raise the variance in the resulting conditional
 #' distributions to a realistic level.
 #' The closest k predicted values are identified by a fast
 #' k-nearest neighbour approach wrapped in the package
@@ -173,7 +165,7 @@
 #' independent. Imputations of genotypes is then conducted for each marker separately.
 #'
 #'
-#' \strong{Imputing globally or by populations ?}
+#' \strong{Imputing globally or by strata ?}
 #' \code{hierarchical.levels = "global"} argument will act differently depending
 #' on the \code{imputation.method} selected.
 #'
@@ -226,20 +218,36 @@
 #' missing genotypes are imputed one at a time. The fitted forest is used to
 #' predict missing genotypes. Missingness in the response variables are
 #' incorporated as attributes for growing the forest.
+#' 
+#' \emph{boosting trees:} Prediction method is used for both XGBoost and LightGBM.
+#' 
+#' \href{https://lightgbm.readthedocs.io/en/latest/index.html}{LightGBM documentation}
+#' 
+#' \href{http://xgboost.readthedocs.io/en/latest/}{XGBoost documentation}
+#' 
+#' \href{https://sites.google.com/view/lauraepp/parameters}{LightGBM and XGBoost parameters optimization}
+#' 
+#' 
+#' 
 #'
 #' \strong{... :dot dot dot arguments}
 #'
 #' The argument is available to tailor your imputations using
-#' extreme gradient tree boosting and random forest:
+#' XGBoost, LightGBM and Random Forests:
 #'
-#' Available arguments for extreme gradient tree boosting tree method:
+#' Available arguments for eXtreme Gradient Boosting tree method:
 #' \emph{eta, gamma, max_depth, min_child_weight, subsample, colsample_bytree,
 #' num_parallel_tree, nrounds, save_name, early_stopping_rounds}.
 #' Refer to \code{\link[xgboost]{xgboost}} for arguments documentation.
 #'
-#'
+#' Available arguments for LightGBM:
+#' \emph{boosting, objective, learning_rate, feature_fraction, bagging_fraction,
+#' bagging_freq, max_depth, min_data_in_leaf, num_leaves, early_stopping_rounds,
+#' nrounds, max_depth}. Refer to \code{\link[lightgbm]{lightgbm}}
+#' for arguments documentation.
+#' 
 #' Available arguments for Random forests method:
-#' \emph{nodesize, nsplit, nimpute}.
+#' \emph{num.tree, nodesize, nsplit, nimpute}.
 #' Refer to \code{\link[randomForestSRC]{impute.rfsrc}} for arguments documentation.
 #'
 #'
@@ -250,27 +258,29 @@
 #' @note
 #'
 #' \strong{Reference genome or linkage map available ?}
-#'
 #' Numerous approaches are available and more appropriate, please search
 #' the literature
 #' (\href{https://online.papersapp.com/collections/05d6e65a-73c9-49e6-9c75-289a818f76f3/share}{references}).
 #'
 #'
-#' \strong{What's simple imputation message when running the function ?}
+#' \strong{What's the simple imputation message when running the function ?}
 #'
-#' Before conducting the imputations by populations with random forest or extreme
-#' gradient tree boosting, the data is first screened for markers that are
-#' monomorphic within populations. Because for those cases, it's clear what the
+#' Before conducting the imputations by strata with the machine learning algorithms, 
+#' the data is first screened for markers that are
+#' monomorphic WITHIN the strata/populations.
+#' Because for those cases, it's clear what the
 #' missing genotypes should be, the imputations is very \emph{simple} and missing
-#' genotypes are imputed with the only genotype found for the particular population.
-#' The small cost in time is worth it, because the random forest or extreme
-#' gradient tree boosting model will benefit having more complete and
-#' reliable genotypes.
+#' genotypes are imputed with the only genotype found for the particular strata/populations.
+#' There's no need for a fancy method here.
+#' The small cost in time is worth it, because the model inside 
+#' the machine learning algorithms will benefit from having a more complete and
+#' reliable genotype matrix.
 #'
 #'
 #' \strong{Deprecated arguments:}
 #'
 #' \itemize{
+#' \item \code{hierarchical.levels = "populations"} update your codes with "strata".
 #' \item \code{imputations.group} is now replaced by \code{hierarchical.levels}
 #' \item \code{impute} is no longer available.
 #' Imputing using \code{impute = "allele"} option was wrong because it
@@ -283,15 +293,27 @@
 #' }
 
 #' @seealso
+#' The package \href{https://github.com/imbs-hl/ranger}{ranger}
+#' (see Wright and Ziegler, 2016) provides a fast C++ version
+#' of the original implementation of rf from Breiman (2001).
+#' 
 #' \href{https://github.com/mayer79/missRanger}{missRanger}
-#'
-#' \href{https://github.com/imbs-hl/ranger}{ranger}
-#'
+#' 
+#' The package \href{https://github.com/dmlc/xgboost}{randomForestSRC} 
+#' (see Tang and Ishwaran, 2017) provides
+#' a fast on-the-fly imputation method.
+#' 
 #' \href{https://github.com/stekhoven/missForest}{missForest}
-#'
-#' \href{https://github.com/kogalur/randomForestSRC}{randomForestSRC}
-#'
-#' \href{https://github.com/dmlc/xgboost}{XGBoost}
+#' 
+#' The package \href{https://github.com/dmlc/xgboost}{XGBoost} 
+#' (Chen and Guestrin, 2016) provides
+#' a fast C++ implementation for the extreme gradient tree boosting algorithm.
+#' 
+#' The package \href{https://github.com/Microsoft/LightGBM}{LightGBM} is an
+#' exciting new algorithm to conduct tree boosting.
+
+
+
 
 #' @export
 #' @rdname grur_imputations
@@ -313,14 +335,18 @@
 #' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
 #' @importFrom fst write.fst
 #' @importFrom Matrix Matrix
+#' @importFrom lightgbm lgb.Dataset lgb.train
 
 #' @examples
 #' \dontrun{
 #' # The simplest way to run when you have a tidy dataset:
 #'
-#' wolf.imputed <- grur::grur_imputations(data = "wolf.tidy.dataset.tsv")
+#' wolf.imputed <- grur::grur_imputations(
+#' data = "wolf.tidy.dataset.rad",
+#' imputation.method = "lightgbm")
 #'
-#' # This will impute the missing genotypes by population using random Forests.
+#' # This will impute the missing genotypes by strata (in this case the strata,
+#' is the population), population using lightgbm.
 #' # The remaining arguments will be the defaults.
 #'
 #' # When you start with a vcf file you can use magrittr %>% to `pipe` the
@@ -353,8 +379,6 @@ grur_imputations <- function(
   data,
   imputation.method = NULL,
   hierarchical.levels = "strata",
-  # markers.linkage = "multivariate",
-  num.tree = 50,
   pred.mean.matching = 0,
   verbose = TRUE,
   parallel.core = parallel::detectCores() - 1,
@@ -389,27 +413,42 @@ grur_imputations <- function(
       names(dotslist),
       c("eta", "gamma", "max_depth", "min_child_weight", "subsample", "colsample_bytree",
         "num_parallel_tree", "nrounds", "save_name", "early_stopping_rounds",
-        "nodesize", "nsplit", "nimpute", "ncp"))
+        "num.tree", "nodesize", "nsplit", "nimpute", "ncp", "boosting",
+        "objective", "learning_rate",
+        "feature_fraction", "bagging_fraction", "bagging_freq",
+        "max_depth", "min_data_in_leaf", "num_leaves",
+        "early_stopping_rounds"))
     
     if (length(unknowned_param) > 0) {
-      stop("Unknowned \"...\" parameters ",
-           stringi::stri_join(unknowned_param, collapse = " "),
-           " to grur imputation module")
+      stop("Unknowned \"...\" parameters to grur imputation module: ",
+           stringi::stri_join(unknowned_param, collapse = " "))
     }
     
     boost.dots <- dotslist[names(dotslist) %in%
                              c("eta", "gamma", "max_depth", "min_child_weight",
                                "subsample", "colsample_bytree",
                                "num_parallel_tree", "nrounds", "save_name",
-                               "early_stopping_rounds", "nodesize", "nsplit",
+                               "early_stopping_rounds", 
+                               "num.tree", "nodesize", "nsplit",
                                "nimpute", "ncp",
                                "boosting", "objective", "learning_rate",
-                               "feature_fraction", "bagging_fraction",
+                               "feature_fraction", "bagging_fraction", "bagging_freq",
                                "max_depth", "min_data_in_leaf", "num_leaves",
                                "early_stopping_rounds"
                              )]
     
     # randomForestSRC arguments ------------------------------------------------
+    
+    # @param num.tree (integer, optional) The number of trees to grow
+    # when \code{imputation.method = "rf"} or \code{imputation.method = "rf_pred"}.
+    # Default: \code{num.tree = 50}.
+    
+    if (!is.null(boost.dots[["num.tree"]])) {
+      num.tree <- boost.dots[["num.tree"]]
+    } else {
+      num.tree = 50
+    }
+    
     if (!is.null(boost.dots[["nodesize"]])) {
       nodesize <- boost.dots[["nodesize"]]
     } else {
@@ -425,6 +464,9 @@ grur_imputations <- function(
     } else {
       nimpute = 10
     }
+    
+    
+    # MCA ----------------------------------------------------------------------
     
     if (!is.null(boost.dots[["ncp"]])) {
       ncp <- boost.dots[["ncp"]]
@@ -543,7 +585,11 @@ grur_imputations <- function(
     } else {
       bagging_fraction = 0.9
     }
-    
+    if (!is.null(boost.dots[["bagging_freq"]])) {
+      bagging_freq <- boost.dots[["bagging_freq"]]
+    } else {
+      bagging_freq = 1
+    }
     
     # minimum dat per leaf
     # It is a LightGBM specific feature allowing to choose how many observations
@@ -574,6 +620,7 @@ grur_imputations <- function(
         message("    max number of iterations: ", nrounds)
         message("    filename for the model for periodical saving: ", save_name)
         message("    early stopping round integer: ", early_stopping_rounds, "\n")
+        message("    number of threads (cpu.boost): ", cpu.boost)
       }
       
       if (imputation.method == "lightgbm") {
@@ -588,6 +635,7 @@ grur_imputations <- function(
         message("    num_leaves: ", num_leaves)
         message("    early_stopping_rounds: ", early_stopping_rounds)
         message("    max number of iterations: ", nrounds)
+        message("    number of threads (cpu.boost): ", cpu.boost)
       }
       
       
@@ -614,8 +662,7 @@ grur_imputations <- function(
         message("    MCA algorithm: Regularized")
       }
       
-      message("Number of CPUs: ", parallel.core)
-      message("Note: If you have speed issues: follow grur's vignette on parallel computing\n")
+      message("Number of CPUs used grur's operations: ", parallel.core)
       if (!is.null(filename)) message("Filename: ", filename)
     }
     # Checking for missing and/or default arguments ------------------------------
@@ -626,8 +673,9 @@ grur_imputations <- function(
       random.seed <- sample(x = 1:1000000, size = 1)
       set.seed(random.seed)
     } else {
-      set.seed(random.seed)
+      set.seed("num.tree")
     }
+    message("\nSeed: ", random.seed)
     
     # Import data ---------------------------------------------------------------
     if (is.vector(data)) {
@@ -640,6 +688,18 @@ grur_imputations <- function(
     message("\nNumber of populations: ", dplyr::n_distinct(input$POP_ID))
     message("Number of individuals: ", dplyr::n_distinct(input$INDIVIDUALS))
     message("Number of markers: ", dplyr::n_distinct(input$MARKERS))
+    
+    if (imputation.method == "rf") package.used <- "randomForestSRC"
+    if (imputation.method == "boost") package.used <- "xgboost"
+    if (imputation.method == "lightgbm") package.used <- "lightgbm"
+    if (imputation.method %in% c("max", "rf_pref", "mca")) package.used <- NULL
+
+    if (!is.null(package.used)) {
+      message("\nNote: If you have speed issues:")
+      message("    1. Have you installed, ", package.used," package with OpenMP enabled ?")
+      message("    2. Have you followed grur's vignette on parallel computing?")
+      }
+
     
     # output the proportion of missing genotypes BEFORE imputations
     na.before <- dplyr::summarise(.data = input, MISSING = round(length(GT[GT == "000000"])/length(GT), 6)) %>%
@@ -654,11 +714,11 @@ grur_imputations <- function(
     # New simple id for markers, because
     # formula in RF difficult with markers containing separators and numbers
     if (imputation.method %in% c("rf", "boost", "lightgbm")) {
-      marker.meta <- dplyr::distinct(.data = input, MARKERS) %>%
+      markers.meta <- dplyr::distinct(.data = input, MARKERS) %>%
         dplyr::mutate(NEW_MARKERS = stringi::stri_join("M", seq(1, nrow(.))))
-      input <- dplyr::full_join(marker.meta, input, by = "MARKERS")
+      input <- dplyr::full_join(markers.meta, input, by = "MARKERS")
       if (tibble::has_name(input, "CHROM") && tibble::has_name(input, "LOCUS") && tibble::has_name(input, "POS")) {
-        marker.meta <- dplyr::distinct(.data = input, NEW_MARKERS, MARKERS, CHROM, LOCUS, POS)
+        markers.meta <- dplyr::distinct(.data = input, NEW_MARKERS, MARKERS, CHROM, LOCUS, POS)
       }
       input <- dplyr::select(.data = input, -MARKERS) %>%
         dplyr::rename(MARKERS = NEW_MARKERS)
@@ -666,9 +726,9 @@ grur_imputations <- function(
       # not sure necessary for max, need checking
       # scan for the columnn CHROM and keep the info to include back after imputations
       if (tibble::has_name(input, "CHROM") && tibble::has_name(input, "LOCUS") && tibble::has_name(input, "POS")) {
-        marker.meta <- dplyr::distinct(.data = input, MARKERS, CHROM, LOCUS, POS)
+        markers.meta <- dplyr::distinct(.data = input, MARKERS, CHROM, LOCUS, POS)
       } else {
-        marker.meta <- dplyr::distinct(.data = input, MARKERS)
+        markers.meta <- dplyr::distinct(.data = input, MARKERS)
       }
     }
     
@@ -720,7 +780,8 @@ grur_imputations <- function(
         dplyr::count(CHROM_LOCUS)
       
       if (max(snp.number$n) > 1) {
-        if (verbose) message("Encoding SNPs into haplotypes: combining SNPs into groups defined by chromosomes and locus info")
+        # Encoding SNPs into haplotypes: combining SNPs into groups defined by chromosomes and locus info
+        if (verbose) message("Encoding SNPs into haplotypes")
         
         if (tibble::has_name(input, "GL")) {
           keep.gl <- dplyr::ungroup(input) %>%
@@ -837,11 +898,7 @@ grur_imputations <- function(
     
     if (imputation.method %in% c("rf", "boost", "mca", "lightgbm")) {
       # Vector of markers
-      # choose one to keep
-      markers.df <- dplyr::distinct(input, MARKERS) %>% 
-        dplyr::mutate(SPLIT_VEC = split_imp(x = ., cpu.rounds = 20, parallel.core = cpu.boost))
-      boost.split <- unique(markers.df$SPLIT_VEC)
-      markers.list <- purrr::flatten_chr(markers.df)
+      markers.list <- unique(input$MARKERS)
       
       # Simple imputation with monomorphic markers -------------------------------
       
@@ -862,7 +919,7 @@ grur_imputations <- function(
         # 4) because model in RF and xgboost will benefit having more complete 
         #    and reliable genotypes
         
-        if (verbose) message("Scanning dataset for strata(s) with monomorphic marker(s)...")
+        if (verbose) message("Scanning dataset for strata(s) with monomorphic marker(s)")
         # scanning for populations with one genotype group
         scan.pop <- dplyr::group_by(.data = input, MARKERS, POP_ID, GT) %>%
           dplyr::tally(.)
@@ -974,7 +1031,6 @@ grur_imputations <- function(
         # }
         scan.markers.na <- NULL
       }
-      
       # On-the-fly-imputations using Random Forests ------------------------------
       if (imputation.method == "rf") {
         if (verbose) message("On-the-fly-imputations using Random Forests algorithm")
@@ -1056,7 +1112,8 @@ grur_imputations <- function(
         
         # separate the haplotypes/snp group
         if (separate.haplo) {
-          if (verbose) message("Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format")
+          # Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format
+          if (verbose) message("Decoding haplotypes")
           input.imp <- decoding_haplotypes(
             data = input.imp, parallel.core = parallel.core)
         }
@@ -1092,10 +1149,10 @@ grur_imputations <- function(
         
       }# End rf_pred
       
-      # Extreme Gradient Boosting Tree Imputations -------------------------------
-      if (imputation.method == "boost") {
-        if (verbose) message("Using extreme gradient tree boosting algorithm, take a break...")
+      # XGBoost & LightGBM ------------------------------------------------------
+      if (imputation.method %in% c("boost", "lightgbm")) {
         
+        # prep data
         if (hierarchical.levels == "strata") {
           input <- dplyr::ungroup(input) %>%
             dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS) %>%
@@ -1108,7 +1165,7 @@ grur_imputations <- function(
             dplyr::mutate(GT_N = factorize_gt(GT)) %>%
             dplyr::ungroup(.)
           fst::write.fst(x = input, path = "imputation_factor_dictionary.rad")
-          input.xgb <- input %>%
+          input.boost <- input %>%
             dplyr::select(MARKERS, POP_ID = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
             dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS) %>%
             dplyr::group_by(POP_ID, INDIVIDUALS) %>%
@@ -1116,8 +1173,6 @@ grur_imputations <- function(
             dplyr::ungroup(.) %>% 
             as.matrix(.) %>% 
             Matrix::Matrix(., sparse = TRUE)
-          input <- NULL
-          
         }
         
         if (hierarchical.levels == "global") {
@@ -1130,7 +1185,7 @@ grur_imputations <- function(
             dplyr::ungroup(.)
           fst::write.fst(x = input, path = "imputation_factor_dictionary.rad")
           
-          input.xgb <- input %>%
+          input.boost <- input %>%
             dplyr::select(MARKERS, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
             dplyr::arrange(MARKERS, INDIVIDUALS) %>%
             dplyr::group_by(INDIVIDUALS) %>%
@@ -1139,52 +1194,133 @@ grur_imputations <- function(
             as.matrix(.) %>% 
             Matrix::Matrix(., sparse = TRUE)
         }
+        input <- gl.wide <- NULL
         
-        # save.image("testing.imputation")
-        # load("testing.imputation")
+        if (imputation.method == "boost") {
+          if (verbose) message("Using extreme gradient tree boosting algorithm, take a break...")
+          markers.df <- tibble::data_frame(MARKERS = markers.list) %>% 
+            dplyr::mutate(SPLIT_VEC = split_imp(x = ., cpu.rounds = 20, parallel.core = cpu.boost))
+          boost.split <- unique(markers.df$SPLIT_VEC)
+          # single thread test e.g.
+          # cpu.boost <- 1
+          # cpu.boost <- 2
+          # cpu.boost <- 4
+          # cpu.boost <- 8
+          # system.time(input.imp <- purrr::map_df(
+          #   .x = boost.split,
+          #   .f = grur_boost_imputer,
+          #   markers.df = markers.df,
+          #   input.xgb = input.boost,
+          #   gl.wide = gl.wide,
+          #   eta = eta,
+          #   gamma = gamma,
+          #   max_depth = max_depth,
+          #   min_child_weight = min_child_weight,
+          #   subsample = subsample,
+          #   colsample_bytree = colsample_bytree,
+          #   num_parallel_tree = num_parallel_tree,
+          #   cpu.boost = cpu.boost,
+          #   nrounds = nrounds,
+          #   early_stopping_rounds = early_stopping_rounds,
+          #   save_name = save_name))
+          
+          # parallel testing core option
+          # cpu.boost <- 1
+          # cpu.boost <- 2
+          # cpu.boost <- 4
+          # cpu.boost <- 8
+          # parallel.core <- 2
+          # parallel.core <- 4
+          # parallel.core <- 8
+          
+          markers.df <- tibble::data_frame(MARKERS = markers.list) %>%
+            dplyr::mutate(SPLIT_VEC = split_imp(x = ., cpu.rounds = 2, 
+                                                parallel.core = parallel.core))
+          boost.split <- unique(markers.df$SPLIT_VEC)
+          
+          input.imp <- list()
+          input.imp <- .grur_parallel_mc(
+            X = boost.split,
+            FUN = grur_boost_imputer,
+            mc.cores = parallel.core,
+            markers.df = markers.df,
+            input.xgb = input.boost,
+            gl.wide = gl.wide,
+            eta = eta,
+            gamma = gamma,
+            max_depth = max_depth,
+            min_child_weight = min_child_weight,
+            subsample = subsample,
+            colsample_bytree = colsample_bytree,
+            num_parallel_tree = num_parallel_tree,
+            cpu.boost = cpu.boost,
+            nrounds = nrounds,
+            early_stopping_rounds = early_stopping_rounds,
+            save_name = save_name) %>% 
+            dplyr::bind_rows(.)
+        }
+        if (imputation.method == "lightgbm") {
+          if (verbose) message("Using Light Gradient Boosting Machine algorithm, take a break...")
+          markers.df <- tibble::data_frame(MARKERS = markers.list) %>%
+            dplyr::mutate(
+              SPLIT_VEC = as.integer(floor((10 * (1:nrow(.) - 1) / 
+                                              nrow(.)) + 1)))
+          boost.split <- unique(markers.df$SPLIT_VEC)
+          
+          message("    Imputations conducted in 10 rounds")
+          # testing serial
+          # cpu.boost <- 4
+          # boosting <- "dart"
+          # learning_rate <- 0.1
+          # bagging_freq <- 1
+          # max_depth <- 9
+          # num_leaves <- 512
+          
+          input.imp <- purrr::map_df(
+            .x = boost.split,
+            .f = grur_lgbm_imputer,
+            markers.df = markers.df,
+            input.gbm = input.boost,
+            boosting = boosting,
+            objective = objective,
+            learning_rate = learning_rate,
+            feature_fraction = feature_fraction,
+            bagging_fraction = bagging_fraction,
+            bagging_freq = bagging_freq,
+            max_depth = max_depth,
+            min_data_in_leaf = min_data_in_leaf,
+            num_leaves = num_leaves,
+            cpu.boost = cpu.boost,
+            early_stopping_rounds = early_stopping_rounds,
+            nrounds = nrounds)
+          
+          
+          # LightGBM doesn't work well in parallel for features
+          # input.imp <- list()
+          # input.imp <- .grur_parallel_mc(
+          #   X = boost.split,
+          #   FUN = grur_lgbm_imputer,
+          #   mc.cores = parallel.core,
+          #   markers.df = markers.df,
+          #   input.gbm = input.boost,
+          #   boosting = boosting,
+          #   objective = objective,
+          #   learning_rate = learning_rate,
+          #   feature_fraction = feature_fraction,
+          #   bagging_fraction = bagging_fraction,
+          #   max_depth = max_depth,
+          #   min_data_in_leaf = min_data_in_leaf,
+          #   num_leaves = num_leaves,
+          #   cpu.boost = 2,
+          #   early_stopping_rounds = early_stopping_rounds,
+          #   nrounds = nrounds) %>% 
+          #   dplyr::bind_rows(.)
+        }
         
-        
-        # XGBoost not adapted yet to weight variable by GL...yet
-        # if (tibble::has_name(input, "GL")) {
-        #   gl.wide <- dplyr::select(
-        #     .data = input,
-        #     MARKERS, POP_ID = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GL) %>%
-        #     dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS) %>%
-        #     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-        #     tidyr::spread(data = ., key = MARKERS, value = GL) %>%
-        #     dplyr::ungroup(.)
-        # } else {
-        gl.wide <- NULL
-        # }
-
-        
-        # parallel
-        input.imp <- list()
-        input.imp <- .grur_parallel_mc(
-          X = boost.split,
-          FUN = grur_boost_imputer,
-          mc.cores = parallel.core,
-          markers.df = markers.df,
-          input.xgb = input.xgb,
-          gl.wide = gl.wide,
-          eta = eta,
-          gamma = gamma,
-          max_depth = max_depth,
-          min_child_weight = min_child_weight,
-          subsample = subsample,
-          colsample_bytree = colsample_bytree,
-          num_parallel_tree = num_parallel_tree,
-          nthread = cpu.boost,
-          nrounds = nrounds,
-          early_stopping_rounds = early_stopping_rounds,
-          save_name = save_name,
-          hierarchical.levels = hierarchical.levels
-        ) %>% dplyr::bind_rows(.)
-        
-        input.xgb <- NULL# remove unused objects
+        input.boost <- NULL# remove unused objects
         
         # Remove factor/integer type genotype (revert back to original)
-        input.imp <- defactorize_gt(data.to.change = input.imp, data.with.info = input)
+        input.imp <- defactorize_gt(data.to.change = input.imp)
         
         # Reintroduce the stratification (check if required)
         input.imp <- dplyr::left_join(strata.before, input.imp, by = "INDIVIDUALS") %>%
@@ -1193,35 +1329,39 @@ grur_imputations <- function(
         
         if (separate.haplo) {
           # separate the haplotypes/snp group
-          if (verbose) message("Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format")
+          # Decoding haplotypes
+          # separating SNPs on the same locus and chromosome, back to original data format
+          if (verbose) message("Decoding haplotypes")
           input.imp <- decoding_haplotypes(
             data = input.imp, parallel.core = parallel.core)
         }
         
         
         # Impute GL
-        if (tibble::has_name(input.imp, "GL") && hierarchical.levels == "strata") {
-          message("Imputing GL with mean value per populations")
-          input.imp <- dplyr::group_by(.data = input.imp, MARKERS, POP_ID, GT) %>%
-            dplyr::mutate(
-              GL = stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)),
-              GL = replace(GL, which(GL %in% c("NA", "NaN")), NA),
-              GL = as.numeric(GL)) %>%
-            dplyr::group_by(MARKERS, GT) %>%
-            dplyr::mutate(
-              GL = as.numeric(stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)))
-            ) %>%
-            dplyr::ungroup(.)
-        }
-        if (tibble::has_name(input.imp, "GL") && hierarchical.levels == "global") {
-          message("Imputing GL with mean overall value")
-          input.imp <- dplyr::group_by(.data = input.imp, MARKERS, GT) %>%
-            dplyr::mutate(
-              GL = as.numeric(stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)))
-            ) %>%
-            dplyr::ungroup(.)
-        }
+        #Note: will no longer work with stacks
+        # if (tibble::has_name(input.imp, "GL") && hierarchical.levels == "strata") {
+        #   message("Imputing GL with mean value per populations")
+        #   input.imp <- dplyr::group_by(.data = input.imp, MARKERS, POP_ID, GT) %>%
+        #     dplyr::mutate(
+        #       GL = stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)),
+        #       GL = replace(GL, which(GL %in% c("NA", "NaN")), NA),
+        #       GL = as.numeric(GL)) %>%
+        #     dplyr::group_by(MARKERS, GT) %>%
+        #     dplyr::mutate(
+        #       GL = as.numeric(stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)))
+        #     ) %>%
+        #     dplyr::ungroup(.)
+        # }
+        # if (tibble::has_name(input.imp, "GL") && hierarchical.levels == "global") {
+        #   message("Imputing GL with mean overall value")
+        #   input.imp <- dplyr::group_by(.data = input.imp, MARKERS, GT) %>%
+        #     dplyr::mutate(
+        #       GL = as.numeric(stringi::stri_replace_na(GL, replacement = mean(GL, na.rm = TRUE)))
+        #     ) %>%
+        #     dplyr::ungroup(.)
+        # }
       }# End boost
+      
       
       # Multiple Correspondence Analysis Imputations -----------------------------
       if (imputation.method == "mca") {
@@ -1295,7 +1435,7 @@ grur_imputations <- function(
         
       }# End mca
       
-    } # End imputation RF,  boost and MCA
+    } # End imputation RF, xgboost lightgbm and MCA
     
     # prep results ---------------------------------------------------------------
     
@@ -1328,23 +1468,23 @@ grur_imputations <- function(
     if (tibble::has_name(input.imp, "POLYMORPHIC.y")) input.imp <- dplyr::select(input.imp, -POLYMORPHIC.y)
     
     
-    # Integrate marker.meta columns and sort
-    if (!is.null(marker.meta)) {
+    # Integrate markers.meta columns and sort
+    if (!is.null(markers.meta)) {
       want <- c( "MARKERS", "CHROM", "LOCUS", "POS", "POP_ID",
                  "INDIVIDUALS", "REF", "ALT", "GT", "GT_VCF",
                  "GT_VCF_NUC", "GT_BIN", "GL")
       
-      if (tibble::has_name(marker.meta, "NEW_MARKERS")) {
+      if (tibble::has_name(markers.meta, "NEW_MARKERS")) {
         input.imp <- suppressWarnings(dplyr::left_join(
           dplyr::rename(input.imp, NEW_MARKERS = MARKERS),
-          marker.meta, by = "NEW_MARKERS") %>%
+          markers.meta, by = "NEW_MARKERS") %>%
             dplyr::select(dplyr::one_of(want)))
       } else {
         input.imp <- suppressWarnings(dplyr::left_join(
-          input.imp, marker.meta, by = "MARKERS") %>%
+          input.imp, markers.meta, by = "MARKERS") %>%
             dplyr::select(dplyr::one_of(want)))
       }
-      want <- marker.meta <- NULL
+      want <- markers.meta <- NULL
     } else {
       input.imp <- dplyr::arrange(.data = input.imp, MARKERS, POP_ID, INDIVIDUALS)
     }
@@ -1369,7 +1509,7 @@ grur_imputations <- function(
               grur_imputations_error.txt
               email the problem to the author: thierrygosselin@icloud.com")
     }
-    }
+  }
   if (verbose) {
     # output the proportion of missing genotypes after imputations
     timing <- proc.time() - timing
@@ -1377,7 +1517,7 @@ grur_imputations <- function(
     cat("################## grur::grur_imputations completed ###################\n")
   }
   return(input.imp)
-    } # End imputations
+} # End imputations
 
 # Internal nested Function -----------------------------------------------------
 # grur_imputer ---------------------------------------------------------------
@@ -1687,7 +1827,7 @@ impute_genotypes <- function(
 
 # grur_boost_imputer ---------------------------------------------------------------
 #' @title grur_boost_imputer
-#' @description imputations using Ranger package and predictive mean matching
+#' @description imputations using eXtreme Gradient Boosting Tree
 #' @rdname grur_boost_imputer
 #' @keywords internal
 #' @export
@@ -1703,13 +1843,13 @@ grur_boost_imputer <- function(
   subsample = 0.8,
   colsample_bytree = 1,
   num_parallel_tree = 1,
-  nthread = 1,
+  cpu.boost = 1,
   nrounds = 200,
   early_stopping_rounds = 20,
-  save_name = "imputation.model.temp",
-  hierarchical.levels = "strata"
+  save_name = "imputation.model.temp"
 ) {
   # boost.split <- 3
+  # markers.list <- dplyr::distinct(markers.df, MARKERS) %>% purrr::flatten_chr(.)
   markers.list <- dplyr::filter(markers.df, SPLIT_VEC == boost.split) %>%
     dplyr::select(MARKERS) %>% purrr::flatten_chr(.)
   
@@ -1718,10 +1858,11 @@ grur_boost_imputer <- function(
     eta = 0.2, gamma = 0, max_depth = 6, min_child_weight = 1,
     subsample = 0.8, colsample_bytree = 1, num_parallel_tree = 1,
     nthread = 1, nrounds = 200, early_stopping_rounds = 20,
-    save_name = "imputation.model.temp", hierarchical.levels = "strata"
+    save_name = "imputation.model.temp"
   ) {
     # m <- markers.list <- "BINDED_M10642_M10643"
     # m <- markers.list <- "BINDED_M10638_M10639_M10640"
+    # m <- markers.list <- "M29"
     m <- markers.list
     message("Imputation of marker: ", m)
     # preparing data
@@ -1809,14 +1950,149 @@ grur_boost_imputer <- function(
     max_depth = max_depth, min_child_weight = min_child_weight,
     subsample = subsample, colsample_bytree = colsample_bytree,
     num_parallel_tree = num_parallel_tree,
-    nthread = nthread, nrounds = nrounds,
+    nthread = cpu.boost, nrounds = nrounds,
     early_stopping_rounds = early_stopping_rounds,
-    save_name = "imputation.model.temp",
-    hierarchical.levels = "strata")
+    save_name = save_name)
   
   return(boost.res)
   
 }#End boost
+
+
+# grur_lgbm_imputer ------------------------------------------------------------
+#' @title grur_lgbm_imputer
+#' @description imputations using Ligh Gradient Boosting Machine
+#' @rdname grur_lgbm_imputer
+#' @keywords internal
+#' @export
+
+grur_lgbm_imputer <- function(
+  boost.split = NULL,
+  markers.df = NULL,
+  input.gbm = NULL,
+  boosting = "dart",
+  objective = "multiclass",
+  learning_rate = 0.1,
+  feature_fraction = 0.9,
+  bagging_fraction = 0.9,
+  bagging_freq = 1,
+  max_depth = -1,
+  min_data_in_leaf = 20,#default
+  num_leaves = 31,#default
+  cpu.boost = parallel::detectCores() / 2,
+  early_stopping_rounds = 10,
+  nrounds = 200
+) {
+  timing.imp <- proc.time() #for timing
+  # boost.split <- 2 #test
+  # input.gbm <- input.boost #test
+  # markers.list <- dplyr::distinct(markers.df, MARKERS) %>% purrr::flatten_chr(.)
+  markers.list <- dplyr::filter(markers.df, SPLIT_VEC == boost.split) %>%
+    dplyr::select(MARKERS) %>% purrr::flatten_chr(.)
+  
+  lightbgm_imp <- function(
+    markers.list = NULL, input.gbm = NULL,
+    boosting = "dart",
+    objective = "multiclass",
+    learning_rate = 0.1,
+    feature_fraction = 0.9,
+    bagging_fraction = 0.9,
+    bagging_freq = 1,
+    max_depth = -1,
+    min_data_in_leaf = 20,#default
+    num_leaves = 31,#default
+    num_threads = parallel::detectCores() / 2,
+    early_stopping_rounds = 10,
+    nrounds = 200
+  ) {
+    # input.gbm <- as.matrix(input.wide) %>% Matrix::Matrix(., sparse = TRUE)
+    # message("Imputations markers: ", markers.list)
+    # preparing data
+    # markers.list <- "M247"
+    all.var<- colnames(input.gbm)
+    train.var <- !all.var %in% c(markers.list)
+    data.na <- is.na(input.gbm[, all.var, drop = FALSE])
+    select.na <- data.na[, markers.list]
+    all.var <- data.na <- NULL
+    
+    train.data <- input.gbm[!select.na, train.var]
+    train.label <- input.gbm[!select.na, markers.list]
+    
+    data.gbm <- lightgbm::lgb.Dataset(data = train.data, label = train.label)
+    train.data <- NULL
+    
+    # parameters
+    params <- list(
+      boosting = boosting, #"gbdt",
+      objective = objective,
+      num_classes = length(unique(train.label)),
+      learning_rate = learning_rate,
+      feature_fraction = feature_fraction,
+      bagging_fraction = feature_fraction,
+      bagging_freq = bagging_freq,
+      max_depth = max_depth,
+      min_data_in_leaf = min_data_in_leaf,
+      num_leaves = num_leaves,
+      device = "cpu",
+      num_threads = num_threads,
+      early_stopping_rounds = early_stopping_rounds,
+      metric = "multi_logloss")
+    # metric = "multi_error")
+    
+    
+    model <- lightgbm::lgb.train(
+      params = params,
+      data = data.gbm,
+      nrounds = nrounds,
+      valids = list(test = data.gbm),
+      pred_early_stop = TRUE,
+      verbose = -1
+    )
+    # names(model)
+    data.gbm <- NULL
+    
+    train.missing <- input.gbm[select.na, train.var, drop = FALSE]
+    # train.missing.label <- input.gbm[select.na, markers.list]
+    train.var <- select.na <- NULL
+    id.string <- train.missing[, "INDIVIDUALS"]
+    
+    res <- model$predict(train.missing, reshape = TRUE)
+    train.missing <- model <- NULL # remove model if extract info is required
+    
+    res <- tibble::as_data_frame(res) %>% 
+      `colnames<-`(sort(unique(train.label))) %>%
+      dplyr::mutate(
+        INDIVIDUALS = id.string,
+        MARKERS = rep(markers.list, n())) %>% 
+      tidyr::gather(data = ., key = GT, value = score, -c(INDIVIDUALS, MARKERS)) %>%
+      dplyr::group_by(INDIVIDUALS, MARKERS) %>% 
+      dplyr::filter(score == max(score)) %>%
+      dplyr::distinct(INDIVIDUALS, MARKERS, .keep_all = TRUE) %>% 
+      dplyr::arrange(INDIVIDUALS) %>%
+      dplyr::mutate(GT = as.numeric(GT)) %>% 
+      dplyr::select(-score) %>% dplyr::ungroup(.)
+    # View(res)
+    
+    return(res)
+  }# End lightbgm_imp
+  
+  res <- purrr::map_df(
+    .x = markers.list, .f = lightbgm_imp,
+    input.gbm = input.gbm,
+    boosting = boosting, objective = objective,
+    learning_rate = learning_rate,
+    feature_fraction = feature_fraction,
+    bagging_fraction = bagging_fraction,
+    max_depth = max_depth,
+    min_data_in_leaf = min_data_in_leaf,
+    num_leaves = num_leaves,
+    num_threads = cpu.boost,
+    early_stopping_rounds = early_stopping_rounds,
+    nrounds = nrounds)
+  timing.imp <- proc.time() - timing.imp
+  message("    Imputations round ", boost.split, "/10 conducted in ", round(timing.imp[[3]]), " sec")
+  return(res)
+}#End grur_lgbm_imputer
 
 # encoding_snp --------------------------------------------------------------------
 #' @title encoding_snp
@@ -1988,7 +2264,10 @@ factorize_gt <- function(x) {
 #' @keywords internal
 #' @export
 
-defactorize_gt <- function(data.to.change, data.with.info) {
+defactorize_gt <- function(data.to.change,
+                           data.with.info = "imputation_factor_dictionary.rad") {
+  data.with.info <- fst::read.fst(path = data.with.info)
+  
   clean.id <- dplyr::distinct(.data = data.with.info, INDIVIDUALS, INDIVIDUALS_N)
   clean.gt <- dplyr::distinct(.data = data.with.info, MARKERS, GT, GT_N) %>%
     tidyr::drop_na(.)
@@ -2039,4 +2318,3 @@ split_imp <- function(x, cpu.rounds, parallel.core = parallel::detectCores() - 1
   split.vec <- as.integer(floor((parallel.core * cpu.rounds * (1:n.row - 1) / n.row) + 1))
   return(split.vec)
 }#End split_imp
-

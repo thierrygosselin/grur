@@ -4,7 +4,8 @@
 \alias{defactorize_gt}
 \title{defactorize_gt}
 \usage{
-defactorize_gt(data.to.change, data.with.info)
+defactorize_gt(data.to.change,
+  data.with.info = "imputation_factor_dictionary.rad")
 }
 \description{
 Function to "defactorize/decode" the imputed data back to original.

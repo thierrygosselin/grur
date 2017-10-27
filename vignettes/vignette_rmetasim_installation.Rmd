@@ -1,5 +1,5 @@
 ---
-title: "rmetasim installation"
+title: "rmetasim-XGBoost-LightGBM installation"
 output: 
   html_notebook:
     toc: true
@@ -12,7 +12,11 @@ used by `grur`.
 
 This vignette purposes is to show users how to modify/install
 `rmetasim` to allow it to use more markers during simulations, than the 
-latest default set to 2000 markers. 
+latest default set to 2000 markers.
+
+Additionally, macOS users will find the instructions to install
+`XGBoost` and `LightGBM` so that the package work in parallel,
+both need to be compiled with OpenMP enabled.
 
 
 **Time to allow: ETA ~10 min**
@@ -28,7 +32,7 @@ wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 ```
 
-**#Move and Rename clang** to a folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time):
+**Move and Rename clang** to a folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time):
 ```{r}
 #Terminal
 sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang
@@ -176,6 +180,70 @@ However, at the end you should see something like this:
 #Terminal
 cd ..
 sudo rm -R grur_rmetasim.zip rmetasim-master
+```
+
+
+#XGBoost
+
+##Download the github version
+```{r}
+# In RStudio Terminal or macOS Terminal
+cd Downloads
+git clone --recursive https://github.com/dmlc/xgboost
+cd xgboost
+```
+
+
+##CMD line mode only
+
+To compile XGBoost and run in command line mode in the Terminal
+```{r}
+cp make/config.mk ./config.mk
+export CC=/usr/local/bin/gcc
+export CXX=/usr/local/bin/g++
+export CXX11=/usr/local/bin/g++
+export CXX14=/usr/local/bin/g++
+export CXX17=/usr/local/bin/g++
+make -j4
+```
+
+Prefer using CLANG instead of GCC ? (in dev)
+```{r}
+export CC=/Users/thierry/Dropbox/programs/clang/bin/clang
+export CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
+export CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++
+```
+
+
+##R package
+Modify the `configure` file inside the `xgboost/R-package` folder
+
+###In a text editor
+```{r edit xgboost}
+# Go to line 1676
+# change
+  ac_pkg_openmp=no
+# to
+  ac_pkg_openmp=yes
+#save the file under the same name
+```
+
+###Compile `XGBoost`
+
+```{r}
+sudo R CMD INSTALL R-package
+```
+
+##Test R-package
+You should see a time difference between both runs
+
+```{r}
+require(xgboost)
+x <-  matrix(rnorm(100*10000), 10000, 100)
+y <-  x %*% rnorm(100) + rnorm(1000)
+
+system.time({bst = xgboost(data = x, label = y, nthread = 1, nround = 100, verbose = FALSE)})
+system.time({bst = xgboost(data = x, label = y, nthread = 4, nround = 100, verbose = FALSE)})
 ```
 
 

@@ -5,8 +5,8 @@
 \title{Map-independent imputations of missing genotypes}
 \usage{
 grur_imputations(data, imputation.method = NULL,
-  hierarchical.levels = "strata", num.tree = 50, pred.mean.matching = 0,
-  verbose = TRUE, parallel.core = parallel::detectCores() - 1,
+  hierarchical.levels = "strata", pred.mean.matching = 0, verbose = TRUE,
+  parallel.core = parallel::detectCores() - 1,
   cpu.boost = parallel::detectCores()/2, random.seed = NULL,
   filename = NULL, ...)
 }
@@ -20,7 +20,7 @@ To get a tidy dataset from various genomic format, see
 \emph{See details of this function for more info}.}
 
 \item{imputation.method}{(character, optional)
-Methods available for map-independent imputations of missing genotype
+Methods available for map-independent imputations of missing genotypes
 (see details for more info):
 
 \enumerate{
@@ -35,6 +35,8 @@ as a prediction problem.
 
 \item \code{imputation.method = "boost"} extreme gradient boosting trees.
 
+\item \code{imputation.method = "lightgbm"} for a light and fast gradient boosting tree method.
+
 \item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
 
 \code{imputation.method = NULL} the function will stop.
@@ -46,14 +48,10 @@ Should the imputations be computed by markers globally or by strata.
 Historically, this was \code{"populations"}.
 
 Note that imputing genotype globally in conjunction with
-\code{imputation.method = "max"} can potentially create huge bias.
-e.g. by introducing foreign genotypes/haplotypes in some populations
+\code{imputation.method = "max" or "strata"} can potentially create huge bias.
+e.g. by introducing foreign genotypes/haplotypes in some strata/populations
 (see note for more info).
 Default: \code{hierarchical.levels = "strata"}.}
-
-\item{num.tree}{(integer, optional) The number of trees to grow
-when \code{imputation.method = "rf"} or \code{imputation.method = "rf_pred"}.
-Default: \code{num.tree = 50}.}
 
 \item{pred.mean.matching}{(integer, optional) Used in conjunction with
 random Forests (\code{imputation.method = "rf_pred"}).
@@ -61,14 +59,15 @@ Number of candidate non-missing
 value to sample from during the predictive mean matching step.
 A fast k-nearest neighbor searching algorithms is used with this approach.
 \code{pred.mean.matching = 3} will use 3 neighbors.
-Default: \code{pred.mean.matching = 0}, avoids this step.}
+Default: \code{pred.mean.matching = 0}, will avoids this step. (in devel)}
 
 \item{verbose}{(optional, logical) When \code{verbose = TRUE}
 the function is a little more chatty during execution.
 Default: \code{verbose = TRUE}.}
 
 \item{parallel.core}{(optional, integer) The number of core used for parallel.
-Markers are imputed in parallel, strata are processed sequentially.
+For some algorithms, markers will be imputed in parallel and 
+strata are processed sequentially.
 Default: \code{parallel.core = parallel::detectCores() - 1}.}
 
 \item{cpu.boost}{(optional, integer). Number of core for XGBoost and LightGBM.
@@ -97,13 +96,9 @@ imputations. See details below.}
 \value{
 The output in your global environment is the imputed tidy data frame.
 If \code{filename} is provided, the imputed tidy data frame is also
-written to the working directory. The original data is returned for markers
-with \emph{all} or \emph{no} NA.
+written to the working directory.
 }
 \description{
-Used internally in \href{https://github.com/thierrygosselin/assigner}{assigner} and
-\href{https://github.com/thierrygosselin/radiator}{radiator} and
-might be of interest for users.
 The goal of this module is to provide a simple solution for
 a complicated problem: missing genotypes in RADseq genomic datasets.
 This function will performed \strong{map-independent imputations} of missing
@@ -112,44 +107,42 @@ genotypes.
 \strong{Key features:}
 
 \itemize{
-\item \strong{Imputation algorithms/methods: } Random forests (on-the-fly-imputation, ),
-Extreme gradient tree boosting,
-Multiple Correspondence Analysis (MCA) and
-the classic Strawman imputation
+\item \strong{Imputation methods: } several machine learning algorithms;
+Random forests (predictive and on-the-fly-imputations); 
+Extreme gradient tree boosting (XGBoost);
+Fast, distributed, high performance gradient
+boosting (LightGBM) and
+Multiple Correspondence Analysis (MCA). Furthermore, the module allows to
+compare these algorithms with the classic Strawman imputation
 (~ max/mean/mode: the most frequently observed, i.e. non-missing, genotypes is used).
-\item \strong{Hierarchical level: } Imputations conducted by populations or globally.
-\item \strong{Haplotype/SNP approach: } Correlation among SNPs is accounted for during
-rf and tree boosting imputation, i.e. imputation is automatically conducted by haplotype
-when marker meta-information is avaialble (chromosome, locus and position,
-usually from VCF files). The alternative, considers all the markers independent
-and imputation is conducted by SNPs.
+\item \strong{Hierarchical level: } Imputations conducted by strata or globally.
+\item \strong{SNP linkage/Haplotypes: } Correlation among SNPs is accounted for during
+rf and tree boosting imputations, i.e. the imputations are 
+automatically conducted by haplotypes
+when marker meta-information is available (chromosome, locus and position,
+usually taken from VCF files). The alternative, considers all the markers 
+independent and imputation is conducted by SNPs/markers.
 \item \strong{Genotype likelihood (GL): } The GL info is detected automatically
 (GL column in FORMAT field of VCF files). Genotypes with higher likelihood
 will have higher probability during bootstrap samples of trees in Random
-forests.
-Notes: (1) option only available with Random forests;
-(2) the use of genotype likelihoods
-in the form of normalized, phred-scaled likelihoods (PL, e.g. from GATK)
-are not recognized, yet... it's still under development.
-\item \strong{Predictive mean matching: } the rf option uses a fast k-nearest neighbor
-(KNN) searching algorithms (see argument documentation and details below).
-\item \strong{Optimized for speed: } the package
-\href{https://github.com/imbs-hl/ranger}{ranger}
-(see Wright and Ziegler, 2016) provides a fast C++ version
-of the original implementation of rf from Breiman (2001).
-The \href{https://github.com/dmlc/xgboost}{XGBoost} provides the fast C++
-implementation for the extreme gradient tree boosting algorithm.
-Imputations of genotypes are conducted in parallel across CPUs.
-A progress bar is now available to see if you have time for a coffee break!
+forests (under devel).
+\item \strong{Predictive mean matching: } random forest in prediction mode
+uses a fast k-nearest neighbor (KNN) searching algorithms 
+(see argument documentation and details below).
+\item \strong{Optimized for speed: } There's a
+\href{https://github.com/thierrygosselin/grur#troubleshooting}{tutorial} and a
+\href{https://github.com/thierrygosselin/grur#vignettes-and-examples}{vignette}
+detailing the procedure to install the packages from source to enable OpenMP.
+Depending on algorithm used, a progress bar is sometimes available to see 
+if you have time for a coffee break!
 }
 
 
 Before running this function to populate the original dataset with synthetic
-data I highly recommend you look for patterns of missingness
+data, I highly recommend you look for patterns of missingness
 \code{\link[grur]{missing_visualization}}
-and explore the reasons for their presence.
-Follow the \href{https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0}{vignette}
-for more info.
+and explore the reasons for their presence 
+(see \href{https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0}{vignette}).
 }
 \details{
 \strong{Predictive mean matching:}
@@ -157,7 +150,7 @@ for more info.
 Random Forests already behave like a nearest neighbor
 classifier, with adaptive metric. Now we have the option to conduct
 predictive mean matching on top of the prediction based missing value
-imputation.PMM tries to raise the variance in the resulting conditional
+imputation. PMM tries to raise the variance in the resulting conditional
 distributions to a realistic level.
 The closest k predicted values are identified by a fast
 k-nearest neighbour approach wrapped in the package
@@ -179,7 +172,7 @@ Alternatively, a \emph{snp approach} is used, and the SNP are considered
 independent. Imputations of genotypes is then conducted for each marker separately.
 
 
-\strong{Imputing globally or by populations ?}
+\strong{Imputing globally or by strata ?}
 \code{hierarchical.levels = "global"} argument will act differently depending
 on the \code{imputation.method} selected.
 
@@ -233,44 +226,62 @@ missing genotypes are imputed one at a time. The fitted forest is used to
 predict missing genotypes. Missingness in the response variables are
 incorporated as attributes for growing the forest.
 
+\emph{boosting trees:} Prediction method is used for both XGBoost and LightGBM.
+
+\href{https://lightgbm.readthedocs.io/en/latest/index.html}{LightGBM documentation}
+
+\href{http://xgboost.readthedocs.io/en/latest/}{XGBoost documentation}
+
+\href{https://sites.google.com/view/lauraepp/parameters}{LightGBM and XGBoost parameters optimization}
+
+
+
+
 \strong{... :dot dot dot arguments}
 
 The argument is available to tailor your imputations using
-extreme gradient tree boosting and random forest:
+XGBoost, LightGBM and Random Forests:
 
-Available arguments for extreme gradient tree boosting tree method:
+Available arguments for eXtreme Gradient Boosting tree method:
 \emph{eta, gamma, max_depth, min_child_weight, subsample, colsample_bytree,
 num_parallel_tree, nrounds, save_name, early_stopping_rounds}.
 Refer to \code{\link[xgboost]{xgboost}} for arguments documentation.
 
+Available arguments for LightGBM:
+\emph{boosting, objective, learning_rate, feature_fraction, bagging_fraction,
+bagging_freq, max_depth, min_data_in_leaf, num_leaves, early_stopping_rounds,
+nrounds, max_depth}. Refer to \code{\link[lightgbm]{lightgbm}}
+for arguments documentation.
 
 Available arguments for Random forests method:
-\emph{nodesize, nsplit, nimpute}.
+\emph{num.tree, nodesize, nsplit, nimpute}.
 Refer to \code{\link[randomForestSRC]{impute.rfsrc}} for arguments documentation.
 }
 \note{
 \strong{Reference genome or linkage map available ?}
-
 Numerous approaches are available and more appropriate, please search
 the literature
 (\href{https://online.papersapp.com/collections/05d6e65a-73c9-49e6-9c75-289a818f76f3/share}{references}).
 
 
-\strong{What's simple imputation message when running the function ?}
+\strong{What's the simple imputation message when running the function ?}
 
-Before conducting the imputations by populations with random forest or extreme
-gradient tree boosting, the data is first screened for markers that are
-monomorphic within populations. Because for those cases, it's clear what the
+Before conducting the imputations by strata with the machine learning algorithms, 
+the data is first screened for markers that are
+monomorphic WITHIN the strata/populations.
+Because for those cases, it's clear what the
 missing genotypes should be, the imputations is very \emph{simple} and missing
-genotypes are imputed with the only genotype found for the particular population.
-The small cost in time is worth it, because the random forest or extreme
-gradient tree boosting model will benefit having more complete and
-reliable genotypes.
+genotypes are imputed with the only genotype found for the particular strata/populations.
+There's no need for a fancy method here.
+The small cost in time is worth it, because the model inside 
+the machine learning algorithms will benefit from having a more complete and
+reliable genotype matrix.
 
 
 \strong{Deprecated arguments:}
 
 \itemize{
+\item \code{hierarchical.levels = "populations"} update your codes with "strata".
 \item \code{imputations.group} is now replaced by \code{hierarchical.levels}
 \item \code{impute} is no longer available.
 Imputing using \code{impute = "allele"} option was wrong because it
@@ -286,9 +297,12 @@ is now set to 10 iterations.
 \dontrun{
 # The simplest way to run when you have a tidy dataset:
 
-wolf.imputed <- grur::grur_imputations(data = "wolf.tidy.dataset.tsv")
+wolf.imputed <- grur::grur_imputations(
+data = "wolf.tidy.dataset.rad",
+imputation.method = "lightgbm")
 
-# This will impute the missing genotypes by population using random Forests.
+# This will impute the missing genotypes by strata (in this case the strata,
+is the population), population using lightgbm.
 # The remaining arguments will be the defaults.
 
 # When you start with a vcf file you can use magrittr \%>\% to `pipe` the
@@ -320,15 +334,24 @@ Tang F, Ishwaran H. (2017) Random Forest Missing Data Algorithms.
 arXiorg: 1–24.
 }
 \seealso{
+The package \href{https://github.com/imbs-hl/ranger}{ranger}
+(see Wright and Ziegler, 2016) provides a fast C++ version
+of the original implementation of rf from Breiman (2001).
+
 \href{https://github.com/mayer79/missRanger}{missRanger}
 
-\href{https://github.com/imbs-hl/ranger}{ranger}
+The package \href{https://github.com/dmlc/xgboost}{randomForestSRC} 
+(see Tang and Ishwaran, 2017) provides
+a fast on-the-fly imputation method.
 
 \href{https://github.com/stekhoven/missForest}{missForest}
 
-\href{https://github.com/kogalur/randomForestSRC}{randomForestSRC}
+The package \href{https://github.com/dmlc/xgboost}{XGBoost} 
+(Chen and Guestrin, 2016) provides
+a fast C++ implementation for the extreme gradient tree boosting algorithm.
 
-\href{https://github.com/dmlc/xgboost}{XGBoost}
+The package \href{https://github.com/Microsoft/LightGBM}{LightGBM} is an
+exciting new algorithm to conduct tree boosting.
 }
 \author{
 Thierry Gosselin \email{thierrygosselin@icloud.com}
