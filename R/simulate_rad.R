@@ -71,6 +71,7 @@
 
 #' @author Eric Archer \email{eric.archer@@noaa.gov} and Thierry Gosselin \email{thierrygosselin@@icloud.com}
 #' 
+#' @importFrom readr write_tsv
 #' @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
 # @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
 #' @import rmetasim
@@ -123,12 +124,13 @@ simulate_rad <- function(
   # create scenario data.frame
   sc.df <- expand.grid(
     num.pops = num.pops, num.loci = num.loci, div.time = div.time, ne = ne,
-    ne = ne, nm = nm, theta = theta, mig.type = mig.type,
+    nm = nm, theta = theta, mig.type = mig.type,
     stringsAsFactors = FALSE
   )
   sc.df <- cbind(scenario = 1:nrow(sc.df), sc.df)
   sc.df$mut.rate <- sc.df$theta / (4 * sc.df$ne)
   sc.df$mig.rate <- sc.df$nm / sc.df$ne
+  readr::write_tsv(x = sc.df, path = file.path(label, "scenarios.summary.tsv"))
   sc.df$mig.mat <- lapply(1:nrow(sc.df), function(i) {
     num.pops <- sc.df$num.pops[i]
     mig.rate <- sc.df$mig.rate[i]

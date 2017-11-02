@@ -10,6 +10,6 @@ NULL
 
 
 
-.onUnload <- function(libpath) {
-  library.dynam.unload("grur", libpath)
-}
+# .onUnload <- function(libpath) {
+#   library.dynam.unload("grur", libpath)
+# }

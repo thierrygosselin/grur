@@ -60,7 +60,8 @@ if (getRversion() >= "2.15.1") {
       "NUMBER_MARKERS", "path.folder", "(Intercept)", "log10(num.missing.total)",
       "num.missing.col", "num.missing.total", "p.value", "pct.missing", "statistic",
       "std.error", "term", "estimate", "a", "b", "is.missing", "STRATA_SELECT",
-      "POLYMORPHIC.x", "POLYMORPHIC.y", "SPLIT_VEC", "score"
+      "POLYMORPHIC.x", "POLYMORPHIC.y", "SPLIT_VEC", "SCORE", "IMPUTED_DATA",
+      "LABEL", "MODEL", "ROWS", "ANCESTRY", "ASSIGN", "GROUP_POST", "GROUP_PRIOR"
     )
   )
 }

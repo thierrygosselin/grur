@@ -71,9 +71,11 @@
 #' \item \code{imputation.method = "rf_pred"} Random Forests algorithm is used
 #' as a prediction problem.
 #'
-#' \item \code{imputation.method = "boost"} extreme gradient boosting trees.
+#' \item \code{imputation.method = "boost"} extreme gradient boosting trees
+#' using depth-wise tree growth.
 #' 
-#' \item \code{imputation.method = "lightgbm"} for a light and fast gradient boosting tree method.
+#' \item \code{imputation.method = "lightgbm"} for a light and fast 
+#' leaf-wise tree growth gradient boosting algorithm.
 #'
 #' \item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
 #'
@@ -92,17 +94,18 @@
 #' Default: \code{hierarchical.levels = "strata"}.
 
 
-#' @param pred.mean.matching (integer, optional) Used in conjunction with
-#' random Forests (\code{imputation.method = "rf_pred"}).
+#' @param pmm (integer, optional) Predictive mean matching used in conjunction with
+#' random Forests and lightgbm (\code{imputation.method = "rf_pred"} or
+#' \code{imputation.method = "lightgbm"}).
 #' Number of candidate non-missing
 #' value to sample from during the predictive mean matching step.
 #' A fast k-nearest neighbor searching algorithms is used with this approach.
-#' \code{pred.mean.matching = 3} will use 3 neighbors.
-#' Default: \code{pred.mean.matching = 0}, will avoids this step. (in devel)
+#' \code{pmm = 2} will use 2 neighbors.
+#' Default: \code{pmm = 0}, will avoids this step.
 
 #' @param random.seed (integer, optional) For reproducibility, set an integer
 #' that will be used to initialize the random generator. With default,
-#' a random number is generated.
+#' a random number is generated. Currently not implemented for XGBoost and LightGBM.
 #' Default: \code{random.seed = NULL}.
 
 #' @param verbose (optional, logical) When \code{verbose = TRUE}
@@ -243,8 +246,9 @@
 #' Available arguments for LightGBM:
 #' \emph{boosting, objective, learning_rate, feature_fraction, bagging_fraction,
 #' bagging_freq, max_depth, min_data_in_leaf, num_leaves, early_stopping_rounds,
-#' nrounds, max_depth}. Refer to \code{\link[lightgbm]{lightgbm}}
-#' for arguments documentation.
+#' nrounds, max_depth, iteration.subsample}. Refer to \code{\link[lightgbm]{lightgbm}}
+#' for arguments documentation. \code{iteration.subsample} is the number of iteration
+#' to conduct training of the model with new subsamples (default: \code{iteration.subsample = 2}).
 #' 
 #' Available arguments for Random forests method:
 #' \emph{num.tree, nodesize, nsplit, nimpute}.
@@ -327,7 +331,7 @@
 #' @importFrom stats predict reformulate as.formula
 #' @importFrom rlang .data
 #' @importFrom ranger ranger
-# @importFrom missRanger pmm
+#' @importFrom missRanger pmm
 #' @importFrom xgboost xgb.DMatrix cb.early.stop xgb.train
 # @importFrom base split
 #' @importFrom randomForestSRC impute.rfsrc
@@ -379,7 +383,7 @@ grur_imputations <- function(
   data,
   imputation.method = NULL,
   hierarchical.levels = "strata",
-  pred.mean.matching = 0,
+  pmm = 0,
   verbose = TRUE,
   parallel.core = parallel::detectCores() - 1,
   cpu.boost = parallel::detectCores() / 2,
@@ -417,7 +421,7 @@ grur_imputations <- function(
         "objective", "learning_rate",
         "feature_fraction", "bagging_fraction", "bagging_freq",
         "max_depth", "min_data_in_leaf", "num_leaves",
-        "early_stopping_rounds"))
+        "early_stopping_rounds", "iteration.subsample"))
     
     if (length(unknowned_param) > 0) {
       stop("Unknowned \"...\" parameters to grur imputation module: ",
@@ -434,7 +438,7 @@ grur_imputations <- function(
                                "boosting", "objective", "learning_rate",
                                "feature_fraction", "bagging_fraction", "bagging_freq",
                                "max_depth", "min_data_in_leaf", "num_leaves",
-                               "early_stopping_rounds"
+                               "early_stopping_rounds", "iteration.subsample"
                              )]
     
     # randomForestSRC arguments ------------------------------------------------
@@ -553,6 +557,7 @@ grur_imputations <- function(
       if (imputation.method == "lightgbm") max_depth = -1# infinite depth
     }
     
+    
     # LightGBM arguments -------------------------------------------------------
     
     
@@ -607,6 +612,14 @@ grur_imputations <- function(
       num_leaves = 31
     }
     
+    # iteration.subsample
+    # number of leaves in one tree
+    if (!is.null(boost.dots[["iteration.subsample"]])) {
+      iteration.subsample <- boost.dots[["iteration.subsample"]]
+    } else {
+      iteration.subsample = 2
+    }
+    
     if (verbose) {
       if (imputation.method == "boost") {
         message("Extreme gradient tree boosting options:")
@@ -634,6 +647,8 @@ grur_imputations <- function(
         message("    min_data_in_leaf: ", min_data_in_leaf)
         message("    num_leaves: ", num_leaves)
         message("    early_stopping_rounds: ", early_stopping_rounds)
+        message("    iteration.subsample: ", iteration.subsample)
+        message("    Predictive Mean Matching: ", pmm)
         message("    max number of iterations: ", nrounds)
         message("    number of threads (cpu.boost): ", cpu.boost)
       }
@@ -653,7 +668,7 @@ grur_imputations <- function(
         message("    minimum terminal node size: ", nodesize)
         message("    non-negative integer value used to specify random splitting: ", nsplit)
         message("    number of iterations: ", nimpute)
-        message("    predictive mean matching: ", pred.mean.matching, "\n")
+        message("    predictive mean matching: ", pmm, "\n")
       }
       
       if (imputation.method == "mca") {
@@ -739,7 +754,6 @@ grur_imputations <- function(
       ref.column <- FALSE
     }
     biallelic <- radiator::detect_biallelic_markers(data = input)
-    
     
     # Manage Genotype Likelihood -------------------------------------------------
     if (tibble::has_name(input, "GL")) {
@@ -900,7 +914,7 @@ grur_imputations <- function(
       # Vector of markers
       markers.list <- unique(input$MARKERS)
       
-      # Simple imputation with monomorphic markers -------------------------------
+      # Simple imputation with pop monomorphic markers -------------------------
       
       # Problem encountered:
       # Merged SNPs might end up be missing if one of the SNP on the read is missing
@@ -1128,7 +1142,7 @@ grur_imputations <- function(
                                   .f = grur_imputer,
                                   hierarchical.levels = hierarchical.levels,
                                   num.tree = num.tree,
-                                  pred.mean.matching = pred.mean.matching,
+                                  pmm = pmm,
                                   random.seed = random.seed,
                                   parallel.core = parallel.core) %>%
             dplyr::bind_rows(.)
@@ -1141,7 +1155,7 @@ grur_imputations <- function(
           input.rf.imp <- grur_imputer(data = input,
                                        hierarchical.levels = hierarchical.levels,
                                        num.tree = num.tree,
-                                       pred.mean.matching = pred.mean.matching,
+                                       pmm = pmm,
                                        random.seed = random.seed,
                                        parallel.core = parallel.core)
         } # End imputation RF global
@@ -1151,7 +1165,6 @@ grur_imputations <- function(
       
       # XGBoost & LightGBM ------------------------------------------------------
       if (imputation.method %in% c("boost", "lightgbm")) {
-        
         # prep data
         if (hierarchical.levels == "strata") {
           input <- dplyr::ungroup(input) %>%
@@ -1171,8 +1184,7 @@ grur_imputations <- function(
             dplyr::group_by(POP_ID, INDIVIDUALS) %>%
             tidyr::spread(data = ., key = MARKERS, value = GT) %>%
             dplyr::ungroup(.) %>% 
-            as.matrix(.) %>% 
-            Matrix::Matrix(., sparse = TRUE)
+            as.matrix(.) %>% Matrix::Matrix(., sparse = TRUE)
         }
         
         if (hierarchical.levels == "global") {
@@ -1292,7 +1304,9 @@ grur_imputations <- function(
             num_leaves = num_leaves,
             cpu.boost = cpu.boost,
             early_stopping_rounds = early_stopping_rounds,
-            nrounds = nrounds)
+            nrounds = nrounds,
+            iteration.subsample = iteration.subsample,
+            pmm = pmm)
           
           
           # LightGBM doesn't work well in parallel for features
@@ -1319,6 +1333,12 @@ grur_imputations <- function(
         
         input.boost <- NULL# remove unused objects
         
+        # save.image("imputation.test.RData")
+        #Note to myself: if you want to further explore error
+        # the column need parsing...
+        # error.lightgbm <-  dplyr::select(input.imp, MARKERS, ERROR)
+        input.imp <- input.imp %>% dplyr::select(IMPUTED_DATA) %>% tidyr::unnest(.)
+
         # Remove factor/integer type genotype (revert back to original)
         input.imp <- defactorize_gt(data.to.change = input.imp)
         
@@ -1530,7 +1550,7 @@ grur_imputations <- function(
 grur_imputer <- function(
   data,
   num.tree = 100,
-  pred.mean.matching = 0,
+  pmm = 0,
   random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
   # markers.linkage = "multivariate",
@@ -1588,7 +1608,7 @@ grur_imputer <- function(
       data.na = data.na,
       data.gl = data.gl,
       num.tree = num.tree,
-      pred.mean.matching = pred.mean.matching,
+      pmm = pmm,
       random.seed = random.seed,
       parallel.core = parallel.core,
       hierarchical.levels = hierarchical.levels,
@@ -1604,7 +1624,7 @@ grur_imputer <- function(
       data.gl = data.gl,
       data.imp = data.imp,
       num.tree = num.tree,
-      pred.mean.matching = pred.mean.matching,
+      pmm = pmm,
       random.seed = random.seed,
       parallel.core = parallel.core,
       hierarchical.levels = hierarchical.levels,
@@ -1650,7 +1670,7 @@ impute_genotypes <- function(
   data.gl = NULL,
   data.imp,
   num.tree = 100,
-  pred.mean.matching = 0,
+  pmm = 0,
   random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
   hierarchical.levels = "strata",
@@ -1754,7 +1774,7 @@ impute_genotypes <- function(
   
   message("RF: ok")# for diagnostic
   # predictive mean matching ---------------------------------------------
-  if (pred.mean.matching > 0) {
+  if (pmm > 0) {
     
     # ytrain <- dplyr::select(data.complete, GT) %>%
     #   dplyr::mutate(GT = as.character(GT)) %>%
@@ -1777,7 +1797,7 @@ impute_genotypes <- function(
     #   xtrain = ranger.res$predictions,
     #   xtest = predicted,
     #   ytrain = ytrain,
-    #   k = pred.mean.matching)
+    #   k = pmm)
     predicted <- NULL
   }
   
@@ -1981,17 +2001,19 @@ grur_lgbm_imputer <- function(
   num_leaves = 31,#default
   cpu.boost = parallel::detectCores() / 2,
   early_stopping_rounds = 10,
-  nrounds = 200
+  nrounds = 200,
+  iteration.subsample = 2,
+  pmm = 2
 ) {
   timing.imp <- proc.time() #for timing
-  # boost.split <- 2 #test
+  # boost.split <- 1 #test
   # input.gbm <- input.boost #test
-  # markers.list <- dplyr::distinct(markers.df, MARKERS) %>% purrr::flatten_chr(.)
   markers.list <- dplyr::filter(markers.df, SPLIT_VEC == boost.split) %>%
     dplyr::select(MARKERS) %>% purrr::flatten_chr(.)
   
   lightbgm_imp <- function(
-    markers.list = NULL, input.gbm = NULL,
+    markers.list = NULL,
+    input.gbm = NULL,
     boosting = "dart",
     objective = "multiclass",
     learning_rate = 0.1,
@@ -2001,80 +2023,213 @@ grur_lgbm_imputer <- function(
     max_depth = -1,
     min_data_in_leaf = 20,#default
     num_leaves = 31,#default
-    num_threads = parallel::detectCores() / 2,
+    cpu.boost = parallel::detectCores() / 2,
     early_stopping_rounds = 10,
-    nrounds = 200
+    nrounds = 200,
+    iteration.subsample = 2,
+    pmm = 2
   ) {
-    # input.gbm <- as.matrix(input.wide) %>% Matrix::Matrix(., sparse = TRUE)
     # message("Imputations markers: ", markers.list)
     # preparing data
-    # markers.list <- "M247"
+    # markers.list <- "BINDED_M667_M668"
     all.var<- colnames(input.gbm)
-    train.var <- !all.var %in% c(markers.list)
+    data.var <- !all.var %in% c(markers.list)
     data.na <- is.na(input.gbm[, all.var, drop = FALSE])
     select.na <- data.na[, markers.list]
-    all.var <- data.na <- NULL
     
-    train.data <- input.gbm[!select.na, train.var]
-    train.label <- input.gbm[!select.na, markers.list]
+    # use train.gbm but here it's just to recycle object name below
+    # here it's all the data
+    xtrain <- data.gbm <- input.gbm[!select.na, data.var] #xtrain for PMM
+    data.label <- input.gbm[!select.na, markers.list]
+    ytrain <- unname(data.label)#ytrain for PMM
+  
+    # Note to myself: sampling for training and test set was not a good choice
+    # with genomic data. Some training sets didn't contain all the potential genotypes.
+    # tried sample with prob but trying a stratified sampling below
     
-    data.gbm <- lightgbm::lgb.Dataset(data = train.data, label = train.label)
-    train.data <- NULL
+    # before
+    # sample 90% of rows (samples) for training
+    # train.row <- sort(sample(x = 1:nrow(train.gbm), size = ceiling(0.9 * nrow(train.gbm)), replace = FALSE))
+    # test.row <- purrr::discard(.x = 1:nrow(train.gbm), .p = 1:nrow(train.gbm) %in% train.row)
     
-    # parameters
-    params <- list(
-      boosting = boosting, #"gbdt",
+    subsampling_gbm <- function(
+      iteration.subsample, data.label, data.gbm,
+      boosting = "dart",
+      objective = "multiclass",
+      learning_rate = 0.1,
+      feature_fraction = 0.9,
+      bagging_fraction = 0.9,
+      bagging_freq = 1,
+      max_depth = -1,
+      min_data_in_leaf = 20,#default
+      num_leaves = 31,#default
+      cpu.boost = parallel::detectCores() / 2,
+      early_stopping_rounds = 10,
+      nrounds = 200) {
+      # now using this function to make sure that label as all the potential num_classes
+      stratified_sampling <- function(x, size = 0.9) {
+        # x <- train.label
+        # size <-  0.9
+        data <- tibble::data_frame(LABEL = x) %>%
+          dplyr::mutate(ROWS = seq(1, n(), by = 1))
+        
+        sampled <- data %>% 
+          dplyr::group_by(LABEL) %>% 
+          dplyr::sample_frac(tbl = ., size = size) %>% 
+          dplyr::arrange(ROWS)
+        
+        train.row <- sampled$ROWS
+        train.label <- sampled$LABEL
+        test.label <- data %>% dplyr::filter(!ROWS %in% sampled$ROWS) %>% 
+          dplyr::select(LABEL) %>% purrr::flatten_dbl(.)
+        return(res = list(
+          train.row = train.row, 
+          train.label = train.label,
+          test.label = test.label))
+      }#End stratified_sampling
+      
+      sampled <- stratified_sampling(data.label)
+      
+      train.row <- sampled$train.row
+      test.gbm <- data.gbm[-train.row,]
+      # test.label <- train.label[!1:nrow(train.gbm) %in% train.row]
+      test.label <- sampled$test.label
+      train.gbm <- data.gbm[train.row,]
+      # train.label <- train.label[1:nrow(train.gbm) %in% train.row]
+      train.label <- sampled$train.label
+      sampled <- NULL
+      train.gbm <- lightgbm::lgb.Dataset(data = train.gbm, label = train.label)
+      
+      test.gbm <- lightgbm::lgb.Dataset.create.valid(dataset = train.gbm,
+                                                     data = test.gbm, label = test.label)
+      valids <- list(test = test.gbm)
+      
+      # parameters
+      params <- list(
+        boosting = boosting, #"gbdt"#"dart",
+        # boosting = "gbdt",
+        objective = objective,
+        num_classes = length(unique(train.label)),
+        learning_rate = learning_rate,
+        feature_fraction = feature_fraction,
+        bagging_fraction = bagging_fraction,
+        bagging_freq = bagging_freq,
+        max_depth = max_depth,
+        min_data_in_leaf = min_data_in_leaf,
+        num_leaves = num_leaves,
+        device = "cpu",
+        num_threads = cpu.boost,
+        early_stopping_rounds = early_stopping_rounds,
+        # metric = "multi_logloss")
+        metric = "multi_error")
+      
+      
+      model <- lightgbm::lgb.train(
+        # init_model = model,
+        params = params,
+        data = train.gbm,
+        nrounds = nrounds,
+        valids = valids,
+        pred_early_stop = TRUE,
+        verbose = -1,
+        reset_data = TRUE
+      )
+      
+      model.df <- tibble::data_frame(ITERATIONS = iteration.subsample, MODEL = list(model), SCORE = model$best_score)
+      gc(verbose = FALSE)
+      return(model.df)
+    } # End of loop
+    
+    # #testing
+    # learning_rate <- 0.05
+    # feature_fraction <- 0.5
+    # bagging_fraction <- 0.5
+    # bagging_freq <- 1
+    # min_data_in_leaf <- 20
+    # num_leaves <- 31
+    # max_depth <- -1
+    # early_stopping_rounds <- 20
+    # iteration.subsample <- 20
+    
+    model <- purrr::map_df(
+      .x = 1:iteration.subsample,
+      .f = subsampling_gbm,
+      data.label = data.label, 
+      data.gbm = data.gbm,
+      boosting = boosting,
       objective = objective,
-      num_classes = length(unique(train.label)),
       learning_rate = learning_rate,
       feature_fraction = feature_fraction,
-      bagging_fraction = feature_fraction,
+      bagging_fraction = bagging_fraction,
       bagging_freq = bagging_freq,
       max_depth = max_depth,
       min_data_in_leaf = min_data_in_leaf,
       num_leaves = num_leaves,
-      device = "cpu",
-      num_threads = num_threads,
+      cpu.boost = cpu.boost,
       early_stopping_rounds = early_stopping_rounds,
-      metric = "multi_logloss")
-    # metric = "multi_error")
+      nrounds = nrounds
+      ) %>% 
+      dplyr::filter(SCORE == min(SCORE)) %>% 
+      dplyr::distinct(SCORE, .keep_all = TRUE) %>% 
+      dplyr::select(MODEL) %>% 
+      purrr::flatten(.)
+    model <- model$MODEL
+    error <- model$best_score
     
-    
-    model <- lightgbm::lgb.train(
-      params = params,
-      data = data.gbm,
-      nrounds = nrounds,
-      valids = list(test = data.gbm),
-      pred_early_stop = TRUE,
-      verbose = -1
-    )
-    # names(model)
-    data.gbm <- NULL
-    
-    train.missing <- input.gbm[select.na, train.var, drop = FALSE]
-    # train.missing.label <- input.gbm[select.na, markers.list]
-    train.var <- select.na <- NULL
+    train.missing <- input.gbm[select.na, data.var, drop = FALSE]
     id.string <- train.missing[, "INDIVIDUALS"]
     
-    res <- model$predict(train.missing, reshape = TRUE)
-    train.missing <- model <- NULL # remove model if extract info is required
+    all.var <- data.na <- train.gbm <- data.var <- select.na <- input.gbm <- data.gbm <- NULL
     
-    res <- tibble::as_data_frame(res) %>% 
-      `colnames<-`(sort(unique(train.label))) %>%
+    res <- model$predict(train.missing, reshape = TRUE) %>% #using best_iter by default
+      tibble::as_data_frame(.) %>% 
+      `colnames<-`(sort(unique(data.label))) %>%
       dplyr::mutate(
         INDIVIDUALS = id.string,
         MARKERS = rep(markers.list, n())) %>% 
-      tidyr::gather(data = ., key = GT, value = score, -c(INDIVIDUALS, MARKERS)) %>%
+      tidyr::gather(data = ., key = GT, value = SCORE, -c(INDIVIDUALS, MARKERS)) %>%
       dplyr::group_by(INDIVIDUALS, MARKERS) %>% 
-      dplyr::filter(score == max(score)) %>%
+      dplyr::filter(SCORE == max(SCORE)) %>%
       dplyr::distinct(INDIVIDUALS, MARKERS, .keep_all = TRUE) %>% 
       dplyr::arrange(INDIVIDUALS) %>%
       dplyr::mutate(GT = as.numeric(GT)) %>% 
-      dplyr::select(-score) %>% dplyr::ungroup(.)
-    # View(res)
+      dplyr::select(-SCORE) %>% dplyr::ungroup(.)
+
+    train.missing <- NULL
     
+    # Predictive Mean Matching
+    # pmm = 2 # test
+    if (pmm > 0) {
+      xtrain <- tibble::as_data_frame(model$predict(xtrain, reshape = TRUE)) %>% 
+        `colnames<-`(sort(unique(data.label))) %>%
+        dplyr::mutate(INDIVIDUALS = unique(xtrain[, "INDIVIDUALS"])) %>% 
+        tidyr::gather(data = ., key = GT, value = SCORE, -INDIVIDUALS) %>%
+        dplyr::group_by(INDIVIDUALS) %>% 
+        dplyr::filter(SCORE == max(SCORE)) %>%
+        dplyr::distinct(INDIVIDUALS, .keep_all = TRUE) %>% 
+        dplyr::arrange(INDIVIDUALS) %>%
+        dplyr::mutate(GT = as.numeric(GT)) %>% 
+        dplyr::select(-SCORE) %>%
+        dplyr::ungroup(.) %>% 
+        dplyr::select(GT) %>% 
+        purrr::flatten_dbl(.)
+      res$GT <- missRanger::pmm(xtrain, xtest = res$GT, ytrain, k = pmm, seed = NULL)
+    }
+    res <- tibble::data_frame(IMPUTED_DATA = list(res), MARKERS = markers.list, ERROR = error)
     return(res)
   }# End lightbgm_imp
+  
+  #testing
+  # learning_rate <- 0.1
+  # feature_fraction <- 0.9
+  # bagging_fraction <- 0.9
+  # bagging_freq <- 1
+  # min_data_in_leaf <- 20
+  # num_leaves <- 31
+  # max_depth <- -1
+  # early_stopping_rounds <- 20
+  # iteration.subsample <- 2
+  # pmm <- 2
   
   res <- purrr::map_df(
     .x = markers.list, .f = lightbgm_imp,
@@ -2086,9 +2241,10 @@ grur_lgbm_imputer <- function(
     max_depth = max_depth,
     min_data_in_leaf = min_data_in_leaf,
     num_leaves = num_leaves,
-    num_threads = cpu.boost,
+    cpu.boost = cpu.boost,
     early_stopping_rounds = early_stopping_rounds,
-    nrounds = nrounds)
+    nrounds = nrounds,
+    iteration.subsample = 2, pmm = pmm)
   timing.imp <- proc.time() - timing.imp
   message("    Imputations round ", boost.split, "/10 conducted in ", round(timing.imp[[3]]), " sec")
   return(res)

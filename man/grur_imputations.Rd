@@ -5,7 +5,7 @@
 \title{Map-independent imputations of missing genotypes}
 \usage{
 grur_imputations(data, imputation.method = NULL,
-  hierarchical.levels = "strata", pred.mean.matching = 0, verbose = TRUE,
+  hierarchical.levels = "strata", pmm = 0, verbose = TRUE,
   parallel.core = parallel::detectCores() - 1,
   cpu.boost = parallel::detectCores()/2, random.seed = NULL,
   filename = NULL, ...)
@@ -33,9 +33,11 @@ Random Forests algorithm.
 \item \code{imputation.method = "rf_pred"} Random Forests algorithm is used
 as a prediction problem.
 
-\item \code{imputation.method = "boost"} extreme gradient boosting trees.
+\item \code{imputation.method = "boost"} extreme gradient boosting trees
+using depth-wise tree growth.
 
-\item \code{imputation.method = "lightgbm"} for a light and fast gradient boosting tree method.
+\item \code{imputation.method = "lightgbm"} for a light and fast 
+leaf-wise tree growth gradient boosting algorithm.
 
 \item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
 
@@ -53,13 +55,14 @@ e.g. by introducing foreign genotypes/haplotypes in some strata/populations
 (see note for more info).
 Default: \code{hierarchical.levels = "strata"}.}
 
-\item{pred.mean.matching}{(integer, optional) Used in conjunction with
-random Forests (\code{imputation.method = "rf_pred"}).
+\item{pmm}{(integer, optional) Predictive mean matching used in conjunction with
+random Forests and lightgbm (\code{imputation.method = "rf_pred"} or
+\code{imputation.method = "lightgbm"}).
 Number of candidate non-missing
 value to sample from during the predictive mean matching step.
 A fast k-nearest neighbor searching algorithms is used with this approach.
-\code{pred.mean.matching = 3} will use 3 neighbors.
-Default: \code{pred.mean.matching = 0}, will avoids this step. (in devel)}
+\code{pmm = 2} will use 2 neighbors.
+Default: \code{pmm = 0}, will avoids this step.}
 
 \item{verbose}{(optional, logical) When \code{verbose = TRUE}
 the function is a little more chatty during execution.
@@ -80,7 +83,7 @@ Default: \code{cpu_boost = parallel::detectCores() / 2}.}
 
 \item{random.seed}{(integer, optional) For reproducibility, set an integer
 that will be used to initialize the random generator. With default,
-a random number is generated.
+a random number is generated. Currently not implemented for XGBoost and LightGBM.
 Default: \code{random.seed = NULL}.}
 
 \item{filename}{(optional) The function uses \code{\link[fst]{write.fst}},
@@ -250,8 +253,9 @@ Refer to \code{\link[xgboost]{xgboost}} for arguments documentation.
 Available arguments for LightGBM:
 \emph{boosting, objective, learning_rate, feature_fraction, bagging_fraction,
 bagging_freq, max_depth, min_data_in_leaf, num_leaves, early_stopping_rounds,
-nrounds, max_depth}. Refer to \code{\link[lightgbm]{lightgbm}}
-for arguments documentation.
+nrounds, max_depth, iteration.subsample}. Refer to \code{\link[lightgbm]{lightgbm}}
+for arguments documentation. \code{iteration.subsample} is the number of iteration
+to conduct training of the model with new subsamples (default: \code{iteration.subsample = 2}).
 
 Available arguments for Random forests method:
 \emph{num.tree, nodesize, nsplit, nimpute}.

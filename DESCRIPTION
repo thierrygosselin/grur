@@ -42,13 +42,17 @@ Imports:
     ggpubr,
     broom,
     Matrix,
-    lightgbm
+    lightgbm,
+    missRanger,
+    adegenet,
+    ggridges
 Suggests:
     knitr,
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
-    github::kvnkuang/pbmcapply
+    github::kvnkuang/pbmcapply,
+    github::thibautjombart/adegenet
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr
