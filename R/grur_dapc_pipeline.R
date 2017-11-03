@@ -52,7 +52,7 @@ dapc_clustering <- function(
     message("DAPC calculated using alpha-score")
     dapc.best.optim.a.score <- adegenet::optim.a.score(adegenet::dapc(x, n.da = length(levels(x@strata[,strata])), n.pca = round((length(adegenet::indNames(x))/3) - 1, 0)), pop = x@strata[,strata], plot = FALSE)$best
     dapc.data <- adegenet::dapc(x, n.da = length(levels(x@strata[,strata])), n.pca = dapc.best.optim.a.score, pop = x@strata[,strata])
-
+    
     dapc.assignment <- data.frame(
       POP_ID = x@strata[,"POP_ID"],
       INDIVIDUALS = adegenet::indNames(x),
@@ -62,7 +62,7 @@ dapc_clustering <- function(
       tidyr::gather(key = ANCESTRY, value = "PERC", -c(POP_ID, INDIVIDUALS, GROUP_PRIOR, GROUP_POST)) %>%
       dplyr::mutate(POP_ID = factor(POP_ID, levels = pop.levels, ordered = TRUE)) %>%
       dplyr::arrange(POP_ID, INDIVIDUALS)
-
+    
     n.pop <- dplyr::n_distinct(dapc.assignment$POP_ID)
     
     # figure
@@ -93,7 +93,7 @@ dapc_clustering <- function(
         label.hjust = 0.5)
       ) +
       ggplot2::facet_grid(~POP_ID, scales = "free", space = "free_x")
-
+    
     res = list(dapc.best.optim.a.score = dapc.best.optim.a.score,
                dapc.data = dapc.data,
                dapc.assignment = dapc.assignment,
@@ -114,9 +114,9 @@ dapc_clustering <- function(
       parallel = "multicore",
       ncpus = parallel.core
     )
-
+    
     dapc.data <- xval$DAPC
-
+    
     # for admixture type figure:
     dapc.assignment <- data.frame(
       POP_ID = x@strata[,"POP_ID"],
@@ -129,11 +129,11 @@ dapc_clustering <- function(
         POP_ID = factor(POP_ID, levels = pop.levels, ordered = TRUE),
         ANCESTRY = stringi::stri_replace_all_fixed(ANCESTRY, "X", "K", vectorize_all = FALSE),
         ANCESTRY = factor(ANCESTRY, ordered = TRUE)
-        ) %>%
+      ) %>%
       dplyr::arrange(POP_ID, INDIVIDUALS)
     
     n.pop <- dplyr::n_distinct(dapc.assignment$POP_ID)
-   
+    
     
     # figure
     dapc.plot <- ggplot2::ggplot(dapc.assignment, ggplot2::aes(x = INDIVIDUALS, y = PERC, fill = ANCESTRY)) +
@@ -211,11 +211,11 @@ dapc_clustering <- function(
   # Densities of discriminant function -----------------------------------------
   density.prep <- pc.data %>% 
     tidyr::gather(data = ., key = "PC", value = "VALUE", -c(INDIVIDUALS, POP_ID, ASSIGN, GROUP))
-
+  
   element.text.fig <- ggplot2::element_text(
     size = 12, family = "Helvetica", face = "bold")
   facet_names <- ggplot2::as_labeller(c(`LD1` = "PC1", `LD2` = "PC2", `LD3` = "PC3", `LD4` = "PC4"))
-
+  
   res$ridges.plots <- ggplot2::ggplot(density.prep, ggplot2::aes(x = VALUE, y = POP_ID, na.rm = TRUE)) +
     ggridges::geom_density_ridges(ggplot2::aes(fill = POP_ID), alpha = 0.4, rel_min_height = 0.01, scale = 3) +
     # ggplot2::geom_density(ggplot2::aes(fill = POP_ID), alpha = 0.4) +
@@ -251,7 +251,7 @@ dapc_clustering <- function(
   
   
   # Clustering with snapclust --------------------------------------------------
-  message("Likelihood-base genetic clustering with adegenet snapclust")
+  message("Likelihood-based genetic clustering with adegenet snapclust")
   n.k <- length(unique(x@strata[,strata]))
   k.string <- x@strata[,strata]
   k.string <- factor(k.string, levels = pop.levels, ordered = FALSE)
@@ -266,9 +266,8 @@ dapc_clustering <- function(
       POP_ID = factor(POP_ID, levels = pop.levels, ordered = TRUE),
       ANCESTRY = stringi::stri_replace_all_fixed(ANCESTRY, "X", "K", vectorize_all = FALSE),
       ANCESTRY = factor(ANCESTRY, ordered = TRUE)
-      ) %>%
+    ) %>%
     dplyr::arrange(POP_ID, INDIVIDUALS, ANCESTRY)
- test <- dplyr::filter(clust.assignment, POP_ID == 2)
   
   n.pop <- dplyr::n_distinct(clust.assignment$POP_ID)
   
