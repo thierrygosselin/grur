@@ -19,12 +19,44 @@ Additionally, macOS users will find the instructions to install
 both need to be compiled with OpenMP enabled.
 
 
-**Time to allow: ETA ~10 min**
+**Time to allow: ETA ~15 min**
 
-#Update [clang](https://en.wikipedia.org/wiki/Clang) 
+#macOS
 
-##macOS
-We want clang compiler with OpenMP enabled
+##Apple's Command Line Tools
+
+Make sure it's installed...if not, follow instructions:
+```{r}
+xcode-select --install
+```
+
+
+##Update GCC
+
+Apple can't ship GNU Compiler Collection with OpenMP enabled, so you need to
+install it manually. Choose the binary version number based on your OS.
+
+**High Sierra, Sierra & El Capitan:** gcc-7.1-bin.tar.gz
+
+**Yosemite:** gcc-5.1-bin.tar.gz
+
+```{r}
+cd Downloads
+wget http://prdownloads.sourceforge.net/hpc/gcc-7.1-bin.tar.gz#change version accordingly
+# This will install the compiler in `/usr/local/bin`
+sudo tar -zxvf gcc-7.1-bin.tar.gz -C/
+# to remove the package from your Downloads directory
+sudo rm gcc-7.1-bin.tar.gz
+# to check the installation
+gcc -v
+```
+
+
+##Update Clang
+
+It's the same story with [clang](https://en.wikipedia.org/wiki/Clang), we want
+clang compiler with OpenMP enabled.
+
 ```{r}
 #Terminal
 cd Downloads
@@ -43,11 +75,7 @@ sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang
 sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 ```
 
-##Linux
-Several flavors available, check for the proper [link](http://releases.llvm.org/download.html)
-
-
-#Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)
+###Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)
 
 Open the [`.bash_profile`](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=bash_profile#save-time) file with Terminal *nano* or [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) or another text editor:
 ```{r}
@@ -55,9 +83,20 @@ export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/inclu
 export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/c++:$CPLUS_INCLUDE_PATH
 ```
 
-#Modify *R's* `~/.R/Makevars` file
+#Linux
 
-This is exactly the same step required to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and 
+Make sure you have GCC and CLANG with OpenMP enabled.
+Several flavors available, check for the proper [link](http://releases.llvm.org/download.html)
+
+
+
+#*R's* `~/.R/Makevars` file
+
+You need to tell R how to use the compilers. This might change from one package
+to another. Nothing is simple, you know this by now...
+All this is done through R's Makevars file. 
+
+Below, are exactly the same steps required to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and 
 [data.table](https://github.com/Rdatatable/data.table) to work in parallel.
 This is detailed in this vignette: [vignette_imputations_parallel](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd)
 
@@ -138,6 +177,26 @@ enter
 ctrl-x
 ```
 
+###Makevars configuration
+*rmetasim* requires these Makevars specifications. If you have other lines, comment (#)
+before compiling:
+
+
+```{r}
+CC=/Users/thierry/Dropbox/programs/clang/bin/clang # -fopenmp
+CC=/Users/thierry/Dropbox/programs/clang/bin/clang
+CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
+CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++
+FLIBS=-L/Users/thierry/Dropbox/programs/clang/lib
+LDFLAGS=-L/Users/thierry/Dropbox/programs/clang/lib -L/usr/local/opt/gettext/lib
+CPPFLAGS=-I/Users/thierry/Dropbox/programs/clang/include -I/usr/local/opt/gettext/include
+SHLIB_OPENMP_CFLAGS= -fopenmp
+SHLIB_OPENMP_FCFLAGS= -fopenmp
+SHLIB_OPENMP_FFLAGS= -fopenmp
+SHLIB_OPENMP_CXXFLAGS= -fopenmp
+```
+
+
 ###Compile `rmetasim`
 
 ```{r}
@@ -152,6 +211,11 @@ The devel version will work using:
 devtools::install_github("hadley/devtools")
 devtools::install("~/Downloads/rmetasim-master")
 ```
+
+
+If you get an error saying `Error: invalid version specification ‘>=3.4.0’`,
+open *rmetasim* `DESCRIPTION` file, and change `Depends: R (>=3.4.0)` to
+`Depends: R (>= 3.4.0)`. There's a space between `>=` and `3.4.0`.
 
 
 ###What to expect
@@ -247,3 +311,36 @@ system.time({bst = xgboost(data = x, label = y, nthread = 4, nround = 100, verbo
 ```
 
 
+#LightGBM
+
+LightGBM requires an OpenMP-enabled compiler. Currently, it doesn't work well with
+clang, so make sure you have updated your GCC compiler (instructions above).
+Additionally, LightGBM requires [CMake](https://cmake.org/overview/)
+
+##Install CMake
+```{r}
+cd Downloads
+wget https://cmake.org/files/v3.10/cmake-3.10.0-rc3-Darwin-x86_64.dmg
+# double-click on the disk image and follow instructions
+```
+
+
+To add CMake to the PATH:
+
+```{r}
+PATH="/Applications/CMake.app/Contents/bin":"$PATH"
+# Or, to install symlinks to '/usr/local/bin', run:
+sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install
+# Or, to install symlinks to another directory, run:
+sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install=/path/to/bin
+Then, run the following commands to install LightGBM:
+```
+
+##Download and Install LightGBM
+```{r}
+cd Downloads
+git clone --recursive https://github.com/Microsoft/LightGBM
+cd LightGBM/R-package
+export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++
+R CMD INSTALL --build . --no-multiarch
+```

@@ -167,6 +167,7 @@ simulate_rad <- function(
     sc$mig.mat <- sc$mig.mat[[1]]
     
     # run fastsimcoal
+    message("fastsimcoal runs")
     fsc.list <- with(sc, {
       n <- num.pops
       pi <- strataG::fscPopInfo(pop.size = rep(ne, n), sample.size = rep(ne, n))
@@ -182,12 +183,15 @@ simulate_rad <- function(
     })
     
     # run rmetasim for 'num.gens' generations using fastsimcoal runs as initialization
+    message("rmetasim runs")
     rms.list <- lapply(1:length(fsc.list), function(i) {
+      # i <- 1
       af <- strataG::alleleFreqs(fsc.list[[i]], by.strata = T)
       rl <- loadLandscape(sc, af, num.rms.gens)
       for (g in 1:num.rms.gens) {
+        #g <- 1
         rl <- rmetasim::landscape.simulate(rl, 1)
-        rl <- killExcess(rl, sc$ne)
+          rl <- killExcess(rl, sc$ne)
       }
       landscape2gtypes(rl)
     })
@@ -197,6 +201,7 @@ simulate_rad <- function(
     
     sim.data <- rms.list
     # save both fastsimcoal and rmetasim results to same workspace file
+    message("saving fastsimcoal and rmetasim results")
     save(fsc.list, sim.data, file = fname)
     fname
   })
