@@ -419,7 +419,7 @@ generate_pcoa_plot <- function(
       ggplot2::geom_point(ggplot2::aes_string(colour = strata.select), alpha = 0.5) +
       ggplot2::labs(x = stringi::stri_join("PCo", pcx, " [", variance.component[pcx,2], "]")) +
       ggplot2::labs(y = stringi::stri_join("PCo", pcy, " [", variance.component[pcy,2], "]")) +
-      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 3) +
+      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 4) +
       ggplot2::theme_bw() +
       ggplot2::theme(
         axis.title.x = element.text.fig,
@@ -648,7 +648,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     ggplot2::ggsave(
       filename = stringi::stri_join(path.folder, "/", fig.name, ".pdf"),
       plot = fig,
-      width = n.strata * 1.5, height = n.strata * 1.5,
+      width = n.strata * 3, height = n.strata * 3,
       dpi = 600, units = "cm",
       useDingbats = FALSE, limitsize = FALSE)
   }

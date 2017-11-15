@@ -16,10 +16,13 @@ missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
 \arguments{
 \item{data}{12 options: VCF (SNPs or Haplotypes,
 to make the vcf population ready, see details below),
-plink, stacks haplotype file, genind (library(adegenet)),
-genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
+plink, stacks haplotype file, genind & genlight (library(adegenet)),
+gtypes (library(strataG)), genepop, DArT,
 and a data frame in long/tidy or wide format.
-\emph{See details} of \code{\link[radiator]{tidy_genomic_data}}.}
+\emph{See details} in \code{\link[radiator]{tidy_genomic_data}}.
+
+If yo supply a tidy data frame object already in R or a \code{.rad} file,
+the import process is faster because this will bypass all the filters and checks.}
 
 \item{vcf.metadata}{(optional, logical or string) For VCF files only.
 With \code{logical, TRUE/FALSE}, \code{vcf.metadata = FALSE}, only the genotype

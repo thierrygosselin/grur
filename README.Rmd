@@ -41,6 +41,10 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
+
+https://thierrygosselin.github.io/grur/
+
+
 The name **grur** |ɡro͞oˈr| was chosen because the missing genotypes dilemma with
 RADseq data reminds me of the cheese paradox. 
 

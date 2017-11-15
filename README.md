@@ -5,9 +5,11 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.9-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--10--26-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.9-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--11--15-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
+
+<https://thierrygosselin.github.io/grur/>
 
 The name **grur** |ɡro͞oˈr| was chosen because the missing genotypes dilemma with RADseq data reminds me of the cheese paradox.
 

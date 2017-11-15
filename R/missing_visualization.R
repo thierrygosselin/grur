@@ -33,6 +33,17 @@
 #' }
 
 #' @inheritParams radiator::tidy_genomic_data
+
+#' @param data 12 options: VCF (SNPs or Haplotypes,
+#' to make the vcf population ready, see details below),
+#' plink, stacks haplotype file, genind & genlight (library(adegenet)),
+#' gtypes (library(strataG)), genepop, DArT,
+#' and a data frame in long/tidy or wide format.
+#' \emph{See details} in \code{\link[radiator]{tidy_genomic_data}}.
+#' 
+#' If yo supply a tidy data frame object already in R or a \code{.rad} file,
+#' the import process is faster because this will bypass all the filters and checks.
+
 #' @param strata (optional/required) Required for VCF and haplotypes files,
 #' optional for the other formats supported.
 #'
@@ -199,38 +210,62 @@ missing_visualization <- function(
   # import data ----------------------------------------------------------------
   message("\nImporting data")
   if (!is.null(filename)) filename <- stringi::stri_join(path.folder, "/", filename)
-  res$tidy.data <- radiator::tidy_genomic_data(
-    data = data,
-    vcf.metadata = FALSE,
-    blacklist.id = blacklist.id,
-    blacklist.genotype = blacklist.genotype,
-    whitelist.markers = whitelist.markers,
-    monomorphic.out = monomorphic.out,
-    max.marker = max.marker,
-    snp.ld = snp.ld,
-    common.markers = common.markers,
-    strata = strata,
-    pop.select = pop.select,
-    pop.levels = pop.levels,
-    pop.labels = pop.labels,
-    filename = filename,
-    parallel.core = parallel.core,
-    verbose = FALSE
-  )
+  data.type <- radiator::detect_genomic_format(data)
+  if (data.type %in% c("tbl.df", "fst.file")) {
+    want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN")
+    if (data.type == "tbl_df") {
+      res$tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
+      data <- NULL
+    }
+    if (data.type == "fst.file") {
+      import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
+      import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
+      res$tidy.data <- fst::read.fst(path = data, columns = import.col)
+      import.col <- want <- NULL
+    }
+  } else {
+    res$tidy.data <- radiator::tidy_genomic_data(
+      data = data,
+      vcf.metadata = FALSE,
+      blacklist.id = blacklist.id,
+      blacklist.genotype = blacklist.genotype,
+      whitelist.markers = whitelist.markers,
+      monomorphic.out = monomorphic.out,
+      max.marker = max.marker,
+      snp.ld = snp.ld,
+      common.markers = common.markers,
+      strata = strata,
+      pop.select = pop.select,
+      pop.levels = pop.levels,
+      pop.labels = pop.labels,
+      filename = filename,
+      parallel.core = parallel.core,
+      verbose = FALSE
+    )
+  }
   
   # strata.df --------------------------------------------------------
-  strata.df <- suppressWarnings(dplyr::ungroup(res$tidy.data) %>%
-                                  dplyr::select(-dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
-                                                                 "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
-                                  dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
+  strata.df <- suppressWarnings(
+    dplyr::ungroup(res$tidy.data) %>%
+      dplyr::select(
+        -dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
+                         "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
+      dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
   
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
-  res$tidy.data <- dplyr::mutate(
-    .data = res$tidy.data,
-    GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
-    GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
-  )
-  
+  if (tibble::has_name(res$tidy.data, "GT_BIN")) {
+    res$tidy.data <- dplyr::mutate(
+      .data = res$tidy.data,
+      GT_MISSING_BINARY = dplyr::if_else(is.na(GT_BIN), "0", "1"),
+      GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
+    )
+  } else {
+    res$tidy.data <- dplyr::mutate(
+      .data = res$tidy.data,
+      GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
+      GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
+    )
+  }
   # some statistics  -----------------------------------------------------------
   message("\nInformations:")
   strata.stats <- strata.df %>%
@@ -273,7 +308,7 @@ missing_visualization <- function(
   }
   message("Number of SNPs: ", n.snp)
   
-  message("\nProportion of missing genotypes: ", na.before)
+  message("\nProportion of missing genotypes (overall): ", na.before)
   
   
   # missingness per individuals (required now in the IBM with PCoA) ------------
@@ -335,8 +370,6 @@ missing_visualization <- function(
     dplyr::mutate(
       VARIANCE_PROP = round(EIGENVALUES/sum(EIGENVALUES), 2)
     )
-  
-  
   # alternative tested giving the same results:
   # ibm <- stats::cmdscale(d, eig = TRUE, k = 2)
   
@@ -528,7 +561,7 @@ missing_visualization <- function(
     cowplot::save_plot(
       filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.combined.plots.pdf"),
       plot = res$missing.genotypes.ind.combined.plots, 
-      base_height = n.pop * 0.2,
+      base_height = n.pop * 1,
       base_aspect_ratio = 2.5, ncol = 2, nrow = 2, limitsize = FALSE)
     
     # ggplot2::ggsave(
@@ -609,7 +642,7 @@ missing_visualization <- function(
     cowplot::save_plot(
       filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.combined.plots.pdf"),
       plot = res$missing.genotypes.ind.fh.combined.plots, 
-      base_height = n.pop * 0.2,
+      base_height = n.pop * 1,
       base_aspect_ratio = 1, ncol = 2, nrow = 2, limitsize = FALSE)
   }
   
@@ -681,9 +714,8 @@ missing_visualization <- function(
       # ggplot2::geom_jitter(alpha = 0.5) +
       ggplot2::geom_violin(trim = TRUE, fill = NA) +
       ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
-      ggplot2::labs(y = "Marker's missing genotypes (proportion)") +
-      ggplot2::labs(x = "Populations") +
-      ggplot2::labs(colour = "Populations") +
+      ggplot2::labs(y = "Marker's missing genotypes (proportion)", x = "Populations",
+                    colour = "Populations") +
       ggplot2::theme_bw() +
       ggplot2::theme(
         legend.position = "none",
@@ -724,8 +756,8 @@ missing_visualization <- function(
   
   res$missing.genotypes.markers.combined.plots <- suppressMessages(
     cowplot::plot_grid(
-    top.row.plot, plots[[2]],
-    ncol = 1, nrow = 2, labels = c("", "C"), rel_heights = c(1.5, 1)))
+      top.row.plot, plots[[2]],
+      ncol = 1, nrow = 2, labels = c("", "C"), rel_heights = c(1.5, 1)))
   # res$missing.genotypes.markers.plots
   plots <- top.row.plot <- NULL
   
@@ -741,7 +773,7 @@ missing_visualization <- function(
       filename = stringi::stri_join(
         path.folder, "/missing.genotypes.markers.combined.plots.pdf"),
       plot = res$missing.genotypes.markers.combined.plots, 
-      base_height = n.pop * 0.2,
+      base_height = n.pop * 1,
       base_aspect_ratio = 2.5, ncol = 2, nrow = 2, limitsize = FALSE)
   }
   

@@ -391,14 +391,14 @@ grur_imputations <- function(
   filename = NULL,
   ...
 ) {
-  timing <- proc.time() #for timing
-  
   if (verbose) {
     cat("\n\n")
     cat("#######################################################################\n")
     cat("####################### grur::grur_imputations ########################\n")
     cat("#######################################################################\n")
   }
+  timing <- proc.time() #for timing
+  
   if (is.null(imputation.method)) {
     message("Imputation method: NULL")
     message("Returning the tidy dataset")
@@ -1539,7 +1539,7 @@ grur_imputations <- function(
   return(input.imp)
 } # End imputations
 
-# Internal nested Function -----------------------------------------------------
+# Internal nested functions ----------------------------------------------------
 # grur_imputer ---------------------------------------------------------------
 #' @title grur_imputer
 #' @description imputations using Ranger package and predictive mean matching
