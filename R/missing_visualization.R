@@ -211,7 +211,7 @@ missing_visualization <- function(
   message("\nImporting data")
   if (!is.null(filename)) filename <- stringi::stri_join(path.folder, "/", filename)
   data.type <- radiator::detect_genomic_format(data)
-  if (data.type %in% c("tbl.df", "fst.file")) {
+  if (data.type %in% c("tbl_df", "fst.file")) {
     want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN")
     if (data.type == "tbl_df") {
       res$tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
