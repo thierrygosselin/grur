@@ -42,11 +42,11 @@ Imports:
     ggpubr,
     broom,
     Matrix,
-    lightgbm,
     missRanger,
     adegenet,
     ggridges
 Suggests:
+    lightgbm,
     knitr,
     rmarkdown
 Remotes:

@@ -85,7 +85,7 @@ into a new pop called \code{"NEW"}:
 (1) First, define the levels for your pop with \code{pop.levels} argument:
 \code{pop.levels = c("QUE", "ONT", "ALB")}.
 (2) then, use \code{pop.labels} argument:
-\code{pop.levels = c("NEW", "NEW", "ALB")}.
+\code{pop.labels = c("NEW", "NEW", "ALB")}.
 To rename \code{"QUE"} to \code{"TAS"}:
 \code{pop.labels = c("TAS", "ONT", "ALB")}.
 Default: \code{pop.labels = NULL}. If you find this too complicated,
@@ -101,7 +101,8 @@ Default: \code{pop.select = NULL}}
 \item{blacklist.id}{(optional) A blacklist with individual ID and
 a column header 'INDIVIDUALS'. The blacklist is an object in your
 global environment or a file in the working directory
-(e.g. "blacklist.txt").
+(e.g. "blacklist.txt"). \code{_} and \code{:} in individual's names
+are changed to a dash \code{-}.
 Default: \code{blacklist.id = NULL}.}
 
 \item{blacklist.genotype}{(optional) Useful to erase genotype with below

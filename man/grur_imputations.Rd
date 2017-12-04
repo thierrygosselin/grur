@@ -37,9 +37,9 @@ as a prediction problem.
 using depth-wise tree growth.
 
 \item \code{imputation.method = "lightgbm"} for a light and fast 
-leaf-wise tree growth gradient boosting algorithm.
+leaf-wise tree growth gradient boosting algorithm (in devel).
 
-\item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
+\item \code{imputation.method = "bpca"} Multiple Correspondence Analysis (in devel).
 
 \code{imputation.method = NULL} the function will stop.
 Default: \code{imputation.method = NULL}.

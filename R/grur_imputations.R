@@ -75,9 +75,9 @@
 #' using depth-wise tree growth.
 #' 
 #' \item \code{imputation.method = "lightgbm"} for a light and fast 
-#' leaf-wise tree growth gradient boosting algorithm.
+#' leaf-wise tree growth gradient boosting algorithm (in devel).
 #'
-#' \item \code{imputation.method = "mca"} Multiple Correspondence Analysis (in devel).
+#' \item \code{imputation.method = "bpca"} Multiple Correspondence Analysis (in devel).
 #'
 #' \code{imputation.method = NULL} the function will stop.
 #' Default: \code{imputation.method = NULL}.
@@ -339,7 +339,7 @@
 #' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
 #' @importFrom fst write.fst
 #' @importFrom Matrix Matrix
-#' @importFrom lightgbm lgb.Dataset lgb.train
+# @importFrom lightgbm lgb.Dataset lgb.train
 
 #' @examples
 #' \dontrun{
@@ -671,10 +671,10 @@ grur_imputations <- function(
         message("    predictive mean matching: ", pmm, "\n")
       }
       
-      if (imputation.method == "mca") {
-        message("Multiple Correspondence Analysis options:")
-        message("    number of dimentions used to predict the missing values: ", ncp)
-        message("    MCA algorithm: Regularized")
+      if (imputation.method == "bpca") {
+        # message("Multiple Correspondence Analysis options:")
+        # message("    number of dimentions used to predict the missing values: ", ncp)
+        # message("    MCA algorithm: Regularized")
       }
       
       message("Number of CPUs used grur's operations: ", parallel.core)
@@ -707,7 +707,7 @@ grur_imputations <- function(
     if (imputation.method == "rf") package.used <- "randomForestSRC"
     if (imputation.method == "boost") package.used <- "xgboost"
     if (imputation.method == "lightgbm") package.used <- "lightgbm"
-    if (imputation.method %in% c("max", "rf_pref", "mca")) package.used <- NULL
+    if (imputation.method %in% c("max", "rf_pref", "bpca")) package.used <- NULL
 
     if (!is.null(package.used)) {
       message("\nNote: If you have speed issues:")
@@ -910,7 +910,7 @@ grur_imputations <- function(
     # Imputation with Random Forests and tree boosting ---------------------------
     ### Note to myself: Need to add CHROM hierarchy (by markers inside CHROM, one at a time)
     
-    if (imputation.method %in% c("rf", "boost", "mca", "lightgbm")) {
+    if (imputation.method %in% c("rf", "boost", "bpca", "lightgbm")) {
       # Vector of markers
       markers.list <- unique(input$MARKERS)
       
@@ -1384,76 +1384,76 @@ grur_imputations <- function(
       
       
       # Multiple Correspondence Analysis Imputations -----------------------------
-      if (imputation.method == "mca") {
-        if (verbose) message("Using Multiple Correspondence Analysis algorithm...")
-        
-        impute_mca <- function(x, ncp = 2) {
-          # res <- missMDA::imputeMCA(data.frame(x), ncp = ncp)$completeObs
-          res <- rep(1, nrow(x)) #test
-          return(res)
-        } # End impute_mca
-        
-        input <- dplyr::select(input, MARKERS, POP_ID, INDIVIDUALS, GT) %>%
-          dplyr::mutate(GT = replace(GT, which(GT == "000000"), NA)) %>%
-          dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-          tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-          dplyr::ungroup(.) %>%
-          dplyr::mutate_all(.tbl = ., .funs = factor)
-        
-        # test <- impute_mca(x = input, ncp = 2)
-        
-        
-        # Random Forest by pop
-        if (hierarchical.levels == "strata") {
-          message("    Imputations computed by strata, take a break...")
-          
-          input.split <- split(x = input, f = input$POP_ID)
-          input.imp <- list()
-          input.imp <- .grur_parallel_mc(
-            X = input.split,
-            FUN = impute_mca,
-            mc.cores = parallel.core,
-            ncp = ncp
-          ) %>%
-            dplyr::bind_rows(.) %>%
-            dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-            tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-            # Reintroduce the stratification (check if required)
-            dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
-            dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
-        }#End RF by pop
-        
-        # Random Forests global
-        if (hierarchical.levels == "global") { # Globally/overall
-          if (verbose) message("Imputations computed globally, take a break...")
-          
-          input.imp <- dplyr::select(input, MARKERS, INDIVIDUALS, GT) %>%
-            dplyr::group_by(INDIVIDUALS) %>%
-            tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-            dplyr::ungroup(.) %>%
-            dplyr::mutate_all(.tbl = ., .funs = factor)
-          
-          input.imp <- impute_rf(
-            x = input.imp,
-            num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
-            nimpute = nimpute,verbose = FALSE,
-            hierarchical.levels = "global") %>%
-            dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-            tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-            # Reintroduce the stratification (check if required)
-            dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
-            dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
-        } #End RF global
-        
-        
-        # separate the haplotypes/snp group
-        if (separate.haplo) {
-          if (verbose) message("Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format")
-          input.imp <- decoding_haplotypes(
-            data = input.imp, parallel.core = parallel.core)
-        }
-        
-      }# End mca
+      # if (imputation.method == "bpca") {
+      #   if (verbose) message("Using Multiple Correspondence Analysis algorithm...")
+      #   
+      #   impute_bpca <- function(x, ncp = 2) {
+      #     # res <- missMDA::imputeMCA(data.frame(x), ncp = ncp)$completeObs
+      #     res <- rep(1, nrow(x)) #test
+      #     return(res)
+      #   } # End impute_mca
+      #   
+      #   input <- dplyr::select(input, MARKERS, POP_ID, INDIVIDUALS, GT) %>%
+      #     dplyr::mutate(GT = replace(GT, which(GT == "000000"), NA)) %>%
+      #     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
+      #     tidyr::spread(data = ., key = MARKERS, value = GT) %>%
+      #     dplyr::ungroup(.) %>%
+      #     dplyr::mutate_all(.tbl = ., .funs = factor)
+      #   
+      #   # test <- impute_mca(x = input, ncp = 2)
+      #   
+      #   
+      #   # Random Forest by pop
+      #   if (hierarchical.levels == "strata") {
+      #     message("    Imputations computed by strata, take a break...")
+      #     
+      #     input.split <- split(x = input, f = input$POP_ID)
+      #     input.imp <- list()
+      #     input.imp <- .grur_parallel_mc(
+      #       X = input.split,
+      #       FUN = impute_mca,
+      #       mc.cores = parallel.core,
+      #       ncp = ncp
+      #     ) %>%
+      #       dplyr::bind_rows(.) %>%
+      #       dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
+      #       tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
+      #       # Reintroduce the stratification (check if required)
+      #       dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
+      #       dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
+      #   }#End RF by pop
+      #   
+      #   # Random Forests global
+      #   if (hierarchical.levels == "global") { # Globally/overall
+      #     if (verbose) message("Imputations computed globally, take a break...")
+      #     
+      #     input.imp <- dplyr::select(input, MARKERS, INDIVIDUALS, GT) %>%
+      #       dplyr::group_by(INDIVIDUALS) %>%
+      #       tidyr::spread(data = ., key = MARKERS, value = GT) %>%
+      #       dplyr::ungroup(.) %>%
+      #       dplyr::mutate_all(.tbl = ., .funs = factor)
+      #     
+      #     input.imp <- impute_rf(
+      #       x = input.imp,
+      #       num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
+      #       nimpute = nimpute,verbose = FALSE,
+      #       hierarchical.levels = "global") %>%
+      #       dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
+      #       tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
+      #       # Reintroduce the stratification (check if required)
+      #       dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
+      #       dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
+      #   } #End RF global
+      #   
+      #   
+      #   # separate the haplotypes/snp group
+      #   if (separate.haplo) {
+      #     if (verbose) message("Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format")
+      #     input.imp <- decoding_haplotypes(
+      #       data = input.imp, parallel.core = parallel.core)
+      #   }
+      #   
+      # }# End mca
       
     } # End imputation RF, xgboost lightgbm and MCA
     
@@ -2092,16 +2092,14 @@ grur_lgbm_imputer <- function(
       
       train.row <- sampled$train.row
       test.gbm <- data.gbm[-train.row,]
-      # test.label <- train.label[!1:nrow(train.gbm) %in% train.row]
       test.label <- sampled$test.label
       train.gbm <- data.gbm[train.row,]
-      # train.label <- train.label[1:nrow(train.gbm) %in% train.row]
       train.label <- sampled$train.label
       sampled <- NULL
-      train.gbm <- lightgbm::lgb.Dataset(data = train.gbm, label = train.label)
+      # train.gbm <- lightgbm::lgb.Dataset(data = train.gbm, label = train.label)
       
-      test.gbm <- lightgbm::lgb.Dataset.create.valid(dataset = train.gbm,
-                                                     data = test.gbm, label = test.label)
+      # test.gbm <- lightgbm::lgb.Dataset.create.valid(dataset = train.gbm,
+                                                     # data = test.gbm, label = test.label)
       valids <- list(test = test.gbm)
       
       # parameters
@@ -2124,16 +2122,16 @@ grur_lgbm_imputer <- function(
         metric = "multi_error")
       
       
-      model <- lightgbm::lgb.train(
-        # init_model = model,
-        params = params,
-        data = train.gbm,
-        nrounds = nrounds,
-        valids = valids,
-        pred_early_stop = TRUE,
-        verbose = -1,
-        reset_data = TRUE
-      )
+      # model <- lightgbm::lgb.train(
+      #   # init_model = model,
+      #   params = params,
+      #   data = train.gbm,
+      #   nrounds = nrounds,
+      #   valids = valids,
+      #   pred_early_stop = TRUE,
+      #   verbose = -1,
+      #   reset_data = TRUE
+      # )
       
       model.df <- tibble::data_frame(ITERATIONS = iteration.subsample, MODEL = list(model), SCORE = model$best_score)
       gc(verbose = FALSE)
