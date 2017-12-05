@@ -6,7 +6,7 @@
 \usage{
 missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   strata.select = "POP_ID", distance.method = "euclidean",
-  ind.missing.geno.threshold = c(10, 20, 30, 40, 50, 60, 70, 80, 90),
+  ind.missing.geno.threshold = c(2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90),
   pop.levels = NULL, pop.labels = NULL, pop.select = NULL,
   blacklist.id = NULL, blacklist.genotype = NULL,
   whitelist.markers = NULL, monomorphic.out = TRUE, max.marker = NULL,

@@ -213,7 +213,7 @@ ind_genotyped_helper <- function(x) {
     ggplot2::aes(x = GENOTYPED_THRESHOLD, y = NUMBER_INDIVIDUALS)) +
     ggplot2::geom_line() +
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
-    ggplot2::scale_x_continuous(name = "Individual's missing genotyped threshold (percent)") +
+    ggplot2::scale_x_continuous(name = "Individual's missing genotyped threshold (percent)", breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
     ggplot2::scale_y_continuous(name = "Individuals\n(blacklisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -294,17 +294,17 @@ markers_genotyped_helper <- function(x, y) {
   threshold.helper.overall <- y %>% 
     dplyr::ungroup(.) %>% 
     dplyr::summarise(
-      `0` = length(PERCENT[PERCENT >= 0]),
-      `10` = length(PERCENT[PERCENT >= 10]),
-      `20` = length(PERCENT[PERCENT >= 20]),
-      `30` = length(PERCENT[PERCENT >= 30]),
-      `40` = length(PERCENT[PERCENT >= 40]),
-      `50` = length(PERCENT[PERCENT >= 50]),
-      `60` = length(PERCENT[PERCENT >= 60]),
-      `70` = length(PERCENT[PERCENT >= 70]),
-      `80` = length(PERCENT[PERCENT >= 80]),
-      `90` = length(PERCENT[PERCENT >= 90]),
-      `100` = length(PERCENT[PERCENT == 100])
+      `0` = length(PERCENT[PERCENT == 0]),
+      `10` = length(PERCENT[PERCENT <= 10]),
+      `20` = length(PERCENT[PERCENT <= 20]),
+      `30` = length(PERCENT[PERCENT <= 30]),
+      `40` = length(PERCENT[PERCENT <= 40]),
+      `50` = length(PERCENT[PERCENT <= 50]),
+      `60` = length(PERCENT[PERCENT <= 60]),
+      `70` = length(PERCENT[PERCENT <= 70]),
+      `80` = length(PERCENT[PERCENT <= 80]),
+      `90` = length(PERCENT[PERCENT <= 90]),
+      `100` = length(PERCENT[PERCENT <= 100])
     ) %>%
     tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS) %>%
     dplyr::mutate(POP_ID = rep("OVERALL", n()))
@@ -312,17 +312,17 @@ markers_genotyped_helper <- function(x, y) {
   threshold.helper.pop <- x %>%
     dplyr::group_by(POP_ID) %>%
     dplyr::summarise(
-      `0` = length(PERCENT[PERCENT >= 0]),
-      `10` = length(PERCENT[PERCENT >= 10]),
-      `20` = length(PERCENT[PERCENT >= 20]),
-      `30` = length(PERCENT[PERCENT >= 30]),
-      `40` = length(PERCENT[PERCENT >= 40]),
-      `50` = length(PERCENT[PERCENT >= 50]),
-      `60` = length(PERCENT[PERCENT >= 60]),
-      `70` = length(PERCENT[PERCENT >= 70]),
-      `80` = length(PERCENT[PERCENT >= 80]),
-      `90` = length(PERCENT[PERCENT >= 90]),
-      `100` = length(PERCENT[PERCENT == 100])
+      `0` = length(PERCENT[PERCENT == 0]),
+      `10` = length(PERCENT[PERCENT <= 10]),
+      `20` = length(PERCENT[PERCENT <= 20]),
+      `30` = length(PERCENT[PERCENT <= 30]),
+      `40` = length(PERCENT[PERCENT <= 40]),
+      `50` = length(PERCENT[PERCENT <= 50]),
+      `60` = length(PERCENT[PERCENT <= 60]),
+      `70` = length(PERCENT[PERCENT <= 70]),
+      `80` = length(PERCENT[PERCENT <= 80]),
+      `90` = length(PERCENT[PERCENT <= 90]),
+      `100` = length(PERCENT[PERCENT <= 100])
     ) %>%
     tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS, -POP_ID)
   
@@ -340,9 +340,7 @@ markers_genotyped_helper <- function(x, y) {
         POP_ID = factor(POP_ID, levels = c(levels(x$POP_ID), "MEAN_POP", "OVERALL"), ordered = TRUE)
       ))
   threshold.helper.pop <- mean.pop <- threshold.helper.overall <- x <- y <- NULL
-  
-  
-  
+
   #Function to replace plyr::round_any
   rounder <- function(x, accuracy, f = round) {
     f(x / accuracy) * accuracy
@@ -364,7 +362,7 @@ markers_genotyped_helper <- function(x, y) {
     ggplot2::aes(x = GENOTYPED_THRESHOLD, y = NUMBER_MARKERS)) +
     ggplot2::geom_line() +
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
-    ggplot2::scale_x_continuous(name = "Marker's missing genotyped threshold (percent)") +
+    ggplot2::scale_x_continuous(name = "Marker's missing genotyped threshold (percent)", breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
     ggplot2::scale_y_continuous(name = "Markers\n(whitelisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -419,7 +417,7 @@ generate_pcoa_plot <- function(
       ggplot2::geom_point(ggplot2::aes_string(colour = strata.select), alpha = 0.5) +
       ggplot2::labs(x = stringi::stri_join("PCo", pcx, " [", variance.component[pcx,2], "]")) +
       ggplot2::labs(y = stringi::stri_join("PCo", pcy, " [", variance.component[pcy,2], "]")) +
-      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(proportion)", max_size = 4) +
+      ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(percent)", max_size = 4) +
       ggplot2::theme_bw() +
       ggplot2::theme(
         axis.title.x = element.text.fig,
@@ -445,6 +443,9 @@ generate_pcoa_plot <- function(
   # 
   # ggplot2::labs(title = stringi::stri_join("Principal Coordinates Analysis (PCoA)\n Identity by Missing (IBM) with strata = ", i)) +
   
+# message("ggarrange problem")
+# print(pcoa.plots.strata[[1]])
+# message("worked")
   pcoa.plots.strata <- ggpubr::ggarrange(
     pcoa.plots.strata[[1]],
     pcoa.plots.strata[[2]],
@@ -455,9 +456,12 @@ generate_pcoa_plot <- function(
     ncol = 2, nrow = 3, legend = "right", common.legend = TRUE
   )
   
+  # message("write plot problem")
+  
   if (write.plot) {
+    plot.name <- stringi::stri_join("ibm.plots.strata.", strata.select, ".pdf")
     ggplot2::ggsave(
-      filename = stringi::stri_join(path.folder, "/ibm.plots.strata.", strata.select, ".pdf"),
+      filename = file.path(path.folder, plot.name),
       plot = pcoa.plots.strata,
       width = 20, height = 15,
       dpi = 600, units = "cm",
@@ -657,3 +661,160 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
   
   return(res)
 }#End pct_missing_by_total
+
+
+
+#' @title missing_rda
+#' @description The function uses Permutation test Anova and
+#' Redundancy Analysis to highlight potential patterns of missingness in the data
+#' basedon the strata provided
+#' @rdname missing_rda
+#' @importFrom dplyr group_by left_join summarise mutate filter ungroup select arrange
+#' @importFrom tidyr gather spread
+#' @importFrom purrr map flatten_chr keep
+#' @importFrom broom tidy
+#' @importFrom fst read.fst
+#' @importFrom ape pcoa
+#' @importFrom adespatial dist.ldc
+#' @importFrom stats as.formula
+#' @importFrom stringi stri_join
+#' @importFrom broom tidy
+#' @importFrom vegan anova.cca rda
+#' @keywords internal
+#' @export
+
+
+missing_rda <- function(
+  data, strata, 
+  permutations = 1000, 
+  parallel.core = parallel::detectCores() - 1
+) {
+  res <- list()
+  if (is.vector(data)) {
+    res$data.pcoa <- fst::read.fst(data)
+  } else {
+    res$data.pcoa <- dplyr::ungroup(data)
+  }
+  res$data.pcoa <- dplyr::ungroup(res$data.pcoa)
+  data <- NULL
+  
+  # res$data.pcoa <- dplyr::ungroup(data) %>% 
+  #   dplyr::select(INDIVIDUALS, MARKERS, GT_BIN) %>%
+  #   dplyr::mutate(GT_BIN = as.numeric(dplyr::if_else(is.na(GT_BIN), "1", "0"))) %>%
+  #   dplyr::group_by(INDIVIDUALS) %>% 
+  #   tidyr::spread(data = ., key = MARKERS, value = GT_BIN) %>% 
+  #   dplyr::ungroup(.) %>% 
+  #   dplyr::select(-INDIVIDUALS) %>% 
+  #   tibble::remove_rownames(.)
+  # suppressWarnings(rownames(res$data.pcoa) <- strata$INDIVIDUALS)
+  
+  # PCoA on Jaccard distance (binary)
+  res$data.pcoa <- ape::pcoa(
+    D = sqrt(adespatial::dist.ldc(
+      Y = res$data.pcoa,
+      method = "jaccard",
+      binary = TRUE, silent = TRUE)), 
+    rn = strata$INDIVIDUALS)
+  # D is Euclidean because the function outputs D[jk] = sqrt(1-S[jk])
+  
+  rda_anova <- function(
+    strata.select, 
+    data.pcoa, 
+    strata, 
+    permutations = 100,
+    parallel.core = parallel::detectCores() - 1) {
+    
+    # strata.select <- "POP_ID" #test
+    # data.pcoa <- res$data.pcoa #test
+    
+    res.rda <- list()#to store results
+    
+    # Generate the function formula --------------------------------------------
+    # based on increasing levels for available strata
+    grur_count <- function(x) length(unique(x))
+    strata.formula <- dplyr::select(strata, dplyr::one_of(strata.select)) %>%
+      dplyr::summarise_all(.tbl = ., .funs = grur_count) %>% 
+      tidyr::gather(data = ., key = TERMS, value = LEVELS) %>%
+      dplyr::arrange(LEVELS) %>% 
+      dplyr::select(TERMS) %>%
+      purrr::flatten_chr(.)
+    
+    formula.grur <- stats::as.formula(
+      paste("data.pcoa$vectors ~ ", paste(strata.formula, collapse= "+")))
+    
+    # Check how many strata.select are used and messages -----------------------
+    # if (length(strata.select) > 1) {
+    message("\nRedundancy Analysis using strata: ",
+            stringi::stri_join(strata.select, collapse = ", "))
+    rda_strata_name <- stringi::stri_join("rda.strata", strata.select, collapse = "_", sep = "_")
+    anova_strata_name <- stringi::stri_join("anova.strata.", strata.select, collapse = "_", sep = "_")
+    # } else {
+    #   rda_strata_name <- stringi::stri_join("rda.strata.", strata.select)
+    #   anova_strata_name <- stringi::stri_join("anova.strata.", strata.select)
+    #   strata.select <- rlang::sym(strata.select)
+    #   message("Redundancy Analysis using strata: ", strata.select)
+    # }
+    message("RDA model formula: ", format(formula.grur))
+    
+    #RDA -----------------------------------------------------------------------
+    
+    data.rda <- vegan::rda(formula.grur, strata)
+    # data.rda <- vegan::rda(rlang::`f_rhs<-`(data.pcoa$vectors ~ ., strata.select), strata)
+    # data.rda <- vegan::rda(rlang::`f_rhs<-`(data.pcoa$vectors ~ ., stats::reformulate(termlabels = strata.select)), strata)
+    # data.rda <- vegan::rda(stats::reformulate(termlabels = strata.select, response = data.pcoa$vectors), data = strata)
+    # data.rda <- vegan::rda(res$data.pcoa$vectors ~ POP_ID + POP_TYPE + ECOTYPE, strata)
+    
+    # ANOVA overall test
+    message("Permutation test for Redundancy Analysis using strata: ", stringi::stri_join(strata.select, collapse = ", "))
+    # data.anova <- vegan::anova.cca(object = data.rda, permutations = permutations, parallel = parallel.core)
+    # data.anova <- suppressWarnings(broom::tidy(vegan::anova.cca(object = data.rda, permutations = permutations, parallel = parallel.core)))
+    
+    data.anova <- suppressWarnings(broom::tidy(vegan::anova.cca(object = data.rda, by = "terms", model = "direct", permutations = permutations, parallel = parallel.core)))
+    p.value.message <- dplyr::select(data.anova, STRATA = term, VARIANCE = Variance, P_VALUE = p.value) %>%
+      dplyr::filter(STRATA %in% strata.formula)
+    
+    message("\nHypothesis based on the strata provided")
+    message("    Null Hypothesis (H0): No pattern of missingness in the data between strata")
+    message("    Null Hypothesis (H0): Presence of pattern(s) of missingness in the data between strata\n")
+    # message("    p-value: ", data.anova$p.value[1], "\n")
+    print(p.value.message)
+    message("    note: low p-value -> reject the null hypothesis\n")
+    #return results
+    res.rda[[rda_strata_name]] <- data.rda
+    res.rda[[anova_strata_name]] <- data.anova
+    return(res.rda)
+  }
+  
+  strata.select <- purrr::keep(.x = colnames(strata),
+                               .p = !colnames(strata) %in% "INDIVIDUALS")
+  
+  if (length(strata.select) > 1) {
+    message("\nSeparate analysis of strata\n")
+    res$rda_separate_strata <- purrr::map(
+      .x = strata.select, 
+      .f = rda_anova,
+      data.pcoa = res$data.pcoa,
+      strata = strata,
+      permutations = permutations,
+      parallel.core = parallel.core) %>%
+      purrr::flatten(.)
+    
+    message("\nCombined strata analysis\n")
+    
+    res$rda_combined_strata <- rda_anova(
+      strata.select = strata.select,
+      data.pcoa = res$data.pcoa,
+      strata = strata,
+      permutations = permutations,
+      parallel.core = parallel.core)
+  } else {
+    res$rda_combined_strata <- rda_anova(
+      strata.select = strata.select,
+      data.pcoa = res$data.pcoa,
+      strata = strata,
+      permutations = permutations,
+      parallel.core = parallel.core)
+  }
+  
+  return(res)
+}#End missing_rda

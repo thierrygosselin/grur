@@ -150,7 +150,7 @@
 
 #' @export
 #' @rdname missing_visualization
-#' @importFrom ggplot2 ggplot aes geom_violin geom_boxplot stat_summary labs theme element_blank element_text geom_jitter scale_colour_manual scale_y_reverse theme_light geom_bar facet_grid geom_histogram aes_string scale_fill_manual theme_bw stat_smooth geom_boxplot ggsave
+#' @importFrom ggplot2 ggplot aes geom_violin geom_boxplot stat_summary labs theme element_blank element_text geom_jitter scale_colour_manual scale_y_reverse theme_light geom_bar facet_grid geom_histogram aes_string scale_fill_manual theme_bw stat_smooth geom_boxplot ggsave scale_size_area
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join transmute
 #' @importFrom stringi stri_join stri_replace_all_fixed stri_replace_all_regex
 #' @importFrom utils count.fields
@@ -171,7 +171,7 @@ missing_visualization <- function(
   strata = NULL,
   strata.select = "POP_ID",
   distance.method = "euclidean",
-  ind.missing.geno.threshold = c(10, 20, 30, 40, 50, 60, 70, 80, 90),
+  ind.missing.geno.threshold = c(2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90),
   pop.levels = NULL,
   pop.labels = NULL,
   pop.select = NULL,
@@ -245,13 +245,37 @@ missing_visualization <- function(
   }
   
   # strata.df --------------------------------------------------------
+  # if (is.vector(strata)) {
+  #   strata.col <- readr::read_tsv(
+  #     file = strata,
+  #     n_max = 1,
+  #     na = "-",
+  #     col_names = FALSE,
+  #     col_types = readr::cols(.default = readr::col_character())) %>%
+  #     tidyr::gather(data = .,key = DELETE, value = WANT) %>%
+  #     dplyr::mutate(WANT = stringi::stri_replace_all_fixed(str = WANT, pattern = c("STRATA"), replacement = "POP_ID", vectorize_all = FALSE)) %>%
+  #     dplyr::select(-DELETE) %>%
+  #     purrr::flatten_chr(.)
+  # } else {
+  #   strata.col <- colnames(strata)
+  #   strata.col <- stringi::stri_replace_all_fixed(
+  #     str = strata.col,
+  #     pattern = c("STRATA"),
+  #     replacement = "POP_ID",
+  #     vectorize_all = FALSE)
+  # }
+  # # check strata.select
+  # if (!isTRUE(unique(strata.select %in% strata.col))) stop("strata.select not matching columns in strata")
+
+    
   strata.df <- suppressWarnings(
     dplyr::ungroup(res$tidy.data) %>%
-      dplyr::select(
-        -dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "REF", "ALT",
-                         "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
+      dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
+      # dplyr::select(
+      #   -dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "ID", "COL", "REF", "ALT",
+      #                    "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
       dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
-  
+
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
   if (tibble::has_name(res$tidy.data, "GT_BIN")) {
     res$tidy.data <- dplyr::mutate(
@@ -329,7 +353,6 @@ missing_visualization <- function(
     dplyr::select(res$missing.genotypes.ind, INDIVIDUALS, MISSING_GENOTYPE_PERCENT = PERCENT),
     by = "INDIVIDUALS")
   
-  
   # Identity-by-missingness (IBM) analysis -------------------------------------
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("\n\nIdentity-by-missingness (IBM) analysis using\n    Principal Coordinate Analysis (PCoA)...")
@@ -337,11 +360,15 @@ missing_visualization <- function(
   input.pcoa <- res$tidy.data %>%
     dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-    tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY)
+    tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
+    dplyr::ungroup(.)
   
   # we need rownames for this
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
-  input.pcoa <-  dplyr::ungroup(input.pcoa) %>% dplyr::select(-POP_ID, -INDIVIDUALS)
+  input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
+  
+  fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
+  input.rda <- list.files(path = path.folder, pattern = "input.rda.temp", full.names = TRUE)
   
   # euclidean distances between the rows
   # distance.method <- "euclidean"
@@ -415,7 +442,13 @@ missing_visualization <- function(
   
   variance.component <- pc.to.do <- NULL
   
-  # Eric's code here -----------------------------------------------------------
+  # RDA missing data analysis --------------------------------------------------
+  res$rda.analysis <- missing_rda(data = input.rda, strata = strata.df, 
+    permutations = 1000, parallel.core = parallel.core)
+  
+  file.remove(input.rda)
+  
+  # Eric Archer's code here ----------------------------------------------------
   # Note to Eric: I think it's fits very here ...
   # This is a refinement of the previous summaries where we want to see if the
   # percent missing for each level of a given factor
@@ -536,7 +569,7 @@ missing_visualization <- function(
         axis.title.x = axis.title.element.text.fig,
         axis.title.y = axis.title.element.text.fig,
         axis.text.x = axis.text.element.text.fig,
-        axis.text.y = axis.text.element.text.fig,
+        axis.text.y = axis.text.element.text.fig
       ))
   # res$missing.genotypes.ind.histo
   
@@ -784,3 +817,7 @@ missing_visualization <- function(
   options(width = opt.change)
   return(res)
 }
+
+
+# Internal nested functions ----------------------------------------------------
+# Are now moved in file: internal.R
