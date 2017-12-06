@@ -330,16 +330,16 @@
 #' @importFrom tibble has_name as_data_frame
 #' @importFrom stats predict reformulate as.formula
 #' @importFrom rlang .data
-#' @importFrom ranger ranger
-#' @importFrom missRanger pmm
-#' @importFrom xgboost xgb.DMatrix cb.early.stop xgb.train
 # @importFrom base split
-#' @importFrom randomForestSRC impute.rfsrc
 #' @importFrom readr write_lines write_tsv
 #' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
 #' @importFrom fst write.fst
 #' @importFrom Matrix Matrix
-#' @importFrom lightgbm lgb.Dataset lgb.train
+# @importFrom lightgbm lgb.Dataset lgb.train
+# @importFrom randomForestSRC impute.rfsrc
+# @importFrom ranger ranger
+# @importFrom missRanger pmm
+# @importFrom xgboost xgb.DMatrix cb.early.stop xgb.train
 
 #' @examples
 #' \dontrun{
@@ -430,7 +430,7 @@ Please follow the vignette for install instructions", call. = FALSE)
       stop("ranger needed for this imputation option to work.
            Please follow the vignette for install instructions", call. = FALSE)
     }
-    }
+  }
   
   if (pmm > 0) {
     if (!requireNamespace("missRanger", quietly = TRUE)) {

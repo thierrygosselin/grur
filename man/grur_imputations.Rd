@@ -33,7 +33,7 @@ Random Forests algorithm.
 \item \code{imputation.method = "rf_pred"} Random Forests algorithm is used
 as a prediction problem.
 
-\item \code{imputation.method = "boost"} extreme gradient boosting trees
+\item \code{imputation.method = "xgboost"} extreme gradient boosting trees
 using depth-wise tree growth.
 
 \item \code{imputation.method = "lightgbm"} for a light and fast 
@@ -319,7 +319,7 @@ wolf.imp <- radiator::tidy_genomic_data(
     whitelist.markers = "whitelist.loci.txt",
     verbose = TRUE) \%>\%
 grur::grur_imputations(
-    data = ., imputation.method = "boost", parallel.core = 32)
+    data = ., imputation.method = "xgboost", parallel.core = 32)
 }
 }
 \references{
