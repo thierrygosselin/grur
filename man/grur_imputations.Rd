@@ -4,7 +4,7 @@
 \alias{grur_imputations}
 \title{Map-independent imputations of missing genotypes}
 \usage{
-grur_imputations(data, imputation.method = NULL,
+grur_imputations(data, subsample.markers = NULL, imputation.method = NULL,
   hierarchical.levels = "strata", pmm = 0, verbose = TRUE,
   parallel.core = parallel::detectCores() - 1,
   cpu.boost = parallel::detectCores()/2, random.seed = NULL,
@@ -18,6 +18,10 @@ To get a tidy dataset from various genomic format, see
 \href{https://github.com/thierrygosselin/radiator}{radiator}
 \code{\link[radiator]{tidy_genomic_data}}.
 \emph{See details of this function for more info}.}
+
+\item{subsample.markers}{(optional, integer) To speed up computation and rapidly
+test the function's arguments (e.g. using 200 markers).
+Default: \code{subsample.markers = NULL}.}
 
 \item{imputation.method}{(character, optional)
 Methods available for map-independent imputations of missing genotypes

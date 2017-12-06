@@ -57,6 +57,13 @@
 #' \code{\link[radiator]{tidy_genomic_data}}.
 #' \emph{See details of this function for more info}.
 
+
+#' @param subsample.markers (optional, integer) To speed up computation and rapidly
+#' test the function's arguments (e.g. using 200 markers).
+#' Default: \code{subsample.markers = NULL}.
+
+
+
 #' @param imputation.method (character, optional)
 #' Methods available for map-independent imputations of missing genotypes
 #' (see details for more info):
@@ -381,6 +388,7 @@
 
 grur_imputations <- function(
   data,
+  subsample.markers = NULL,
   imputation.method = NULL,
   hierarchical.levels = "strata",
   pmm = 0,
@@ -432,6 +440,14 @@ Please follow the vignette for install instructions", call. = FALSE)
     }
   }
   
+  if (imputation.method == "bpca") stop("Imputations with bpca is under heavy testing... try again soon!")
+  # if (imputation.method == "bpca") {
+  #   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
+  #     stop("pcaMethods needed for this imputation option to work.
+  #          Please follow the vignette for install instructions", call. = FALSE)
+  #   }
+  # }
+
   if (pmm > 0) {
     if (!requireNamespace("missRanger", quietly = TRUE)) {
       stop("missRanger needed for this imputation option to work.
@@ -736,7 +752,25 @@ Please follow the vignette for install instructions", call. = FALSE)
     if (is.vector(data)) {
       data <- radiator::tidy_wide(data = data, import.metadata = TRUE)
     }
+    data <- dplyr::ungroup(data)
     
+    # Subsampling markers ------------------------------------------------------
+    if (!is.null(subsample.markers)) {
+      # subsample.markers <- 500
+      sample.markers <- dplyr::distinct(data, MARKERS) %>%
+        dplyr::sample_n(tbl = ., size = subsample.markers) %>%
+        readr::write_tsv(
+          x = .,
+          path = stringi::stri_join("subsampled.markers_",
+                                    subsample.markers,
+                                    "_random.seed_", 
+                                    random.seed, ".tsv")) %>%
+        purrr::flatten_chr(.)
+      data <- dplyr::filter(data, MARKERS %in% sample.markers)
+      sample.markers <- NULL
+    }
+    
+    # stats about the dataset --------------------------------------------------
     message("\nNumber of populations: ", dplyr::n_distinct(data$POP_ID))
     message("Number of individuals: ", dplyr::n_distinct(data$INDIVIDUALS))
     message("Number of markers: ", dplyr::n_distinct(data$MARKERS))
@@ -749,9 +783,8 @@ Please follow the vignette for install instructions", call. = FALSE)
     if (!is.null(package.used)) {
       message("\nNote: If you have speed issues:")
       message("    1. Have you installed, ", package.used," package with OpenMP enabled ?")
-      message("    2. Have you followed grur's vignette on parallel computing?")
+      message("    2. Have you followed grur's vignette ?")
     }
-    
     
     # output the proportion of missing genotypes BEFORE imputations
     na.before <- dplyr::summarise(.data = data, MISSING = round(length(GT[GT == "000000"])/length(GT), 6)) %>%
@@ -763,36 +796,40 @@ Please follow the vignette for install instructions", call. = FALSE)
       data <- dplyr::rename(.data = data, MARKERS = LOCUS)
     }
     
-    # New simple id for markers, because
+    # Generate simple markers id -----------------------------------------------
     # formula in RF difficult with markers containing separators and numbers
-    if (imputation.method %in% c("rf", "boost", "lightgbm")) {
+    if (imputation.method %in% c("rf", "xgboost", "lightgbm")) {
       markers.meta <- dplyr::distinct(.data = data, MARKERS) %>%
         dplyr::mutate(NEW_MARKERS = stringi::stri_join("M", seq(1, nrow(.))))
       data <- dplyr::full_join(markers.meta, data, by = "MARKERS")
-      if (tibble::has_name(data, "CHROM") && tibble::has_name(data, "LOCUS") && tibble::has_name(data, "POS")) {
-        markers.meta <- dplyr::distinct(.data = data, NEW_MARKERS, MARKERS, CHROM, LOCUS, POS)
-      }
+      
+      markers.meta <- suppressWarnings(
+        dplyr::select(
+          data,
+          dplyr::one_of(c("NEW_MARKERS", "MARKERS", "CHROM", "LOCUS", "POS"))) %>% 
+          dplyr::distinct(NEW_MARKERS, .keep_all = TRUE))
+      
       data <- dplyr::select(.data = data, -MARKERS) %>%
         dplyr::rename(MARKERS = NEW_MARKERS)
     } else {
-      # not sure necessary for max, need checking
-      # scan for the columnn CHROM and keep the info to include back after imputations
-      if (tibble::has_name(data, "CHROM") && tibble::has_name(data, "LOCUS") && tibble::has_name(data, "POS")) {
-        markers.meta <- dplyr::distinct(.data = data, MARKERS, CHROM, LOCUS, POS)
-      } else {
-        markers.meta <- dplyr::distinct(.data = data, MARKERS)
-      }
+      markers.meta <- suppressWarnings(
+        dplyr::select(
+          data,
+          dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS"))) %>% 
+          dplyr::distinct(MARKERS, .keep_all = TRUE))
     }
     
-    # scan for REF allele column
+    # scan for REF allele column -----------------------------------------------
     if (tibble::has_name(data, "REF")) {
       ref.column <- TRUE
     } else {
       ref.column <- FALSE
     }
+    
+    # Check if biallelic  ------------------------------------------------------
     biallelic <- radiator::detect_biallelic_markers(data = data)
     
-    # Manage Genotype Likelihood -------------------------------------------------
+    # Manage Genotype Likelihood -----------------------------------------------
     if (tibble::has_name(data, "GL")) {
       if (verbose) message("\nGenotype likelihood (GL) column detected")
     }
@@ -816,12 +853,13 @@ Please follow the vignette for install instructions", call. = FALSE)
         dplyr::mutate(GT = replace(GT, which(GT == "000000"), NA))
     }
     have <- want <- selected.columns <- NULL
-    # keep stratification
+    
+    # keep bk of stratification ------------------------------------------------
     strata.before <- dplyr::distinct(.data = data, INDIVIDUALS, POP_ID)
     
     # SNP/haplotype approach -----------------------------------------------------
-    # detect the presence of SNP/LOCUS info and combine SNPs on the same RADseq locus together
     
+    # detect the presence of SNP/LOCUS info and combine SNPs on the same RADseq locus together
     if (tibble::has_name(data, "CHROM") && tibble::has_name(data, "LOCUS") && imputation.method != "max") {
       data <- tidyr::unite(data = data, col = CHROM_LOCUS, CHROM, LOCUS) %>%
         dplyr::select(-POS) # no longer necessary info in MARKERS
@@ -831,7 +869,8 @@ Please follow the vignette for install instructions", call. = FALSE)
         dplyr::count(CHROM_LOCUS)
       
       if (max(snp.number$n) > 1) {
-        # Encoding SNPs into haplotypes: combining SNPs into groups defined by chromosomes and locus info
+        # Encoding SNPs into haplotypes
+        # combining SNPs into groups defined by chromosomes and locus info
         if (verbose) message("Encoding SNPs into haplotypes")
         
         if (tibble::has_name(data, "GL")) {
@@ -885,8 +924,9 @@ Please follow the vignette for install instructions", call. = FALSE)
         separate.haplo <- FALSE
       }
       # End of grouping SNPs
-      data <- dplyr::select(.data = data, -CHROM_LOCUS)
       
+      # remove unnecessary column
+      data <- dplyr::select(.data = data, -CHROM_LOCUS)
     } else {
       separate.haplo <- FALSE
     }#End preparing SNP/haplo approach
@@ -945,13 +985,14 @@ Please follow the vignette for install instructions", call. = FALSE)
     }#End imputation max
     
     # Imputation with Random Forests and tree boosting ---------------------------
-    ### Note to myself: Need to add CHROM hierarchy (by markers inside CHROM, one at a time)
+    ### Note to myself: Need to add CHROM hierarchy
+    ### to impute one chromosome at a time
     
-    if (imputation.method %in% c("rf", "xgboost", "bpca", "lightgbm")) {
+    if (imputation.method %in% c("rf", "rf_pred", "xgboost", "lightgbm", "bpca")) {
       # Vector of markers
       markers.list <- unique(data$MARKERS)
       
-      # Simple imputation with pop monomorphic markers -------------------------
+      # Simple imputation for monomorphic markers in some pop ------------------
       
       # Problem encountered:
       # Merged SNPs might end up be missing if one of the SNP on the read is missing
@@ -960,14 +1001,14 @@ Please follow the vignette for install instructions", call. = FALSE)
       
       # In some dataset I've seen markers becomming monomorphic after this change
       # These markers have very very very low polymorphism and further test are
-      # required to validate this technique. I think that better filtering (MAF, etc.)
-      # can remove those problem...
+      # required to validate this technique. 
+      # remedy : better MAF filtering can remove those problem...
       
       if (hierarchical.levels == "strata") {
         # 1) dont' waist time imputing
         # 2) do some screening first
         # 3) the small cost in time is worth it,
-        # 4) because model in RF and xgboost will benefit having more complete 
+        # 4) because machine learning algorithm  in RF and xgboost will benefit having more complete 
         #    and reliable genotypes
         
         if (verbose) message("Scanning dataset for strata(s) with monomorphic marker(s)")
@@ -1026,7 +1067,11 @@ Please follow the vignette for install instructions", call. = FALSE)
         scan.pop <- markers.pop.na <- NULL
       }# End imputation prep by pop
       
-      if (hierarchical.levels == "global") {
+      
+      # after some testing the next step is not warranted 
+      # prefer to let the algorithm decide how to impute those one. 
+      if (hierarchical.levels == "not_needed") {
+        # if (hierarchical.levels == "global") {
         scan.markers.na <- dplyr::filter(data, is.na(GT)) %>%
           dplyr::distinct(MARKERS) %>%
           purrr::flatten_chr(.)
@@ -1082,93 +1127,63 @@ Please follow the vignette for install instructions", call. = FALSE)
         # }
         scan.markers.na <- NULL
       }
+      
+      
+      
       # On-the-fly-imputations using Random Forests ------------------------------
       if (imputation.method == "rf") {
         if (verbose) message("On-the-fly-imputations using Random Forests algorithm")
-        # Parallel computations options
+        
+        # Parallel computations options for randomForestSRC
         options(rf.cores = parallel.core, mc.cores = parallel.core)
         
-        # on-the-fly-imputations with randomForestSRC package
-        impute_rf <- function(
-          x,
-          num.tree = 10,
-          nodesize = 1,
-          # splitrule = "random",
-          nsplit = 10,
-          nimpute = 10,
-          verbose = FALSE,
-          hierarchical.levels = "strata") {
-          
-          if (hierarchical.levels == "strata") {
-            message("        Imputations for pop: ", unique(x$POP_ID))
-            x <- dplyr::select(x, -POP_ID)
-          }
-          
-          res <- randomForestSRC::impute.rfsrc(
-            data = data.frame(x),
-            ntree = num.tree,
-            nodesize = nodesize,
-            # splitrule = "random",
-            nsplit = nsplit, #split.number,
-            nimpute = nimpute, #iteration.rf,
-            do.trace = verbose)
-          return(res)
-        } # End on-the-fly imputation function
-        
+        # prepare data
+        data.imp <- dplyr::select(data, MARKERS, POP_ID, INDIVIDUALS, GT) %>%
+          dplyr::group_by(POP_ID, INDIVIDUALS) %>%
+          tidyr::spread(data = ., key = MARKERS, value = GT) %>%
+          dplyr::ungroup(.) %>%
+          dplyr::mutate_all(.tbl = ., .funs = factor)
+
         # Random Forest by pop
         if (hierarchical.levels == "strata") {
-          message("    Imputations computed by strata, take a break...")
-          
-          data.imp <- dplyr::select(data, MARKERS, POP_ID, INDIVIDUALS, GT) %>%
-            dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-            tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-            dplyr::ungroup(.) %>%
-            dplyr::mutate_all(.tbl = ., .funs = factor) %>%
-            split(x = ., f = .$POP_ID) %>%
-            purrr::map(.x = ., .f = impute_rf,
-                       num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
-                       nimpute = nimpute,
-                       verbose = FALSE,
-                       hierarchical.levels = "strata") %>%
-            dplyr::bind_rows(.) %>%
+          if (verbose) message("    Imputations computed by strata, take a break...")
+          data.imp <- split(x = data.imp, f = data.imp$POP_ID) %>%
+            purrr::map_df(
+              .x = ., .f = impute_rf,
+              num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
+              nimpute = nimpute,
+              verbose = FALSE,
+              hierarchical.levels = "strata") %>%
             dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
             tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-            # Reintroduce the stratification (check if required)
             dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
             dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
         }#End RF by pop
         
         # Random Forests global
         if (hierarchical.levels == "global") { # Globally/overall
-          if (verbose) message("Imputations computed globally, take a break...")
-          
-          data.imp <- dplyr::select(data, MARKERS, INDIVIDUALS, GT) %>%
-            dplyr::group_by(INDIVIDUALS) %>%
-            tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-            dplyr::ungroup(.) %>%
-            dplyr::mutate_all(.tbl = ., .funs = factor)
-          
+          if (verbose) message("    Imputations computed globally, take a break...")
           data.imp <- impute_rf(
-            x = data.imp,
-            num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
-            nimpute = nimpute, verbose = FALSE,
-            hierarchical.levels = "global") %>%
+              x = data.imp,
+              num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
+              nimpute = nimpute, verbose = FALSE,
+              hierarchical.levels = "global") %>%
             dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-            tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-            # Reintroduce the stratification (check if required)
-            dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
+            tidyr::gather(data = ., key = MARKERS, value = GT, -c(POP_ID, INDIVIDUALS)) %>%
+            dplyr::mutate(POP_ID = factor(POP_ID)) %>% 
             dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
         } #End RF global
         
         
         # separate the haplotypes/snp group
+        # separating SNPs on the same locus and chromosome
+        # back to original data format
         if (separate.haplo) {
-          # Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format
           if (verbose) message("Decoding haplotypes")
           data.imp <- decoding_haplotypes(
             data = data.imp, parallel.core = parallel.core)
         }
-      }# End RF
+      }# End on-the-fly-imputations using RF
       
       # Random Forest imputation as a prediction problem -------------------------
       if (imputation.method == "rf_pred") {
@@ -1420,76 +1435,12 @@ Please follow the vignette for install instructions", call. = FALSE)
       }# End boost
       
       
-      # Multiple Correspondence Analysis Imputations -----------------------------
+      # Baysian PCA here -------------------------------------------------------
       # if (imputation.method == "bpca") {
-      #   if (verbose) message("Using Multiple Correspondence Analysis algorithm...")
-      #   
-      #   impute_bpca <- function(x, ncp = 2) {
-      #     # res <- missMDA::imputeMCA(data.frame(x), ncp = ncp)$completeObs
-      #     res <- rep(1, nrow(x)) #test
-      #     return(res)
-      #   } # End impute_mca
-      #   
-      #   data <- dplyr::select(data, MARKERS, POP_ID, INDIVIDUALS, GT) %>%
-      #     dplyr::mutate(GT = replace(GT, which(GT == "000000"), NA)) %>%
-      #     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-      #     tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-      #     dplyr::ungroup(.) %>%
-      #     dplyr::mutate_all(.tbl = ., .funs = factor)
-      #   
-      #   # test <- impute_mca(x = data, ncp = 2)
-      #   
-      #   
-      #   # Random Forest by pop
-      #   if (hierarchical.levels == "strata") {
-      #     message("    Imputations computed by strata, take a break...")
-      #     
-      #     data.split <- split(x = data, f = data$POP_ID)
-      #     data.imp <- list()
-      #     data.imp <- .grur_parallel_mc(
-      #       X = data.split,
-      #       FUN = impute_mca,
-      #       mc.cores = parallel.core,
-      #       ncp = ncp
-      #     ) %>%
-      #       dplyr::bind_rows(.) %>%
-      #       dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-      #       tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-      #       # Reintroduce the stratification (check if required)
-      #       dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
-      #       dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
-      #   }#End RF by pop
-      #   
-      #   # Random Forests global
-      #   if (hierarchical.levels == "global") { # Globally/overall
-      #     if (verbose) message("Imputations computed globally, take a break...")
-      #     
-      #     data.imp <- dplyr::select(data, MARKERS, INDIVIDUALS, GT) %>%
-      #       dplyr::group_by(INDIVIDUALS) %>%
-      #       tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-      #       dplyr::ungroup(.) %>%
-      #       dplyr::mutate_all(.tbl = ., .funs = factor)
-      #     
-      #     data.imp <- impute_rf(
-      #       x = data.imp,
-      #       num.tree = num.tree, nodesize = nodesize, nsplit = nsplit,
-      #       nimpute = nimpute,verbose = FALSE,
-      #       hierarchical.levels = "global") %>%
-      #       dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-      #       tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
-      #       # Reintroduce the stratification (check if required)
-      #       dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
-      #       dplyr::arrange(MARKERS, POP_ID, INDIVIDUALS)
-      #   } #End RF global
-      #   
-      #   
-      #   # separate the haplotypes/snp group
-      #   if (separate.haplo) {
-      #     if (verbose) message("Decoding haplotypes: separating SNPs on the same locus and chromosome, back to original data format")
-      #     data.imp <- decoding_haplotypes(
-      #       data = data.imp, parallel.core = parallel.core)
-      #   }
-      #   
+      # 
+      # }
+      
+      
       # }# End mca
       
     } # End imputation RF, xgboost lightgbm and MCA
@@ -1519,7 +1470,7 @@ Please follow the vignette for install instructions", call. = FALSE)
       data = data.imp,
       biallelic = biallelic,
       parallel.core = parallel.core,
-      verbose = verbose)$data
+      verbose = verbose)$input
     
     if (tibble::has_name(data.imp, "POLYMORPHIC.x")) data.imp <- dplyr::select(data.imp, -POLYMORPHIC.x)
     if (tibble::has_name(data.imp, "POLYMORPHIC.y")) data.imp <- dplyr::select(data.imp, -POLYMORPHIC.y)
@@ -1548,10 +1499,14 @@ Please follow the vignette for install instructions", call. = FALSE)
     
     # Write to working directory
     if (!is.null(filename)) {
-      tidy.name <- stringi::stri_join(filename, ".rad")
-      if (verbose) message("Writing the imputed tidy data: \n", tidy.name)
+      if (is.null(subsample.markers)) {
+        tidy.name <- stringi::stri_join(filename, ".rad")
+      } else {
+        tidy.name <- stringi::stri_join(
+          filename, "_subsample.markers_", subsample.markers, ".rad")
+      }
+      if (verbose) message("Writing the imputed data: \n", tidy.name)
       fst::write.fst(x = data.imp, path = tidy.name, compress = 85)
-      # readr::write_tsv(x = data.imp, path = filename, col_names = TRUE)
     }
     
     # Missing after imputation:
@@ -1578,6 +1533,41 @@ Please follow the vignette for install instructions", call. = FALSE)
 } # End imputations
 
 # Internal nested functions ----------------------------------------------------
+# on-the-fly-imputations with randomForestSRC package --------------------------
+
+#' @title impute_rf
+#' @description on-the-fly-imputations using randomForestSRC package
+#' @rdname impute_rf
+#' @keywords internal
+#' @export
+
+impute_rf <- function(
+  x,
+  num.tree = 10,
+  nodesize = 1,
+  # splitrule = "random",
+  nsplit = 10,
+  nimpute = 10,
+  verbose = FALSE,
+  hierarchical.levels = "strata") {
+  
+  if (hierarchical.levels == "strata") {
+    message("        Imputations for strata: ", unique(x$POP_ID))
+    x <- dplyr::select(x, -POP_ID)
+  }
+  
+  res <- randomForestSRC::impute.rfsrc(
+    data = data.frame(x),
+    ntree = num.tree,
+    nodesize = nodesize,
+    # splitrule = "random",
+    nsplit = nsplit, #split.number,
+    nimpute = nimpute, #iteration.rf,
+    do.trace = verbose)
+  return(res)
+} # End on-the-fly imputation function
+
+
 # grur_imputer ---------------------------------------------------------------
 #' @title grur_imputer
 #' @description imputations using Ranger package and predictive mean matching
