@@ -35,14 +35,14 @@ Options and required packages
 
 Please follow instructions in the vignette to install required packages for the selected imputation options below:
 
-| imputation options                  | package           |
-|:------------------------------------|:------------------|
-| **imputation.method == "lightgbm"** | `lightgbm`        |
-| **imputation.method == "xgboost"**  | `xgboost`         |
-| **imputation.method == "rf"**       | `randomForestSRC` |
-| **imputation.method == "rf\_pred"** | `ranger`          |
-| **imputation.method == "bpca"**     | `pcaMethods`      |
-| **pmm &gt; 0**                      | `missRanger`      |
+| imputation options                 | package           |
+|:-----------------------------------|:------------------|
+| **imputation.method = "lightgbm"** | `lightgbm`        |
+| **imputation.method = "xgboost"**  | `xgboost`         |
+| **imputation.method = "rf"**       | `randomForestSRC` |
+| **imputation.method = "rf\_pred"** | `ranger`          |
+| **imputation.method = "bpca"**     | `pcaMethods`      |
+| **if using pmm &gt; 0**            | `missRanger`      |
 
 #### Troubleshooting
 

@@ -82,12 +82,12 @@ selected imputation options below:
 
 | imputation options | package |
 |:-------------------|:--------------------------------------------------------|
-|**imputation.method == "lightgbm"**|`lightgbm`|
-|**imputation.method == "xgboost"**|`xgboost`|
-|**imputation.method == "rf"**|`randomForestSRC`|
-|**imputation.method == "rf_pred"**|`ranger`|
-|**imputation.method == "bpca"**|`pcaMethods`|
-|**pmm > 0**|`missRanger`|
+|**imputation.method = "lightgbm"**|`lightgbm`|
+|**imputation.method = "xgboost"**|`xgboost`|
+|**imputation.method = "rf"**|`randomForestSRC`|
+|**imputation.method = "rf_pred"**|`ranger`|
+|**imputation.method = "bpca"**|`pcaMethods`|
+|**if using pmm > 0**|`missRanger`|
 
 
 #### Troubleshooting
