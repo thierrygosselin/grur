@@ -41,7 +41,7 @@ Please follow instructions in the vignette to install required packages for the 
 | **imputation.method == "xgboost"**  | `xgboost`         |
 | **imputation.method == "rf"**       | `randomForestSRC` |
 | **imputation.method == "rf\_pred"** | `ranger`          |
-| **imputation.method == "xgboost"**  | `xgboost`         |
+| **imputation.method == "bpca"**     | `pcaMethods`      |
 | **pmm &gt; 0**                      | `missRanger`      |
 
 #### Troubleshooting

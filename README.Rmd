@@ -86,7 +86,7 @@ selected imputation options below:
 |**imputation.method == "xgboost"**|`xgboost`|
 |**imputation.method == "rf"**|`randomForestSRC`|
 |**imputation.method == "rf_pred"**|`ranger`|
-|**imputation.method == "xgboost"**|`xgboost`|
+|**imputation.method == "bpca"**|`pcaMethods`|
 |**pmm > 0**|`missRanger`|
 
 
