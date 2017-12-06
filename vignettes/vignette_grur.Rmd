@@ -1,5 +1,5 @@
 ---
-title: "Computer setup for genomics in R and grur's dependencies installation instructions"
+title: "Computer setup for genomics in R"
 output: 
   html_notebook:
     toc: true
@@ -18,8 +18,9 @@ This vignette purposes is to show users how to modify/install
 latest default set to 2000 markers.
 
 Additionally, macOS users will find the instructions to install
-`XGBoost` and `LightGBM` so that the package work in parallel,
-both need to be compiled with OpenMP enabled.
+`XGBoost`, `LightGBM`, `ranger`, `missRanger`, and `randomForestSRC`
+so that the packages works in parallel,
+some need to be compiled with OpenMP enabled.
 
 
 **Time to allow: ETA ~15 min**
@@ -360,4 +361,73 @@ git clone --recursive https://github.com/Microsoft/LightGBM
 cd LightGBM/R-package
 export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++
 R CMD INSTALL --build . --no-multiarch
+```
+
+
+
+#randomForestSRC
+
+[randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) requires 
+the GCC OpenMP-enabled compiler to run in parallel. 
+See instructions above if not already done.
+
+
+Check that the lines below **are not** commented in your `~/.R/Makevars` file:
+```{sh}
+CC=/usr/local/bin/gcc
+CXX=/usr/local/bin/g++
+CFLAGS=-g -O3 -Wall -pedantic -std=gnu99 -mtune=native -pipe
+CXXFLAGS=-g -O3 -Wall -pedantic -std=c++11 -mtune=native -pipe
+PKG_CFLAGS= -O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
+PKG_CXXFLAGS=-fopenmp -std=c++11
+```
+
+
+
+From the Terminal run these steps to compile randomForestSRC:
+```{sh}
+cd ~/Downloads
+curl -O http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.5.0.tar.gz
+tar -zxvf randomForestSRC_2.5.0.tar.gz
+cd randomForestSRC
+autoconf
+cd ..
+R CMD INSTALL --preclean --clean randomForestSRC
+```
+
+You want to make sure that this line is printed during execution of the previous command:
+`checking whether OpenMP will work in a package... yes`
+
+If the compilation fails after `autoconf`, follow the first 3 steps in this
+[tutorial](http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html?highlight=autoconf#install-gbs-radseq-software-time-required-30min), to install `libsigsegv`, `m4` and `autoconf`. 
+
+
+#ranger
+[ranger](https://github.com/imbs-hl/ranger) is easy to install.
+
+To install the ranger R package from CRAN:
+```{r}
+install.packages("ranger")
+```
+
+To install the development version from GitHub using devtools, run
+```{r}
+devtools::install_github("imbs-hl/ranger")
+```
+
+#missRanger
+[missRanger](https://github.com/mayer79/missRanger) is also very easy to install.
+
+From CRAN:
+```{r}
+install.packages("missRanger")
+```
+
+
+#pcaMethods
+To install [pcaMethods](https://github.com/hredestig/pcaMethods), from bioconductor:
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("pcaMethods")
 ```

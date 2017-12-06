@@ -35,14 +35,56 @@ Options and required packages
 
 Please follow instructions in the vignette to install required packages for the selected imputation options below:
 
-| imputation options                 | package           |
-|:-----------------------------------|:------------------|
-| **imputation.method = "lightgbm"** | `lightgbm`        |
-| **imputation.method = "xgboost"**  | `xgboost`         |
-| **imputation.method = "rf"**       | `randomForestSRC` |
-| **imputation.method = "rf\_pred"** | `ranger`          |
-| **imputation.method = "bpca"**     | `pcaMethods`      |
-| **if using pmm &gt; 0**            | `missRanger`      |
+<table>
+<colgroup>
+<col width="25%" />
+<col width="34%" />
+<col width="39%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">imputation options</th>
+<th align="center">package</th>
+<th>install instructions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>imputation.method = &quot;lightgbm&quot;</strong></td>
+<td align="center"><code>lightgbm</code></td>
+<td>vignette</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>imputation.method = &quot;xgboost&quot;</strong></td>
+<td align="center"><code>xgboost</code></td>
+<td>vignette</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>imputation.method = &quot;rf&quot;</strong></td>
+<td align="center"><code>randomForestSRC</code></td>
+<td>vignette</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>imputation.method = &quot;rf_pred&quot;</strong></td>
+<td align="center"><code>ranger</code></td>
+<td><code>install.packages(&quot;ranger&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>imputation.method = &quot;bpca&quot;</strong></td>
+<td align="center"><code>pcaMethods</code></td>
+<td><code>source(&quot;https://bioconductor.org/biocLite.R&quot;)</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>biocLite(&quot;pcaMethods&quot;)</code></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>if using pmm &gt; 0</strong></td>
+<td align="center"><code>missRanger</code></td>
+<td><code>install.packages(&quot;missRanger&quot;)</code></td>
+</tr>
+</tbody>
+</table>
 
 #### Troubleshooting
 

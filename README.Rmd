@@ -80,14 +80,15 @@ library(grur)
 Please follow instructions in the vignette to install required packages for the
 selected imputation options below:
 
-| imputation options | package |
-|:-------------------|:--------------------------------------------------------|
-|**imputation.method = "lightgbm"**|`lightgbm`|
-|**imputation.method = "xgboost"**|`xgboost`|
-|**imputation.method = "rf"**|`randomForestSRC`|
-|**imputation.method = "rf_pred"**|`ranger`|
-|**imputation.method = "bpca"**|`pcaMethods`|
-|**if using pmm > 0**|`missRanger`|
+| imputation options | package | install instructions |
+|:-------------------|:-------------------------:|-------------------------------|
+|**imputation.method = "lightgbm"**|`lightgbm`|vignette|
+|**imputation.method = "xgboost"**|`xgboost`|vignette|
+|**imputation.method = "rf"**|`randomForestSRC`|vignette|
+|**imputation.method = "rf_pred"**|`ranger`|`install.packages("ranger")`|
+|**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`
+`biocLite("pcaMethods")`|
+|**if using pmm > 0**|`missRanger`|`install.packages("missRanger")`|
 
 
 #### Troubleshooting
