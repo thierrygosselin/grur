@@ -33,7 +33,7 @@ library(grur)
 Options and required packages
 -----------------------------
 
-Please follow instructions in the vignette to install required packages for the selected imputation options below:
+Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install required packages for the selected imputation options below:
 
 <table>
 <colgroup>
@@ -52,17 +52,17 @@ Please follow instructions in the vignette to install required packages for the 
 <tr class="odd">
 <td align="left"><strong>imputation.method = &quot;lightgbm&quot;</strong></td>
 <td align="center"><code>lightgbm</code></td>
-<td>vignette</td>
+<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = &quot;xgboost&quot;</strong></td>
 <td align="center"><code>xgboost</code></td>
-<td>vignette</td>
+<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>imputation.method = &quot;rf&quot;</strong></td>
 <td align="center"><code>randomForestSRC</code></td>
-<td>vignette</td>
+<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = &quot;rf_pred&quot;</strong></td>
@@ -84,8 +84,8 @@ Please follow instructions in the vignette to install required packages for the 
 
 #### Troubleshooting
 
--   `rmetasim` needs to be modified in order to simulate more than 2000 markers [see vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd)
--   **Parallel computing**: [Follow these steps (~ 5 min)](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
+-   `rmetasim` needs to be modified in order to simulate more than 2000 markers [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)
+-   **Parallel computing**: follow the steps in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install the packages with OpenMP-enabled compiler.
 -   [Installation problems.](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
 -   **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 -   The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)), so I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/) for a better experience.

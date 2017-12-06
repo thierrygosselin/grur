@@ -77,22 +77,22 @@ library(grur)
 
 ## Options and required packages
 
-Please follow instructions in the vignette to install required packages for the
+Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install required packages for the
 selected imputation options below:
 
 | imputation options | package | install instructions |
 |:-------------------|:-------------------------:|-------------------------------|
-|**imputation.method = "lightgbm"**|`lightgbm`|vignette|
-|**imputation.method = "xgboost"**|`xgboost`|vignette|
-|**imputation.method = "rf"**|`randomForestSRC`|vignette|
+|**imputation.method = "lightgbm"**|`lightgbm`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
+|**imputation.method = "xgboost"**|`xgboost`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
+|**imputation.method = "rf"**|`randomForestSRC`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
 |**imputation.method = "rf_pred"**|`ranger`|`install.packages("ranger")`|
 |**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`<br>`biocLite("pcaMethods")`|
 |**if using pmm > 0**|`missRanger`|`install.packages("missRanger")`|
 
 
 #### Troubleshooting
-  * `rmetasim` needs to be modified in order to simulate more than 2000 markers [see vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd)
-  * **Parallel computing**: [Follow these steps (~ 5 min)](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd) to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and [XGBoost](https://github.com/dmlc/xgboost) packages to really work in parallel.
+  * `rmetasim` needs to be modified in order to simulate more than 2000 markers [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)
+  * **Parallel computing**: follow the steps in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install the packages with OpenMP-enabled compiler.
   * [Installation problems.](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
   * **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
   * The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)), so I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/) for a better experience.
