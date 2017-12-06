@@ -86,8 +86,7 @@ selected imputation options below:
 |**imputation.method = "xgboost"**|`xgboost`|vignette|
 |**imputation.method = "rf"**|`randomForestSRC`|vignette|
 |**imputation.method = "rf_pred"**|`ranger`|`install.packages("ranger")`|
-|**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`
-`biocLite("pcaMethods")`|
+|**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`<br>`biocLite("pcaMethods")`|
 |**if using pmm > 0**|`missRanger`|`install.packages("missRanger")`|
 
 

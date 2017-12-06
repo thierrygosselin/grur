@@ -72,13 +72,9 @@ Please follow instructions in the vignette to install required packages for the 
 <tr class="odd">
 <td align="left"><strong>imputation.method = &quot;bpca&quot;</strong></td>
 <td align="center"><code>pcaMethods</code></td>
-<td><code>source(&quot;https://bioconductor.org/biocLite.R&quot;)</code></td>
+<td><code>source(&quot;https://bioconductor.org/biocLite.R&quot;)</code><br><code>biocLite(&quot;pcaMethods&quot;)</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>biocLite(&quot;pcaMethods&quot;)</code></td>
-<td align="center"></td>
-</tr>
-<tr class="odd">
 <td align="left"><strong>if using pmm &gt; 0</strong></td>
 <td align="center"><code>missRanger</code></td>
 <td><code>install.packages(&quot;missRanger&quot;)</code></td>
