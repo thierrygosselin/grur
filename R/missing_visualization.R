@@ -87,7 +87,7 @@
 #' that take longer to generate. For this, do it manually following example below.
 #' Default: \code{write.plot = TRUE}.
 
-#' @return A list is created with several objects: the tidy data,
+#' @return A list is created with several objects:
 #' the principal coordinates
 #' with eigenvalues of the PCoA, the identity-by-missingness plot, several
 #' summary tables and plots of missing information
@@ -214,17 +214,17 @@ missing_visualization <- function(
   if (data.type %in% c("tbl_df", "fst.file")) {
     want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN")
     if (data.type == "tbl_df") {
-      res$tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
+      tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
       data <- NULL
     }
     if (data.type == "fst.file") {
       import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
       import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
-      res$tidy.data <- fst::read.fst(path = data, columns = import.col)
+      tidy.data <- fst::read.fst(path = data, columns = import.col)
       import.col <- want <- NULL
     }
   } else {
-    res$tidy.data <- radiator::tidy_genomic_data(
+    tidy.data <- radiator::tidy_genomic_data(
       data = data,
       vcf.metadata = FALSE,
       blacklist.id = blacklist.id,
@@ -269,7 +269,7 @@ missing_visualization <- function(
 
     
   strata.df <- suppressWarnings(
-    dplyr::ungroup(res$tidy.data) %>%
+    dplyr::ungroup(tidy.data) %>%
       dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
       # dplyr::select(
       #   -dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "ID", "COL", "REF", "ALT",
@@ -277,15 +277,15 @@ missing_visualization <- function(
       dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
 
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
-  if (tibble::has_name(res$tidy.data, "GT_BIN")) {
-    res$tidy.data <- dplyr::mutate(
-      .data = res$tidy.data,
+  if (tibble::has_name(tidy.data, "GT_BIN")) {
+    tidy.data <- dplyr::mutate(
+      .data = tidy.data,
       GT_MISSING_BINARY = dplyr::if_else(is.na(GT_BIN), "0", "1"),
       GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
     )
   } else {
-    res$tidy.data <- dplyr::mutate(
-      .data = res$tidy.data,
+    tidy.data <- dplyr::mutate(
+      .data = tidy.data,
       GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
       GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
     )
@@ -299,21 +299,21 @@ missing_visualization <- function(
   
   duplicate.id <- nrow(strata.df) - length(unique(strata.df$INDIVIDUALS))
   
-  if (tibble::has_name(res$tidy.data, "CHROM")) {
-    n.chrom = dplyr::n_distinct(res$tidy.data$CHROM)
-    n.locus = dplyr::n_distinct(res$tidy.data$LOCUS)
+  if (tibble::has_name(tidy.data, "CHROM")) {
+    n.chrom = dplyr::n_distinct(tidy.data$CHROM)
+    n.locus = dplyr::n_distinct(tidy.data$LOCUS)
   }
-  n.snp = dplyr::n_distinct(res$tidy.data$MARKERS)
+  n.snp = dplyr::n_distinct(tidy.data$MARKERS)
   
   # output the proportion of missing genotypes
   na.before <- dplyr::summarise(
-    .data = res$tidy.data,
+    .data = tidy.data,
     MISSING = round(length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0])/length(GT_MISSING_BINARY), 6)) %>%
     purrr::flatten_dbl(.) %>% format(., scientific = FALSE)
   
-  marker.problem <- radiator::detect_all_missing(data = res$tidy.data)
+  marker.problem <- radiator::detect_all_missing(data = tidy.data)
   if (marker.problem$marker.problem) {
-    res$tidy.data <- marker.problem$data
+    tidy.data <- marker.problem$data
     message("Marker problem: some marker(s) are missing all genotypes")
     message("    removing markers, see blacklist for details: blacklist.markers.all.missing.tsv")
     res$blacklist.markers.all.missing <- marker.problem$blacklist.markers.all.missing
@@ -326,7 +326,7 @@ missing_visualization <- function(
   message("Number of individuals: ", n.ind)
   message("Number of ind/pop:\n", stringi::stri_join(strata.stats$STRATA, collapse = "\n"))
   message("\nNumber of duplicate id: ", duplicate.id)
-  if (tibble::has_name(res$tidy.data, "CHROM")) {
+  if (tibble::has_name(tidy.data, "CHROM")) {
     message("Number of chrom/scaffolds: ", n.chrom)
     message("Number of locus: ", n.locus)
   }
@@ -336,7 +336,7 @@ missing_visualization <- function(
   
   
   # missingness per individuals (required now in the IBM with PCoA) ------------
-  res$missing.genotypes.ind <- res$tidy.data %>%
+  res$missing.genotypes.ind <- tidy.data %>%
     dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
     dplyr::group_by(INDIVIDUALS, POP_ID) %>%
     dplyr::summarise(
@@ -357,7 +357,7 @@ missing_visualization <- function(
   # MultiDimensional Scaling analysis (MDS) - Principal Coordinates Analysis (PCoA)
   message("\n\nIdentity-by-missingness (IBM) analysis using\n    Principal Coordinate Analysis (PCoA)...")
   
-  input.pcoa <- res$tidy.data %>%
+  input.pcoa <- tidy.data %>%
     dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
     dplyr::group_by(POP_ID, INDIVIDUALS) %>%
     tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
@@ -476,14 +476,14 @@ missing_visualization <- function(
   res$pct.missing.total <- purrr::map(
     .x = strata.select,
     .f = pct_missing_by_total,
-    data = res$tidy.data,
+    data = tidy.data,
     ci = 0.95,
     path.folder = path.folder,
     write.plot = write.plot) %>%
     purrr::flatten(.)
   
   # Heatmap --------------------------------------------------------------------
-  res$heatmap <- res$tidy.data %>%
+  res$heatmap <- tidy.data %>%
     dplyr::mutate(
       GT_MISSING_BINARY = as.character(GT_MISSING_BINARY),
       Missingness = stringi::stri_replace_all_regex(
@@ -515,7 +515,7 @@ missing_visualization <- function(
   
   # Individuals-----------------------------------------------------------------
   message("Missingness per individuals")
-  # res$missing.genotypes.ind <- res$tidy.data %>%
+  # res$missing.genotypes.ind <- tidy.data %>%
   #   dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
   #   dplyr::group_by(INDIVIDUALS, POP_ID) %>%
   #   dplyr::summarise(
@@ -624,8 +624,8 @@ missing_visualization <- function(
   
   # FH -------------------------------------------------------------------------
   message("Calulation of FH: a measure of IBDg")
-  fh <- radiator::ibdg_fh(data = res$tidy.data, verbose = FALSE)
-  # fh <- ibdg_fh(data = res$tidy.data, verbose = FALSE)
+  fh <- radiator::ibdg_fh(data = tidy.data, verbose = FALSE)
+  # fh <- ibdg_fh(data = tidy.data, verbose = FALSE)
   
   res$missing.genotypes.ind.fh <- suppressWarnings(
     dplyr::full_join(
@@ -693,12 +693,12 @@ missing_visualization <- function(
   message("Missingness per markers")
   
   want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "GT_MISSING_BINARY")
-  tidy.col <- colnames(res$tidy.data)
+  tidy.col <- colnames(tidy.data)
   markers.meta <- purrr::keep(
     .x = tidy.col,
     .p = tidy.col %in% c("MARKERS", "CHROM", "LOCUS", "POS"))
   res$missing.genotypes.markers.overall <- suppressWarnings(
-    res$tidy.data %>%
+    tidy.data %>%
       dplyr::select(dplyr::one_of(want)) %>% 
       dplyr::group_by_if(.tbl = ., .predicate = colnames(x = .) %in% markers.meta) %>% 
       dplyr::summarise(
@@ -710,7 +710,7 @@ missing_visualization <- function(
       dplyr::ungroup(.) %>%
       dplyr::arrange(MARKERS))
   
-  res$missing.genotypes.markers.pop <- res$tidy.data %>%
+  res$missing.genotypes.markers.pop <- tidy.data %>%
     dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
     dplyr::group_by(MARKERS, POP_ID) %>%
     dplyr::summarise(
@@ -722,7 +722,12 @@ missing_visualization <- function(
     dplyr::ungroup(.) %>%
     dplyr::arrange(POP_ID, MARKERS)
   
+  # # Save tidy Note to myself: think it's saved when people use filename
+  # saved via tidy_genomic_data.
+  # fst::write.fst(x = tidy.data, path = file.path(path.folder, "tidy.data.rad"))
+  # tidy.data <- NULL
   # test <- res$missing.genotypes.markers.overall
+  
   markers.missing.geno.threshold <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ,0.8, 0.9)
   whitelists <- purrr::map(
     .x = markers.missing.geno.threshold,
@@ -735,7 +740,7 @@ missing_visualization <- function(
     tidyr::gather(data = ., key = "WHITELIST", value = "n") %>%
     dplyr::transmute(WHITELIST = stringi::stri_join(WHITELIST, n, sep = " = "))
   message("    Number of markers whitelisted per whitelist generated:\n", stringi::stri_join("    ", whitelists.stats$WHITELIST, collapse = "\n"))
-  res <- c(res, whitelists)
+  # res <- c(res, whitelists)
   whitelists.stats <- whitelists <- NULL
   
   # Figure markers

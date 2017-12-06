@@ -182,7 +182,7 @@ that take longer to generate. For this, do it manually following example below.
 Default: \code{write.plot = TRUE}.}
 }
 \value{
-A list is created with several objects: the tidy data,
+A list is created with several objects:
 the principal coordinates
 with eigenvalues of the PCoA, the identity-by-missingness plot, several
 summary tables and plots of missing information
