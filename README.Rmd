@@ -71,9 +71,24 @@ To try out the dev version of **grur**, copy/paste the code below:
 
 ```r
 if (!require("devtools")) install.packages("devtools") # to install
-devtools::install_github("thierrygosselin/grur”, auth_token=Sys.getenv("GITHUB_TOKEN_GRUR”))
+devtools::install_github("thierrygosselin/grur”)
 library(grur)
 ```
+
+## Options and required packages
+
+Please follow instructions in the vignette to install required packages for the
+selected imputation options below:
+
+| imputation options | package |
+|:-------------------|:--------------------------------------------------------|
+|**imputation.method == "lightgbm"**|`lightgbm`|
+|**imputation.method == "xgboost"**|`xgboost`|
+|**imputation.method == "rf"**|`randomForestSRC`|
+|**imputation.method == "rf_pred"**|`ranger`|
+|**imputation.method == "xgboost"**|`xgboost`|
+|**pmm > 0**|`missRanger`|
+
 
 #### Troubleshooting
   * `rmetasim` needs to be modified in order to simulate more than 2000 markers [see vignette](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd)

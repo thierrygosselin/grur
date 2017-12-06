@@ -30,10 +30,7 @@ Imports:
     magrittr,
     stats,
     utils,
-    ranger,
     pbmcapply,
-    xgboost,
-    randomForestSRC,
     pegas,
     radiator,
     fst (>= 0.7.2),
@@ -44,17 +41,18 @@ Imports:
     cowplot,
     ggpubr,
     Matrix,
-    missRanger,
-    adegenet,
     ggridges
 Suggests:
+    xgboost,
+    ranger,
+    missRanger,
+    randomForestSRC,
     lightgbm,
     knitr,
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
-    github::kvnkuang/pbmcapply,
-    github::thibautjombart/adegenet
+    github::kvnkuang/pbmcapply
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr
