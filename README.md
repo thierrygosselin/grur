@@ -5,7 +5,7 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.9-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--12--06-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.9-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2017--12--07-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -153,11 +153,11 @@ New features
 
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
-\*\* grur v.0.0.9 2017-10-27\*\*
+**grur v.0.0.9 2017-10-27**
 
 -   `lightGBM` option to conduct the imputations is fully functional
 
-\*\* grur v.0.0.8 2017-10-24\*\*
+**grur v.0.0.8 2017-10-24**
 
 -   worked on `missing_visualization` to get better output figures with large number of pop
 -   worked on imputation algorithm to prep for the use of `lightGBM` package

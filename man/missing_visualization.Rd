@@ -36,14 +36,11 @@ to keep (except the GT field that is always imported).
 e.g. \code{vcf.metadata = "PL"} or \code{vcf.metadata = c("DP", "GL")}.
 Default: \code{vcf.metadata = FALSE}.}
 
-\item{strata}{(optional/required) Required for VCF and haplotypes files,
-optional for the other formats supported.
-
+\item{strata}{(optional)
 The strata file is a tab delimited file with a minimum of 2 columns headers:
 \code{INDIVIDUALS} and \code{STRATA}.
-If a \code{strata} file is specified with all file formats that don't
-require it, the strata argument will have precedence on the population
-groupings used internally in those file formats.
+If a \code{strata} file is specified the strata argument will have 
+precedence on the population groupings (\code{POP_ID}) used internally.
 The \code{STRATA} column can be any hierarchical grouping.
 To create a strata file see \code{\link[radiator]{individuals2strata}}.
 If you have already run

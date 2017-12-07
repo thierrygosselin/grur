@@ -4,9 +4,9 @@
 \alias{grur_imputations}
 \title{Map-independent imputations of missing genotypes}
 \usage{
-grur_imputations(data, subsample.markers = NULL, imputation.method = NULL,
-  hierarchical.levels = "strata", pmm = 0, verbose = TRUE,
-  parallel.core = parallel::detectCores() - 1,
+grur_imputations(data, strata = NULL, subsample.markers = NULL,
+  imputation.method = NULL, hierarchical.levels = "strata", pmm = 0,
+  verbose = TRUE, parallel.core = parallel::detectCores() - 1,
   cpu.boost = parallel::detectCores()/2, random.seed = NULL,
   filename = NULL, ...)
 }
@@ -18,6 +18,17 @@ To get a tidy dataset from various genomic format, see
 \href{https://github.com/thierrygosselin/radiator}{radiator}
 \code{\link[radiator]{tidy_genomic_data}}.
 \emph{See details of this function for more info}.}
+
+\item{strata}{(optional) The strata file is a tab delimited file with
+2 columns headers: \code{INDIVIDUALS} and \code{STRATA}. 
+If a \code{strata} file is specified, the strata argument will have precedence
+on the population groupings used internally in the dataset (e.g. \code{POP_ID}.
+The \code{STRATA} column can be any hierarchical grouping.
+To create a strata file see \code{\link[radiator]{individuals2strata}}.
+If you have missing data patterns associated with sequencing lanes, use the 
+different lanes id associated with your samples and store the info in the
+\code{STRATA} column.
+Default: \code{strata = NULL}.}
 
 \item{subsample.markers}{(optional, integer) To speed up computation and rapidly
 test the function's arguments (e.g. using 200 markers).
@@ -215,11 +226,11 @@ Random Forests use machine learning and you can take this into account while
 choosing argument values. Uncertain of the groupings ? Use random forests with
 \code{hierarchical.levels = "global"}. Random forests will account for the
 potential linkage and correlation between
-markers and genotypes to make the best imputation available. This can potentially
+markers and genotypes to make the best imputations available. This can potentially
 results in genotypes for a certain combo population/marker with new groupings
 (e.g. a new allele). This is much more accurate and not the same thing as
-the \code{imputation.method = "max"} because the imputed genotype was validated
-after considering all the other genotype values of the individual being imputed.
+the \code{imputation.method = "max"} because the imputed genotype is validated
+by considering all other variables (all the other markers genotyped for the individual).
 \emph{Test the option and report bug if you find one.}
 
 \emph{random forest with on-the-fly-imputation (rf): }the technique is described
@@ -227,6 +238,9 @@ in Tang and Ishwaran (2017). Non-missing genotypes are used for
 the split-statistics. Daughter node assignation membership use random
 non-missing genotypes from the inbag data. Missing genotypes are imputed at
 terminal nodes using maximal class rule with out-of-bag non-missing genotypes.
+Example of computation time: for 1500 individuals, 20 000 markers and
+2% of overall missing genotypes using the hierarchical levels globally
+takes around 10 hours on 6 CPUs to complete the imputations.
 
 \emph{random forest as a prediction problem (rf_pred): }markers with
 missing genotypes are imputed one at a time. The fitted forest is used to
