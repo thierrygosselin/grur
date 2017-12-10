@@ -124,7 +124,7 @@ CXXFLAGS=-mtune=native -g -O2 -Wall -pedantic -Wconversion
 ```
 
 If you don't have the file, use sudo nano in the Terminal to create one:
-```{r}
+```{sh}
 cd ~
 sudo mkdir ~/.R
 sudo nano ~/.R/Makevars
@@ -134,59 +134,35 @@ Copy/paste the section above. Save and Exit with: `crt-o`, `enter`, `crt-x`.
 #`rmetasim`
 Hang in there it's almost over...
 
+
+##Download
 Download the latest github release of Allan Strand's **rmetasim**
-
-##In R
-```{r download rmetasim, echo=TRUE}
-utils::download.file(
-  url = "https://github.com/stranda/rmetasim/archive/master.zip",
-  destfile = "grur_rmetasim.zip")
-#unzip the file
-utils::unzip(zipfile = "grur_rmetasim.zip")
-```
-
-
-##in Terminal
-```{r}
+```{sh}
 cd Downloads
 wget https://github.com/stranda/rmetasim/archive/master.zip
 unzip master.zip
 ```
 
-## 1 quick modification
+##MAXLOCI
 
-###Using a text editor
+2000 loci is the built-in maximum. To use more, you need to modify rmetasim before compiling.
+With a text editor [e.g. TextWrangler with macOS](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler), modify the `const.h` file in the `src` folder: `rmetasim-master/src/const.h`.
+Navigate to **lane 33** and change the integer to the desired maximum number of loci.
 
-With macOS use [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) to modify the `const.h` file in the `src` folder: `rmetasim-master/src/const.h`.
-Navigate to **lane 33** and change the integer to the maximum number of marker
-your likely to use.
-
-###With *nano* in the Terminal
-```{r edit in nano}
-sudo nano rmetasim-master/src/const.h
-# change
-
+```{sh}
 #define MAXLOCI               2000
-
-# to
-
-#define MAXLOCI               200000
-
 ```
 
-Keep lines with `#`. Save and exit *nano*
-```{r save and exit nano}
-ctrl-o
-enter
-ctrl-x
+```{sh}
+#define MAXLOCI               20000
 ```
 
-###Makevars configuration
+##Makevars configuration
 *rmetasim* requires these Makevars specifications. If you have other lines, comment (#)
 before compiling:
 
 
-```{r}
+```{sh}
 CC=/Users/thierry/Dropbox/programs/clang/bin/clang # -fopenmp
 CC=/Users/thierry/Dropbox/programs/clang/bin/clang
 CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
@@ -201,60 +177,16 @@ SHLIB_OPENMP_CXXFLAGS= -fopenmp
 ```
 
 
-###Compile `rmetasim`
-
-```{r}
-#Terminal
-R CMD INSTALL "rmetasim-master"
+##Compile
+```{sh}
+R CMD INSTALL "rmetasim-master" # Terminal command
+sudo rm -R rmetasim-master master.zip # to remove the folders no longer required
 ```
-
-*Warning*: Using `devtools::install` will not work with current `devtools` CRAN version [details](https://community.rstudio.com/t/difference-between-r-cmd-install-and-devtools-install/1441/3).
-The devel version will work using:
-
-```{r}
-devtools::install_github("hadley/devtools")
-devtools::install("~/Downloads/rmetasim-master")
-```
-
-
-If you get an error saying `Error: invalid version specification ‘>=3.4.0’`,
-open *rmetasim* `DESCRIPTION` file, and change `Depends: R (>=3.4.0)` to
-`Depends: R (>= 3.4.0)`. There's a space between `>=` and `3.4.0`.
-
-
-###What to expect
-There sould be some warning messages, not to worry, Allan says it's normal.
-However, at the end you should see something like this:
-```{r}
-** R
-** inst
-** preparing package for lazy loading
-** help
-*** installing help indices
-** building package indices
-** installing vignettes
-   ‘ApplyCarryToStage.Rmd’ using ‘UTF-8’ 
-   ‘CreatingLandscapes.Rmd’ using ‘UTF-8’ 
-   ‘Sexuality-and-mating.Rmd’ using ‘UTF-8’ 
-   ‘Simulating.Rmd’ using ‘UTF-8’ 
-   ‘rmetasim.Rmd’ using ‘UTF-8’ 
-** testing if installed package can be loaded
-* DONE (rmetasim)
-```
-
-
-###Remove folders
-```{r removing downloaded folders}
-#Terminal
-cd ..
-sudo rm -R grur_rmetasim.zip rmetasim-master
-```
-
 
 #XGBoost
 
 ##Download the github version
-```{r}
+```{sh}
 # In RStudio Terminal or macOS Terminal
 cd Downloads
 git clone --recursive https://github.com/dmlc/xgboost
@@ -265,7 +197,7 @@ cd xgboost
 ##CMD line mode only
 
 To compile XGBoost and run in command line mode in the Terminal
-```{r}
+```{sh}
 cp make/config.mk ./config.mk
 export CC=/usr/local/bin/gcc
 export CXX=/usr/local/bin/g++
@@ -276,7 +208,7 @@ make -j4
 ```
 
 Prefer using CLANG instead of GCC ? (in dev)
-```{r}
+```{sh}
 export CC=/Users/thierry/Dropbox/programs/clang/bin/clang
 export CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
 export CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++
