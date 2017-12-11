@@ -5,21 +5,21 @@ output:
     toc: true
     toc_float: true
 ---
+This vignette purposes is to show users how to install packages required
+for imputations inside `grur`. The vignette is also useful to prepare computers
+for genomic analysis inside R. 
 
 There's a more detailed computer setup tutorial found [here](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html)
 
 
-`grur` RADseq-based simulation framework will almost always require more markers
-than the default built-in threshold in `rmetasim`, the `R` simulation engine
-used by `grur`.
+`grur` RADseq-based simulation framework uses `rmetasim`, an `R` simulation engine.
+This vignette will show users how to modify `rmetasim`, so
+that it can be used with more than 2000 markers, the current built-in default. 
+We also show how to compile `rmetasim` to install it.
 
-This vignette purposes is to show users how to modify/install
-`rmetasim` to allow it to use more markers during simulations, than the 
-latest default set to 2000 markers.
-
-Additionally, macOS users will find the instructions to install
-`XGBoost`, `LightGBM`, `ranger`, `missRanger`, and `randomForestSRC`
-so that the packages works in parallel,
+Additionally, macOS and Linux users will find the instructions to install
+`XGBoost`, `LightGBM`, `ranger`, `missRanger`, `randomForestSRC` and 
+`pcaMethods` so that the packages works in parallel,
 some need to be compiled with OpenMP enabled.
 
 
@@ -34,17 +34,20 @@ Make sure it's installed...if not, follow instructions:
 xcode-select --install
 ```
 
+##Compiler
+Apple can't ship GNU Compiler Collection (GCC) with OpenMP enabled,
+similar story with Clang the other compiler used in macOS. Consequently,
+both need to be updateed manually.
 
-##Update GCC
+###Update GCC
 
-Apple can't ship GNU Compiler Collection with OpenMP enabled, so you need to
-install it manually. Choose the binary version number based on your OS.
+Choose the binary version number based on your OS.
 
 **High Sierra, Sierra & El Capitan:** gcc-7.1-bin.tar.gz
 
 **Yosemite:** gcc-5.1-bin.tar.gz
 
-```{r}
+```{sh}
 cd Downloads
 wget http://prdownloads.sourceforge.net/hpc/gcc-7.1-bin.tar.gz#change version accordingly
 # This will install the compiler in `/usr/local/bin`
@@ -56,12 +59,11 @@ gcc -v
 ```
 
 
-##Update Clang
+###Update Clang
 
-It's the same story with [clang](https://en.wikipedia.org/wiki/Clang), we want
-clang compiler with OpenMP enabled.
+We want [clang](https://en.wikipedia.org/wiki/Clang) compiler with OpenMP enabled.
 
-```{r}
+```{sh}
 #Terminal
 cd Downloads
 wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
@@ -69,20 +71,20 @@ tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 ```
 
 **Move and Rename clang** to a folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time):
-```{r}
+```{sh}
 #Terminal
 sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang
 ```
 
 **Delete** downloaded files:
-```{r}
+```{sh}
 sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 ```
 
-###Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)
+**Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)**
 
 Open the [`.bash_profile`](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=bash_profile#save-time) file with Terminal *nano* or [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) or another text editor:
-```{r}
+```{sh}
 export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/clang-c:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/c++:$CPLUS_INCLUDE_PATH
 ```
@@ -94,18 +96,18 @@ Several flavors available, check for the proper [link](http://releases.llvm.org/
 
 
 
-#*R's* `~/.R/Makevars` file
+#Makevars file
 
 You need to tell R how to use the compilers. This might change from one package
 to another. Nothing is simple, you know this by now...
-All this is done through R's Makevars file. 
+All this is done through R's `~/.R/Makevars` file.
 
 Below, are exactly the same steps required to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and 
 [data.table](https://github.com/Rdatatable/data.table) to work in parallel.
 This is detailed in this vignette: [vignette_imputations_parallel](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd)
 
 With macOS use [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) to open the file with `Show hidden items` turned `ON`. You want these lines:
-```{r}
+```{sh}
 CC=/usr/local/bin/gcc
 CXX=/usr/local/bin/g++
 FC=/usr/local/bin/gfortran
@@ -183,43 +185,19 @@ R CMD INSTALL "rmetasim-master" # Terminal command
 sudo rm -R rmetasim-master master.zip # to remove the folders no longer required
 ```
 
-#XGBoost
+#`XGBoost`
 
 ##Download the github version
 ```{sh}
-# In RStudio Terminal or macOS Terminal
+# terminal
 cd Downloads
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost
 ```
 
-
-##CMD line mode only
-
-To compile XGBoost and run in command line mode in the Terminal
+##Modification
+Modify in a text editor the `configure` file inside the `xgboost/R-package` folder:
 ```{sh}
-cp make/config.mk ./config.mk
-export CC=/usr/local/bin/gcc
-export CXX=/usr/local/bin/g++
-export CXX11=/usr/local/bin/g++
-export CXX14=/usr/local/bin/g++
-export CXX17=/usr/local/bin/g++
-make -j4
-```
-
-Prefer using CLANG instead of GCC ? (in dev)
-```{sh}
-export CC=/Users/thierry/Dropbox/programs/clang/bin/clang
-export CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
-export CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++
-```
-
-
-##R package
-Modify the `configure` file inside the `xgboost/R-package` folder:
-
-###In a text editor
-```{r edit xgboost}
 # Go to line 1676
 # change
   ac_pkg_openmp=no
@@ -228,12 +206,11 @@ Modify the `configure` file inside the `xgboost/R-package` folder:
 #save the file under the same name
 ```
 
-###Makevars configuration for XGBoost
+##Makevars configuration
 
-*XGBoost* requires these Makevars specifications. If you have other lines, comment (#)
+`XGBoost` requires these Makevars specifications. If you have other lines, comment (#)
 before compiling:
-
-```{r}
+```{sh}
 CC=/usr/local/bin/gcc
 CXX=/usr/local/bin/g++
 CXX11=/usr/local/bin/g++
@@ -242,15 +219,13 @@ CXX17=/usr/local/bin/g++
 ```
 
 
-###Compile `XGBoost`
-
-```{r}
+##Compile
+```{sh}
 sudo R CMD INSTALL R-package
 ```
 
 ##Test R-package
 You should see a time difference between both runs
-
 ```{r}
 require(xgboost)
 x <-  matrix(rnorm(100*10000), 10000, 100)
@@ -261,14 +236,14 @@ system.time({bst = xgboost(data = x, label = y, nthread = 4, nround = 100, verbo
 ```
 
 
-#LightGBM
+#`LightGBM`
 
-LightGBM requires an OpenMP-enabled compiler. Currently, it doesn't work well with
+`LightGBM` requires an OpenMP-enabled compiler. Currently, it doesn't work well with
 clang, so make sure you have updated your GCC compiler (instructions above).
-Additionally, LightGBM requires [CMake](https://cmake.org/overview/)
+Additionally, `LightGBM` requires [CMake](https://cmake.org/overview/)
 
-##Install CMake
-```{r}
+##Download and install CMake
+```{sh}
 cd Downloads
 wget https://cmake.org/files/v3.10/cmake-3.10.0-rc3-Darwin-x86_64.dmg
 # double-click on the disk image and follow instructions
@@ -276,8 +251,7 @@ wget https://cmake.org/files/v3.10/cmake-3.10.0-rc3-Darwin-x86_64.dmg
 
 
 To add CMake to the PATH:
-
-```{r}
+```{sh}
 PATH="/Applications/CMake.app/Contents/bin":"$PATH"
 # Or, to install symlinks to '/usr/local/bin', run:
 sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install
@@ -287,7 +261,7 @@ Then, run the following commands to install LightGBM:
 ```
 
 ##Download and Install LightGBM
-```{r}
+```{sh}
 cd Downloads
 git clone --recursive https://github.com/Microsoft/LightGBM
 cd LightGBM/R-package
@@ -297,13 +271,13 @@ R CMD INSTALL --build . --no-multiarch
 
 
 
-#randomForestSRC
-
+#`randomForestSRC`
 [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) requires 
 the GCC OpenMP-enabled compiler to run in parallel. 
 See instructions above if not already done.
 
 
+##Makevars configuration
 Check that the lines below **are not** commented in your `~/.R/Makevars` file:
 ```{sh}
 CC=/usr/local/bin/gcc
@@ -314,9 +288,8 @@ PKG_CFLAGS= -O3 -Wall -pipe -pedantic -std=gnu99 -fopenmp
 PKG_CXXFLAGS=-fopenmp -std=c++11
 ```
 
-
-
-From the Terminal run these steps to compile randomForestSRC:
+##Download and install
+From the Terminal run these steps to download and compile randomForestSRC:
 ```{sh}
 cd ~/Downloads
 curl -O http://www.ccs.miami.edu/~hishwaran/rfsrc/randomForestSRC_2.5.0.tar.gz
@@ -334,31 +307,21 @@ If the compilation fails after `autoconf`, follow the first 3 steps in this
 [tutorial](http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html?highlight=autoconf#install-gbs-radseq-software-time-required-30min), to install `libsigsegv`, `m4` and `autoconf`. 
 
 
-#ranger
+#`ranger`
 [ranger](https://github.com/imbs-hl/ranger) is easy to install.
-
-To install the ranger R package from CRAN:
 ```{r}
 install.packages("ranger")
 ```
 
-To install the development version from GitHub using devtools, run
-```{r}
-devtools::install_github("imbs-hl/ranger")
-```
-
-#missRanger
+#`missRanger`
 [missRanger](https://github.com/mayer79/missRanger) is also very easy to install.
-
-From CRAN:
 ```{r}
 install.packages("missRanger")
 ```
 
 
-#pcaMethods
+#`pcaMethods`
 To install [pcaMethods](https://github.com/hredestig/pcaMethods), from bioconductor:
-
 ```{r}
 source("https://bioconductor.org/biocLite.R")
 biocLite("pcaMethods")

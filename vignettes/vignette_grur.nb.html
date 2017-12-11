@@ -271,10 +271,10 @@ div.tocify {
 
 
 <!-- rnb-text-begin -->
+<p>This vignette purposes is to show users how to install packages required for imputations inside <code>grur</code>. The vignette is also useful to prepare computers for genomic analysis inside R.</p>
 <p>There’s a more detailed computer setup tutorial found <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html">here</a></p>
-<p><code>grur</code> RADseq-based simulation framework will almost always require more markers than the default built-in threshold in <code>rmetasim</code>, the <code>R</code> simulation engine used by <code>grur</code>.</p>
-<p>This vignette purposes is to show users how to modify/install <code>rmetasim</code> to allow it to use more markers during simulations, than the latest default set to 2000 markers.</p>
-<p>Additionally, macOS users will find the instructions to install <code>XGBoost</code>, <code>LightGBM</code>, <code>ranger</code>, <code>missRanger</code>, and <code>randomForestSRC</code> so that the packages works in parallel, some need to be compiled with OpenMP enabled.</p>
+<p><code>grur</code> RADseq-based simulation framework uses <code>rmetasim</code>, an <code>R</code> simulation engine. This vignette will show users how to modify <code>rmetasim</code>, so that it can be used with more than 2000 markers, the current built-in default. We also show how to compile <code>rmetasim</code> to install it.</p>
+<p>Additionally, macOS and Linux users will find the instructions to install <code>XGBoost</code>, <code>LightGBM</code>, <code>ranger</code>, <code>missRanger</code>, <code>randomForestSRC</code> and <code>pcaMethods</code> so that the packages works in parallel, some need to be compiled with OpenMP enabled.</p>
 <p><strong>Time to allow: ETA ~15 min</strong></p>
 <div id="macos" class="section level1">
 <h1>macOS</h1>
@@ -289,15 +289,18 @@ div.tocify {
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="update-gcc" class="section level2">
-<h2>Update GCC</h2>
-<p>Apple can’t ship GNU Compiler Collection with OpenMP enabled, so you need to install it manually. Choose the binary version number based on your OS.</p>
+<div id="compiler" class="section level2">
+<h2>Compiler</h2>
+<p>Apple can’t ship GNU Compiler Collection (GCC) with OpenMP enabled, similar story with Clang the other compiler used in macOS. Consequently, both need to be updateed manually.</p>
+<div id="update-gcc" class="section level3">
+<h3>Update GCC</h3>
+<p>Choose the binary version number based on your OS.</p>
 <p><strong>High Sierra, Sierra &amp; El Capitan:</strong> gcc-7.1-bin.tar.gz</p>
 <p><strong>Yosemite:</strong> gcc-5.1-bin.tar.gz</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2QgRG93bmxvYWRzXG53Z2V0IGh0dHA6Ly9wcmRvd25sb2Fkcy5zb3VyY2Vmb3JnZS5uZXQvaHBjL2djYy03LjEtYmluLnRhci5neiNjaGFuZ2UgdmVyc2lvbiBhY2NvcmRpbmdseVxuIyBUaGlzIHdpbGwgaW5zdGFsbCB0aGUgY29tcGlsZXIgaW4gYC91c3IvbG9jYWwvYmluYFxuc3VkbyB0YXIgLXp4dmYgZ2NjLTcuMS1iaW4udGFyLmd6IC1DL1xuIyB0byByZW1vdmUgdGhlIHBhY2thZ2UgZnJvbSB5b3VyIERvd25sb2FkcyBkaXJlY3RvcnlcbnN1ZG8gcm0gZ2NjLTcuMS1iaW4udGFyLmd6XG4jIHRvIGNoZWNrIHRoZSBpbnN0YWxsYXRpb25cbmdjYyAtdlxuYGBgIn0= -->
-<pre class="r"><code>cd Downloads
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuY2QgRG93bmxvYWRzXG53Z2V0IGh0dHA6Ly9wcmRvd25sb2Fkcy5zb3VyY2Vmb3JnZS5uZXQvaHBjL2djYy03LjEtYmluLnRhci5neiNjaGFuZ2UgdmVyc2lvbiBhY2NvcmRpbmdseVxuIyBUaGlzIHdpbGwgaW5zdGFsbCB0aGUgY29tcGlsZXIgaW4gYC91c3IvbG9jYWwvYmluYFxuc3VkbyB0YXIgLXp4dmYgZ2NjLTcuMS1iaW4udGFyLmd6IC1DL1xuIyB0byByZW1vdmUgdGhlIHBhY2thZ2UgZnJvbSB5b3VyIERvd25sb2FkcyBkaXJlY3RvcnlcbnN1ZG8gcm0gZ2NjLTcuMS1iaW4udGFyLmd6XG4jIHRvIGNoZWNrIHRoZSBpbnN0YWxsYXRpb25cbmdjYyAtdlxuYGBgIn0= -->
+<pre class="bash"><code>cd Downloads
 wget http://prdownloads.sourceforge.net/hpc/gcc-7.1-bin.tar.gz#change version accordingly
 # This will install the compiler in `/usr/local/bin`
 sudo tar -zxvf gcc-7.1-bin.tar.gz -C/
@@ -309,13 +312,13 @@ gcc -v</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="update-clang" class="section level2">
-<h2>Update Clang</h2>
-<p>It’s the same story with <a href="https://en.wikipedia.org/wiki/Clang">clang</a>, we want clang compiler with OpenMP enabled.</p>
+<div id="update-clang" class="section level3">
+<h3>Update Clang</h3>
+<p>We want <a href="https://en.wikipedia.org/wiki/Clang">clang</a> compiler with OpenMP enabled.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rlcm1pbmFsXG5jZCBEb3dubG9hZHNcbndnZXQgaHR0cDovL3JlbGVhc2VzLmxsdm0ub3JnLzUuMC4wL2NsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHpcbnRhciAteHp2ZiBjbGFuZytsbHZtLTUuMC4wLXg4Nl82NC1hcHBsZS1kYXJ3aW4udGFyLnh6XG5gYGAifQ== -->
-<pre class="r"><code>#Terminal
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuI1Rlcm1pbmFsXG5jZCBEb3dubG9hZHNcbndnZXQgaHR0cDovL3JlbGVhc2VzLmxsdm0ub3JnLzUuMC4wL2NsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHpcbnRhciAteHp2ZiBjbGFuZytsbHZtLTUuMC4wLXg4Nl82NC1hcHBsZS1kYXJ3aW4udGFyLnh6XG5gYGAifQ== -->
+<pre class="bash"><code>#Terminal
 cd Downloads
 wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz</code></pre>
@@ -325,8 +328,8 @@ tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz</code></pre>
 <p><strong>Move and Rename clang</strong> to a folder in your <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time">PATH</a>:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rlcm1pbmFsXG5zdWRvIG12IGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbiB+L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmdcbmBgYCJ9 -->
-<pre class="r"><code>#Terminal
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuI1Rlcm1pbmFsXG5zdWRvIG12IGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbiB+L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmdcbmBgYCJ9 -->
+<pre class="bash"><code>#Terminal
 sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -334,18 +337,17 @@ sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang</code></pr
 <p><strong>Delete</strong> downloaded files:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VkbyBybSBjbGFuZytsbHZtLTUuMC4wLXg4Nl82NC1hcHBsZS1kYXJ3aW4udGFyLnh6XG5gYGAifQ== -->
-<pre class="r"><code>sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuc3VkbyBybSBjbGFuZytsbHZtLTUuMC4wLXg4Nl82NC1hcHBsZS1kYXJ3aW4udGFyLnh6XG5gYGAifQ== -->
+<pre class="bash"><code>sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="modify-your-path" class="section level3">
-<h3>Modify your <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time">PATH</a></h3>
+<p><strong>Modify your <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time">PATH</a></strong></p>
 <p>Open the <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=bash_profile#save-time"><code>.bash_profile</code></a> file with Terminal <em>nano</em> or <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler">TextWrangler</a> or another text editor:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXhwb3J0IENfSU5DTFVERV9QQVRIPS9pbnN0YWxsL3ByZWZpeC9pbmNsdWRlOiRIT01FL0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvaW5jbHVkZS9jbGFuZy1jOiRDX0lOQ0xVREVfUEFUSFxuZXhwb3J0IENQTFVTX0lOQ0xVREVfUEFUSD0vaW5zdGFsbC9wcmVmaXgvaW5jbHVkZTokSE9NRS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2luY2x1ZGUvYysrOiRDUExVU19JTkNMVURFX1BBVEhcbmBgYCJ9 -->
-<pre class="r"><code>export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/clang-c:$C_INCLUDE_PATH
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuZXhwb3J0IENfSU5DTFVERV9QQVRIPS9pbnN0YWxsL3ByZWZpeC9pbmNsdWRlOiRIT01FL0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvaW5jbHVkZS9jbGFuZy1jOiRDX0lOQ0xVREVfUEFUSFxuZXhwb3J0IENQTFVTX0lOQ0xVREVfUEFUSD0vaW5zdGFsbC9wcmVmaXgvaW5jbHVkZTokSE9NRS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2luY2x1ZGUvYysrOiRDUExVU19JTkNMVURFX1BBVEhcbmBgYCJ9 -->
+<pre class="bash"><code>export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/clang-c:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/c++:$CPLUS_INCLUDE_PATH</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -357,15 +359,15 @@ export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/i
 <h1>Linux</h1>
 <p>Make sure you have GCC and CLANG with OpenMP enabled. Several flavors available, check for the proper <a href="http://releases.llvm.org/download.html">link</a></p>
 </div>
-<div id="rs-.rmakevars-file" class="section level1">
-<h1><em>R’s</em> <code>~/.R/Makevars</code> file</h1>
-<p>You need to tell R how to use the compilers. This might change from one package to another. Nothing is simple, you know this by now… All this is done through R’s Makevars file.</p>
+<div id="makevars-file" class="section level1">
+<h1>Makevars file</h1>
+<p>You need to tell R how to use the compilers. This might change from one package to another. Nothing is simple, you know this by now… All this is done through R’s <code>~/.R/Makevars</code> file.</p>
 <p>Below, are exactly the same steps required to install <a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">randomForestSRC</a> and <a href="https://github.com/Rdatatable/data.table">data.table</a> to work in parallel. This is detailed in this vignette: <a href="https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd">vignette_imputations_parallel</a></p>
 <p>With macOS use <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler">TextWrangler</a> to open the file with <code>Show hidden items</code> turned <code>ON</code>. You want these lines:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjXG5DWFg9L3Vzci9sb2NhbC9iaW4vZysrXG5GQz0vdXNyL2xvY2FsL2Jpbi9nZm9ydHJhblxuRjc3PS91c3IvbG9jYWwvYmluL2dmb3J0cmFuXG5QS0dfTElCUyA9IC1mb3Blbm1wIC1sZ29tcFxuUEtHX0NGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wXG5QS0dfQ1hYRkxBR1M9LWZvcGVubXAgLXN0ZD1jKysxMVxuQ0ZMQUdTPSAtTzMgLVdhbGwgLXBpcGUgLXBlZGFudGljIC1zdGQ9Z251OTkgLWZvcGVubXBcblNITElCX09QRU5NUF9DRkxBR1MgPSAtZm9wZW5tcFxuU0hMSUJfT1BFTk1QX0NYWEZMQUdTID0gLWZvcGVubXBcblNITElCX09QRU5NUF9GQ0ZMQUdTID0gLWZvcGVubXBcblNITElCX09QRU5NUF9GRkxBR1MgPSAtZm9wZW5tcFxuRkxJQlM9LUwvdXNyL2xvY2FsL2xpYi9nY2MveDg2XzY0LWFwcGxlLWRhcndpbjE1LjYuMC83LjEuMC9maW5jbHVkZSAjIGNoYW5nZSBhY2NvcmRpbmcgdG8geW91ciBjb21wdXRlciBjb21waWxlciB2ZXJzaW9uXG5DRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvblxuQ1hYRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvblxuYGBgIn0= -->
-<pre class="r"><code>CC=/usr/local/bin/gcc
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjXG5DWFg9L3Vzci9sb2NhbC9iaW4vZysrXG5GQz0vdXNyL2xvY2FsL2Jpbi9nZm9ydHJhblxuRjc3PS91c3IvbG9jYWwvYmluL2dmb3J0cmFuXG5QS0dfTElCUyA9IC1mb3Blbm1wIC1sZ29tcFxuUEtHX0NGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wXG5QS0dfQ1hYRkxBR1M9LWZvcGVubXAgLXN0ZD1jKysxMVxuQ0ZMQUdTPSAtTzMgLVdhbGwgLXBpcGUgLXBlZGFudGljIC1zdGQ9Z251OTkgLWZvcGVubXBcblNITElCX09QRU5NUF9DRkxBR1MgPSAtZm9wZW5tcFxuU0hMSUJfT1BFTk1QX0NYWEZMQUdTID0gLWZvcGVubXBcblNITElCX09QRU5NUF9GQ0ZMQUdTID0gLWZvcGVubXBcblNITElCX09QRU5NUF9GRkxBR1MgPSAtZm9wZW5tcFxuRkxJQlM9LUwvdXNyL2xvY2FsL2xpYi9nY2MveDg2XzY0LWFwcGxlLWRhcndpbjE1LjYuMC83LjEuMC9maW5jbHVkZSAjIGNoYW5nZSBhY2NvcmRpbmcgdG8geW91ciBjb21wdXRlciBjb21waWxlciB2ZXJzaW9uXG5DRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvblxuQ1hYRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvblxuYGBgIn0= -->
+<pre class="bash"><code>CC=/usr/local/bin/gcc
 CXX=/usr/local/bin/g++
 FC=/usr/local/bin/gfortran
 F77=/usr/local/bin/gfortran
@@ -463,13 +465,13 @@ sudo rm -R rmetasim-master master.zip # to remove the folders no longer required
 </div>
 </div>
 <div id="xgboost" class="section level1">
-<h1>XGBoost</h1>
+<h1><code>XGBoost</code></h1>
 <div id="download-the-github-version" class="section level2">
 <h2>Download the github version</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuIyBJbiBSU3R1ZGlvIFRlcm1pbmFsIG9yIG1hY09TIFRlcm1pbmFsXG5jZCBEb3dubG9hZHNcbmdpdCBjbG9uZSAtLXJlY3Vyc2l2ZSBodHRwczovL2dpdGh1Yi5jb20vZG1sYy94Z2Jvb3N0XG5jZCB4Z2Jvb3N0XG5gYGAifQ== -->
-<pre class="bash"><code># In RStudio Terminal or macOS Terminal
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuIyB0ZXJtaW5hbFxuY2QgRG93bmxvYWRzXG5naXQgY2xvbmUgLS1yZWN1cnNpdmUgaHR0cHM6Ly9naXRodWIuY29tL2RtbGMveGdib29zdFxuY2QgeGdib29zdFxuYGBgIn0= -->
+<pre class="bash"><code># terminal
 cd Downloads
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost</code></pre>
@@ -477,42 +479,13 @@ cd xgboost</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="cmd-line-mode-only" class="section level2">
-<h2>CMD line mode only</h2>
-<p>To compile XGBoost and run in command line mode in the Terminal</p>
+<div id="modification" class="section level2">
+<h2>Modification</h2>
+<p>Modify in a text editor the <code>configure</code> file inside the <code>xgboost/R-package</code> folder:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuY3AgbWFrZS9jb25maWcubWsgLi9jb25maWcubWtcbmV4cG9ydCBDQz0vdXNyL2xvY2FsL2Jpbi9nY2NcbmV4cG9ydCBDWFg9L3Vzci9sb2NhbC9iaW4vZysrXG5leHBvcnQgQ1hYMTE9L3Vzci9sb2NhbC9iaW4vZysrXG5leHBvcnQgQ1hYMTQ9L3Vzci9sb2NhbC9iaW4vZysrXG5leHBvcnQgQ1hYMTc9L3Vzci9sb2NhbC9iaW4vZysrXG5tYWtlIC1qNFxuYGBgIn0= -->
-<pre class="bash"><code>cp make/config.mk ./config.mk
-export CC=/usr/local/bin/gcc
-export CXX=/usr/local/bin/g++
-export CXX11=/usr/local/bin/g++
-export CXX14=/usr/local/bin/g++
-export CXX17=/usr/local/bin/g++
-make -j4</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Prefer using CLANG instead of GCC ? (in dev)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuZXhwb3J0IENDPS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvYmluL2NsYW5nXG5leHBvcnQgQ1hYPS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvYmluL2NsYW5nKytcbmV4cG9ydCBDWFgxWD0vVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2Jpbi9jbGFuZysrXG5gYGAifQ== -->
-<pre class="bash"><code>export CC=/Users/thierry/Dropbox/programs/clang/bin/clang
-export CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
-export CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="r-package" class="section level2">
-<h2>R package</h2>
-<p>Modify the <code>configure</code> file inside the <code>xgboost/R-package</code> folder:</p>
-<div id="in-a-text-editor" class="section level3">
-<h3>In a text editor</h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBHbyB0byBsaW5lIDE2NzZcbiMgY2hhbmdlXG4gIGFjX3BrZ19vcGVubXA9bm9cbiMgdG9cbiAgYWNfcGtnX29wZW5tcD15ZXNcbiNzYXZlIHRoZSBmaWxlIHVuZGVyIHRoZSBzYW1lIG5hbWVcbmBgYCJ9 -->
-<pre class="r"><code># Go to line 1676
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuIyBHbyB0byBsaW5lIDE2NzZcbiMgY2hhbmdlXG4gIGFjX3BrZ19vcGVubXA9bm9cbiMgdG9cbiAgYWNfcGtnX29wZW5tcD15ZXNcbiNzYXZlIHRoZSBmaWxlIHVuZGVyIHRoZSBzYW1lIG5hbWVcbmBgYCJ9 -->
+<pre class="bash"><code># Go to line 1676
 # change
   ac_pkg_openmp=no
 # to
@@ -522,13 +495,13 @@ export CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="makevars-configuration-for-xgboost" class="section level3">
-<h3>Makevars configuration for XGBoost</h3>
-<p><em>XGBoost</em> requires these Makevars specifications. If you have other lines, comment (#) before compiling:</p>
+<div id="makevars-configuration-1" class="section level2">
+<h2>Makevars configuration</h2>
+<p><code>XGBoost</code> requires these Makevars specifications. If you have other lines, comment (#) before compiling:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjXG5DWFg9L3Vzci9sb2NhbC9iaW4vZysrXG5DWFgxMT0vdXNyL2xvY2FsL2Jpbi9nKytcbkNYWDE0PS91c3IvbG9jYWwvYmluL2crK1xuQ1hYMTc9L3Vzci9sb2NhbC9iaW4vZysrXG5gYGAifQ== -->
-<pre class="r"><code>CC=/usr/local/bin/gcc
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjXG5DWFg9L3Vzci9sb2NhbC9iaW4vZysrXG5DWFgxMT0vdXNyL2xvY2FsL2Jpbi9nKytcbkNYWDE0PS91c3IvbG9jYWwvYmluL2crK1xuQ1hYMTc9L3Vzci9sb2NhbC9iaW4vZysrXG5gYGAifQ== -->
+<pre class="bash"><code>CC=/usr/local/bin/gcc
 CXX=/usr/local/bin/g++
 CXX11=/usr/local/bin/g++
 CXX14=/usr/local/bin/g++
@@ -537,16 +510,15 @@ CXX17=/usr/local/bin/g++</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="compile-xgboost" class="section level3">
-<h3>Compile <code>XGBoost</code></h3>
+<div id="compile-1" class="section level2">
+<h2>Compile</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VkbyBSIENNRCBJTlNUQUxMIFItcGFja2FnZVxuYGBgIn0= -->
-<pre class="r"><code>sudo R CMD INSTALL R-package</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuc3VkbyBSIENNRCBJTlNUQUxMIFItcGFja2FnZVxuYGBgIn0= -->
+<pre class="bash"><code>sudo R CMD INSTALL R-package</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
 </div>
 <div id="test-r-package" class="section level2">
 <h2>Test R-package</h2>
@@ -566,14 +538,14 @@ system.time({bst = xgboost(data = x, label = y, nthread = 4, nround = 100, verbo
 </div>
 </div>
 <div id="lightgbm" class="section level1">
-<h1>LightGBM</h1>
-<p>LightGBM requires an OpenMP-enabled compiler. Currently, it doesn’t work well with clang, so make sure you have updated your GCC compiler (instructions above). Additionally, LightGBM requires <a href="https://cmake.org/overview/">CMake</a></p>
-<div id="install-cmake" class="section level2">
-<h2>Install CMake</h2>
+<h1><code>LightGBM</code></h1>
+<p><code>LightGBM</code> requires an OpenMP-enabled compiler. Currently, it doesn’t work well with clang, so make sure you have updated your GCC compiler (instructions above). Additionally, <code>LightGBM</code> requires <a href="https://cmake.org/overview/">CMake</a></p>
+<div id="download-and-install-cmake" class="section level2">
+<h2>Download and install CMake</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2QgRG93bmxvYWRzXG53Z2V0IGh0dHBzOi8vY21ha2Uub3JnL2ZpbGVzL3YzLjEwL2NtYWtlLTMuMTAuMC1yYzMtRGFyd2luLXg4Nl82NC5kbWdcbiMgZG91YmxlLWNsaWNrIG9uIHRoZSBkaXNrIGltYWdlIGFuZCBmb2xsb3cgaW5zdHJ1Y3Rpb25zXG5gYGAifQ== -->
-<pre class="r"><code>cd Downloads
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuY2QgRG93bmxvYWRzXG53Z2V0IGh0dHBzOi8vY21ha2Uub3JnL2ZpbGVzL3YzLjEwL2NtYWtlLTMuMTAuMC1yYzMtRGFyd2luLXg4Nl82NC5kbWdcbiMgZG91YmxlLWNsaWNrIG9uIHRoZSBkaXNrIGltYWdlIGFuZCBmb2xsb3cgaW5zdHJ1Y3Rpb25zXG5gYGAifQ== -->
+<pre class="bash"><code>cd Downloads
 wget https://cmake.org/files/v3.10/cmake-3.10.0-rc3-Darwin-x86_64.dmg
 # double-click on the disk image and follow instructions</code></pre>
 <!-- rnb-source-end -->
@@ -582,8 +554,8 @@ wget https://cmake.org/files/v3.10/cmake-3.10.0-rc3-Darwin-x86_64.dmg
 <p>To add CMake to the PATH:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuUEFUSD1cIi9BcHBsaWNhdGlvbnMvQ01ha2UuYXBwL0NvbnRlbnRzL2JpblwiOlwiJFBBVEhcIlxuIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byAnL3Vzci9sb2NhbC9iaW4nLCBydW46XG5zdWRvIFwiL0FwcGxpY2F0aW9ucy9DTWFrZS5hcHAvQ29udGVudHMvYmluL2NtYWtlLWd1aVwiIC0taW5zdGFsbFxuIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byBhbm90aGVyIGRpcmVjdG9yeSwgcnVuOlxuc3VkbyBcIi9BcHBsaWNhdGlvbnMvQ01ha2UuYXBwL0NvbnRlbnRzL2Jpbi9jbWFrZS1ndWlcIiAtLWluc3RhbGw9L3BhdGgvdG8vYmluXG5UaGVuLCBydW4gdGhlIGZvbGxvd2luZyBjb21tYW5kcyB0byBpbnN0YWxsIExpZ2h0R0JNOlxuYGBgIn0= -->
-<pre class="r"><code>PATH=&quot;/Applications/CMake.app/Contents/bin&quot;:&quot;$PATH&quot;
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuUEFUSD1cIi9BcHBsaWNhdGlvbnMvQ01ha2UuYXBwL0NvbnRlbnRzL2JpblwiOlwiJFBBVEhcIlxuIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byAnL3Vzci9sb2NhbC9iaW4nLCBydW46XG5zdWRvIFwiL0FwcGxpY2F0aW9ucy9DTWFrZS5hcHAvQ29udGVudHMvYmluL2NtYWtlLWd1aVwiIC0taW5zdGFsbFxuIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byBhbm90aGVyIGRpcmVjdG9yeSwgcnVuOlxuc3VkbyBcIi9BcHBsaWNhdGlvbnMvQ01ha2UuYXBwL0NvbnRlbnRzL2Jpbi9jbWFrZS1ndWlcIiAtLWluc3RhbGw9L3BhdGgvdG8vYmluXG5UaGVuLCBydW4gdGhlIGZvbGxvd2luZyBjb21tYW5kcyB0byBpbnN0YWxsIExpZ2h0R0JNOlxuYGBgIn0= -->
+<pre class="bash"><code>PATH=&quot;/Applications/CMake.app/Contents/bin&quot;:&quot;$PATH&quot;
 # Or, to install symlinks to '/usr/local/bin', run:
 sudo &quot;/Applications/CMake.app/Contents/bin/cmake-gui&quot; --install
 # Or, to install symlinks to another directory, run:
@@ -597,8 +569,8 @@ Then, run the following commands to install LightGBM:</code></pre>
 <h2>Download and Install LightGBM</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2QgRG93bmxvYWRzXG5naXQgY2xvbmUgLS1yZWN1cnNpdmUgaHR0cHM6Ly9naXRodWIuY29tL01pY3Jvc29mdC9MaWdodEdCTVxuY2QgTGlnaHRHQk0vUi1wYWNrYWdlXG5leHBvcnQgQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjIENYWD0vdXNyL2xvY2FsL2Jpbi9nKytcblIgQ01EIElOU1RBTEwgLS1idWlsZCAuIC0tbm8tbXVsdGlhcmNoXG5gYGAifQ== -->
-<pre class="r"><code>cd Downloads
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuY2QgRG93bmxvYWRzXG5naXQgY2xvbmUgLS1yZWN1cnNpdmUgaHR0cHM6Ly9naXRodWIuY29tL01pY3Jvc29mdC9MaWdodEdCTVxuY2QgTGlnaHRHQk0vUi1wYWNrYWdlXG5leHBvcnQgQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjIENYWD0vdXNyL2xvY2FsL2Jpbi9nKytcblIgQ01EIElOU1RBTEwgLS1idWlsZCAuIC0tbm8tbXVsdGlhcmNoXG5gYGAifQ== -->
+<pre class="bash"><code>cd Downloads
 git clone --recursive https://github.com/Microsoft/LightGBM
 cd LightGBM/R-package
 export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++
@@ -609,8 +581,10 @@ R CMD INSTALL --build . --no-multiarch</code></pre>
 </div>
 </div>
 <div id="randomforestsrc" class="section level1">
-<h1>randomForestSRC</h1>
+<h1><code>randomForestSRC</code></h1>
 <p><a href="http://www.ccs.miami.edu/~hishwaran/rfsrc.html">randomForestSRC</a> requires the GCC OpenMP-enabled compiler to run in parallel. See instructions above if not already done.</p>
+<div id="makevars-configuration-2" class="section level2">
+<h2>Makevars configuration</h2>
 <p>Check that the lines below <strong>are not</strong> commented in your <code>~/.R/Makevars</code> file:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -624,7 +598,10 @@ PKG_CXXFLAGS=-fopenmp -std=c++11</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>From the Terminal run these steps to compile randomForestSRC:</p>
+</div>
+<div id="download-and-install" class="section level2">
+<h2>Download and install</h2>
+<p>From the Terminal run these steps to download and compile randomForestSRC:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuY2Qgfi9Eb3dubG9hZHNcbmN1cmwgLU8gaHR0cDovL3d3dy5jY3MubWlhbWkuZWR1L35oaXNod2FyYW4vcmZzcmMvcmFuZG9tRm9yZXN0U1JDXzIuNS4wLnRhci5nelxudGFyIC16eHZmIHJhbmRvbUZvcmVzdFNSQ18yLjUuMC50YXIuZ3pcbmNkIHJhbmRvbUZvcmVzdFNSQ1xuYXV0b2NvbmZcbmNkIC4uXG5SIENNRCBJTlNUQUxMIC0tcHJlY2xlYW4gLS1jbGVhbiByYW5kb21Gb3Jlc3RTUkNcbmBgYCJ9 -->
@@ -641,10 +618,10 @@ R CMD INSTALL --preclean --clean randomForestSRC</code></pre>
 <p>You want to make sure that this line is printed during execution of the previous command: <code>checking whether OpenMP will work in a package... yes</code></p>
 <p>If the compilation fails after <code>autoconf</code>, follow the first 3 steps in this <a href="http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html?highlight=autoconf#install-gbs-radseq-software-time-required-30min">tutorial</a>, to install <code>libsigsegv</code>, <code>m4</code> and <code>autoconf</code>.</p>
 </div>
+</div>
 <div id="ranger" class="section level1">
-<h1>ranger</h1>
+<h1><code>ranger</code></h1>
 <p><a href="https://github.com/imbs-hl/ranger">ranger</a> is easy to install.</p>
-<p>To install the ranger R package from CRAN:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5zdGFsbC5wYWNrYWdlcyhcInJhbmdlclwiKVxuYGBgIn0= -->
@@ -652,19 +629,10 @@ R CMD INSTALL --preclean --clean randomForestSRC</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>To install the development version from GitHub using devtools, run</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6Omluc3RhbGxfZ2l0aHViKFwiaW1icy1obC9yYW5nZXJcIilcbmBgYCJ9 -->
-<pre class="r"><code>devtools::install_github(&quot;imbs-hl/ranger&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
 </div>
 <div id="missranger" class="section level1">
-<h1>missRanger</h1>
+<h1><code>missRanger</code></h1>
 <p><a href="https://github.com/mayer79/missRanger">missRanger</a> is also very easy to install.</p>
-<p>From CRAN:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5zdGFsbC5wYWNrYWdlcyhcIm1pc3NSYW5nZXJcIilcbmBgYCJ9 -->
@@ -674,7 +642,7 @@ R CMD INSTALL --preclean --clean randomForestSRC</code></pre>
 <!-- rnb-text-begin -->
 </div>
 <div id="pcamethods" class="section level1">
-<h1>pcaMethods</h1>
+<h1><code>pcaMethods</code></h1>
 <p>To install <a href="https://github.com/hredestig/pcaMethods">pcaMethods</a>, from bioconductor:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -685,7 +653,7 @@ biocLite(&quot;pcaMethods&quot;)</code></pre>
 <!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ29tcHV0ZXIgc2V0dXAgZm9yIGdlbm9taWNzIGluIFIiCm91dHB1dDogCiAgaHRtbF9ub3RlYm9vazoKICAgIHRvYzogdHJ1ZQogICAgdG9jX2Zsb2F0OiB0cnVlCi0tLQoKVGhlcmUncyBhIG1vcmUgZGV0YWlsZWQgY29tcHV0ZXIgc2V0dXAgdHV0b3JpYWwgZm91bmQgW2hlcmVdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwpCgoKYGdydXJgIFJBRHNlcS1iYXNlZCBzaW11bGF0aW9uIGZyYW1ld29yayB3aWxsIGFsbW9zdCBhbHdheXMgcmVxdWlyZSBtb3JlIG1hcmtlcnMKdGhhbiB0aGUgZGVmYXVsdCBidWlsdC1pbiB0aHJlc2hvbGQgaW4gYHJtZXRhc2ltYCwgdGhlIGBSYCBzaW11bGF0aW9uIGVuZ2luZQp1c2VkIGJ5IGBncnVyYC4KClRoaXMgdmlnbmV0dGUgcHVycG9zZXMgaXMgdG8gc2hvdyB1c2VycyBob3cgdG8gbW9kaWZ5L2luc3RhbGwKYHJtZXRhc2ltYCB0byBhbGxvdyBpdCB0byB1c2UgbW9yZSBtYXJrZXJzIGR1cmluZyBzaW11bGF0aW9ucywgdGhhbiB0aGUgCmxhdGVzdCBkZWZhdWx0IHNldCB0byAyMDAwIG1hcmtlcnMuCgpBZGRpdGlvbmFsbHksIG1hY09TIHVzZXJzIHdpbGwgZmluZCB0aGUgaW5zdHJ1Y3Rpb25zIHRvIGluc3RhbGwKYFhHQm9vc3RgLCBgTGlnaHRHQk1gLCBgcmFuZ2VyYCwgYG1pc3NSYW5nZXJgLCBhbmQgYHJhbmRvbUZvcmVzdFNSQ2AKc28gdGhhdCB0aGUgcGFja2FnZXMgd29ya3MgaW4gcGFyYWxsZWwsCnNvbWUgbmVlZCB0byBiZSBjb21waWxlZCB3aXRoIE9wZW5NUCBlbmFibGVkLgoKCioqVGltZSB0byBhbGxvdzogRVRBIH4xNSBtaW4qKgoKI21hY09TCgojI0FwcGxlJ3MgQ29tbWFuZCBMaW5lIFRvb2xzCgpNYWtlIHN1cmUgaXQncyBpbnN0YWxsZWQuLi5pZiBub3QsIGZvbGxvdyBpbnN0cnVjdGlvbnM6CmBgYHtyfQp4Y29kZS1zZWxlY3QgLS1pbnN0YWxsCmBgYAoKCiMjVXBkYXRlIEdDQwoKQXBwbGUgY2FuJ3Qgc2hpcCBHTlUgQ29tcGlsZXIgQ29sbGVjdGlvbiB3aXRoIE9wZW5NUCBlbmFibGVkLCBzbyB5b3UgbmVlZCB0bwppbnN0YWxsIGl0IG1hbnVhbGx5LiBDaG9vc2UgdGhlIGJpbmFyeSB2ZXJzaW9uIG51bWJlciBiYXNlZCBvbiB5b3VyIE9TLgoKKipIaWdoIFNpZXJyYSwgU2llcnJhICYgRWwgQ2FwaXRhbjoqKiBnY2MtNy4xLWJpbi50YXIuZ3oKCioqWW9zZW1pdGU6KiogZ2NjLTUuMS1iaW4udGFyLmd6CgpgYGB7cn0KY2QgRG93bmxvYWRzCndnZXQgaHR0cDovL3ByZG93bmxvYWRzLnNvdXJjZWZvcmdlLm5ldC9ocGMvZ2NjLTcuMS1iaW4udGFyLmd6I2NoYW5nZSB2ZXJzaW9uIGFjY29yZGluZ2x5CiMgVGhpcyB3aWxsIGluc3RhbGwgdGhlIGNvbXBpbGVyIGluIGAvdXNyL2xvY2FsL2JpbmAKc3VkbyB0YXIgLXp4dmYgZ2NjLTcuMS1iaW4udGFyLmd6IC1DLwojIHRvIHJlbW92ZSB0aGUgcGFja2FnZSBmcm9tIHlvdXIgRG93bmxvYWRzIGRpcmVjdG9yeQpzdWRvIHJtIGdjYy03LjEtYmluLnRhci5negojIHRvIGNoZWNrIHRoZSBpbnN0YWxsYXRpb24KZ2NjIC12CmBgYAoKCiMjVXBkYXRlIENsYW5nCgpJdCdzIHRoZSBzYW1lIHN0b3J5IHdpdGggW2NsYW5nXShodHRwczovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9DbGFuZyksIHdlIHdhbnQKY2xhbmcgY29tcGlsZXIgd2l0aCBPcGVuTVAgZW5hYmxlZC4KCmBgYHtyfQojVGVybWluYWwKY2QgRG93bmxvYWRzCndnZXQgaHR0cDovL3JlbGVhc2VzLmxsdm0ub3JnLzUuMC4wL2NsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHoKdGFyIC14enZmIGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHoKYGBgCgoqKk1vdmUgYW5kIFJlbmFtZSBjbGFuZyoqIHRvIGEgZm9sZGVyIGluIHlvdXIgW1BBVEhdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWw/aGlnaGxpZ2h0PVBBVEgjc2F2ZS10aW1lKToKYGBge3J9CiNUZXJtaW5hbApzdWRvIG12IGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbiB+L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcKYGBgCgoqKkRlbGV0ZSoqIGRvd25sb2FkZWQgZmlsZXM6CmBgYHtyfQpzdWRvIHJtIGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHoKYGBgCgojIyNNb2RpZnkgeW91ciBbUEFUSF0oaHR0cDovL2dicy1jbG91ZC10dXRvcmlhbC5yZWFkdGhlZG9jcy5pby9lbi9sYXRlc3QvMDNfY29tcHV0ZXJfc2V0dXAuaHRtbD9oaWdobGlnaHQ9UEFUSCNzYXZlLXRpbWUpCgpPcGVuIHRoZSBbYC5iYXNoX3Byb2ZpbGVgXShodHRwOi8vZ2JzLWNsb3VkLXR1dG9yaWFsLnJlYWR0aGVkb2NzLmlvL2VuL2xhdGVzdC8wM19jb21wdXRlcl9zZXR1cC5odG1sP2hpZ2hsaWdodD1iYXNoX3Byb2ZpbGUjc2F2ZS10aW1lKSBmaWxlIHdpdGggVGVybWluYWwgKm5hbm8qIG9yIFtUZXh0V3JhbmdsZXJdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwjaW5zdGFsbC10ZXh0d3JhbmdsZXIpIG9yIGFub3RoZXIgdGV4dCBlZGl0b3I6CmBgYHtyfQpleHBvcnQgQ19JTkNMVURFX1BBVEg9L2luc3RhbGwvcHJlZml4L2luY2x1ZGU6JEhPTUUvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9pbmNsdWRlL2NsYW5nLWM6JENfSU5DTFVERV9QQVRICmV4cG9ydCBDUExVU19JTkNMVURFX1BBVEg9L2luc3RhbGwvcHJlZml4L2luY2x1ZGU6JEhPTUUvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9pbmNsdWRlL2MrKzokQ1BMVVNfSU5DTFVERV9QQVRICmBgYAoKI0xpbnV4CgpNYWtlIHN1cmUgeW91IGhhdmUgR0NDIGFuZCBDTEFORyB3aXRoIE9wZW5NUCBlbmFibGVkLgpTZXZlcmFsIGZsYXZvcnMgYXZhaWxhYmxlLCBjaGVjayBmb3IgdGhlIHByb3BlciBbbGlua10oaHR0cDovL3JlbGVhc2VzLmxsdm0ub3JnL2Rvd25sb2FkLmh0bWwpCgoKCiMqUidzKiBgfi8uUi9NYWtldmFyc2AgZmlsZQoKWW91IG5lZWQgdG8gdGVsbCBSIGhvdyB0byB1c2UgdGhlIGNvbXBpbGVycy4gVGhpcyBtaWdodCBjaGFuZ2UgZnJvbSBvbmUgcGFja2FnZQp0byBhbm90aGVyLiBOb3RoaW5nIGlzIHNpbXBsZSwgeW91IGtub3cgdGhpcyBieSBub3cuLi4KQWxsIHRoaXMgaXMgZG9uZSB0aHJvdWdoIFIncyBNYWtldmFycyBmaWxlLiAKCkJlbG93LCBhcmUgZXhhY3RseSB0aGUgc2FtZSBzdGVwcyByZXF1aXJlZCB0byBpbnN0YWxsIFtyYW5kb21Gb3Jlc3RTUkNdKGh0dHA6Ly93d3cuY2NzLm1pYW1pLmVkdS9+aGlzaHdhcmFuL3Jmc3JjLmh0bWwpIGFuZCAKW2RhdGEudGFibGVdKGh0dHBzOi8vZ2l0aHViLmNvbS9SZGF0YXRhYmxlL2RhdGEudGFibGUpIHRvIHdvcmsgaW4gcGFyYWxsZWwuClRoaXMgaXMgZGV0YWlsZWQgaW4gdGhpcyB2aWduZXR0ZTogW3ZpZ25ldHRlX2ltcHV0YXRpb25zX3BhcmFsbGVsXShodHRwczovL2dpdGh1Yi5jb20vdGhpZXJyeWdvc3NlbGluL2dydXIvYmxvYi9tYXN0ZXIvdmlnbmV0dGVzL3ZpZ25ldHRlX2ltcHV0YXRpb25zX3BhcmFsbGVsLlJtZCkKCldpdGggbWFjT1MgdXNlIFtUZXh0V3JhbmdsZXJdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwjaW5zdGFsbC10ZXh0d3JhbmdsZXIpIHRvIG9wZW4gdGhlIGZpbGUgd2l0aCBgU2hvdyBoaWRkZW4gaXRlbXNgIHR1cm5lZCBgT05gLiBZb3Ugd2FudCB0aGVzZSBsaW5lczoKYGBge3J9CkNDPS91c3IvbG9jYWwvYmluL2djYwpDWFg9L3Vzci9sb2NhbC9iaW4vZysrCkZDPS91c3IvbG9jYWwvYmluL2dmb3J0cmFuCkY3Nz0vdXNyL2xvY2FsL2Jpbi9nZm9ydHJhbgpQS0dfTElCUyA9IC1mb3Blbm1wIC1sZ29tcApQS0dfQ0ZMQUdTPSAtTzMgLVdhbGwgLXBpcGUgLXBlZGFudGljIC1zdGQ9Z251OTkgLWZvcGVubXAKUEtHX0NYWEZMQUdTPS1mb3Blbm1wIC1zdGQ9YysrMTEKQ0ZMQUdTPSAtTzMgLVdhbGwgLXBpcGUgLXBlZGFudGljIC1zdGQ9Z251OTkgLWZvcGVubXAKU0hMSUJfT1BFTk1QX0NGTEFHUyA9IC1mb3Blbm1wClNITElCX09QRU5NUF9DWFhGTEFHUyA9IC1mb3Blbm1wClNITElCX09QRU5NUF9GQ0ZMQUdTID0gLWZvcGVubXAKU0hMSUJfT1BFTk1QX0ZGTEFHUyA9IC1mb3Blbm1wCkZMSUJTPS1ML3Vzci9sb2NhbC9saWIvZ2NjL3g4Nl82NC1hcHBsZS1kYXJ3aW4xNS42LjAvNy4xLjAvZmluY2x1ZGUgIyBjaGFuZ2UgYWNjb3JkaW5nIHRvIHlvdXIgY29tcHV0ZXIgY29tcGlsZXIgdmVyc2lvbgpDRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvbgpDWFhGTEFHUz0tbXR1bmU9bmF0aXZlIC1nIC1PMiAtV2FsbCAtcGVkYW50aWMgLVdjb252ZXJzaW9uCmBgYAoKSWYgeW91IGRvbid0IGhhdmUgdGhlIGZpbGUsIHVzZSBzdWRvIG5hbm8gaW4gdGhlIFRlcm1pbmFsIHRvIGNyZWF0ZSBvbmU6CmBgYHtzaH0KY2QgfgpzdWRvIG1rZGlyIH4vLlIKc3VkbyBuYW5vIH4vLlIvTWFrZXZhcnMKYGBgCkNvcHkvcGFzdGUgdGhlIHNlY3Rpb24gYWJvdmUuIFNhdmUgYW5kIEV4aXQgd2l0aDogYGNydC1vYCwgYGVudGVyYCwgYGNydC14YC4KCiNgcm1ldGFzaW1gCkhhbmcgaW4gdGhlcmUgaXQncyBhbG1vc3Qgb3Zlci4uLgoKCiMjRG93bmxvYWQKRG93bmxvYWQgdGhlIGxhdGVzdCBnaXRodWIgcmVsZWFzZSBvZiBBbGxhbiBTdHJhbmQncyAqKnJtZXRhc2ltKioKYGBge3NofQpjZCBEb3dubG9hZHMKd2dldCBodHRwczovL2dpdGh1Yi5jb20vc3RyYW5kYS9ybWV0YXNpbS9hcmNoaXZlL21hc3Rlci56aXAKdW56aXAgbWFzdGVyLnppcApgYGAKCiMjTUFYTE9DSQoKMjAwMCBsb2NpIGlzIHRoZSBidWlsdC1pbiBtYXhpbXVtLiBUbyB1c2UgbW9yZSwgeW91IG5lZWQgdG8gbW9kaWZ5IHJtZXRhc2ltIGJlZm9yZSBjb21waWxpbmcuCldpdGggYSB0ZXh0IGVkaXRvciBbZS5nLiBUZXh0V3JhbmdsZXIgd2l0aCBtYWNPU10oaHR0cDovL2dicy1jbG91ZC10dXRvcmlhbC5yZWFkdGhlZG9jcy5pby9lbi9sYXRlc3QvMDNfY29tcHV0ZXJfc2V0dXAuaHRtbCNpbnN0YWxsLXRleHR3cmFuZ2xlciksIG1vZGlmeSB0aGUgYGNvbnN0LmhgIGZpbGUgaW4gdGhlIGBzcmNgIGZvbGRlcjogYHJtZXRhc2ltLW1hc3Rlci9zcmMvY29uc3QuaGAuCk5hdmlnYXRlIHRvICoqbGFuZSAzMyoqIGFuZCBjaGFuZ2UgdGhlIGludGVnZXIgdG8gdGhlIGRlc2lyZWQgbWF4aW11bSBudW1iZXIgb2YgbG9jaS4KCmBgYHtzaH0KI2RlZmluZSBNQVhMT0NJICAgICAgICAgICAgICAgMjAwMApgYGAKCmBgYHtzaH0KI2RlZmluZSBNQVhMT0NJICAgICAgICAgICAgICAgMjAwMDAKYGBgCgojI01ha2V2YXJzIGNvbmZpZ3VyYXRpb24KKnJtZXRhc2ltKiByZXF1aXJlcyB0aGVzZSBNYWtldmFycyBzcGVjaWZpY2F0aW9ucy4gSWYgeW91IGhhdmUgb3RoZXIgbGluZXMsIGNvbW1lbnQgKCMpCmJlZm9yZSBjb21waWxpbmc6CgoKYGBge3NofQpDQz0vVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2Jpbi9jbGFuZyAjIC1mb3Blbm1wCkNDPS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvYmluL2NsYW5nCkNYWD0vVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2Jpbi9jbGFuZysrCkNYWDFYPS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvYmluL2NsYW5nKysKRkxJQlM9LUwvVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2xpYgpMREZMQUdTPS1ML1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9saWIgLUwvdXNyL2xvY2FsL29wdC9nZXR0ZXh0L2xpYgpDUFBGTEFHUz0tSS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvaW5jbHVkZSAtSS91c3IvbG9jYWwvb3B0L2dldHRleHQvaW5jbHVkZQpTSExJQl9PUEVOTVBfQ0ZMQUdTPSAtZm9wZW5tcApTSExJQl9PUEVOTVBfRkNGTEFHUz0gLWZvcGVubXAKU0hMSUJfT1BFTk1QX0ZGTEFHUz0gLWZvcGVubXAKU0hMSUJfT1BFTk1QX0NYWEZMQUdTPSAtZm9wZW5tcApgYGAKCgojI0NvbXBpbGUKYGBge3NofQpSIENNRCBJTlNUQUxMICJybWV0YXNpbS1tYXN0ZXIiICMgVGVybWluYWwgY29tbWFuZApzdWRvIHJtIC1SIHJtZXRhc2ltLW1hc3RlciBtYXN0ZXIuemlwICMgdG8gcmVtb3ZlIHRoZSBmb2xkZXJzIG5vIGxvbmdlciByZXF1aXJlZApgYGAKCiNYR0Jvb3N0CgojI0Rvd25sb2FkIHRoZSBnaXRodWIgdmVyc2lvbgpgYGB7c2h9CiMgSW4gUlN0dWRpbyBUZXJtaW5hbCBvciBtYWNPUyBUZXJtaW5hbApjZCBEb3dubG9hZHMKZ2l0IGNsb25lIC0tcmVjdXJzaXZlIGh0dHBzOi8vZ2l0aHViLmNvbS9kbWxjL3hnYm9vc3QKY2QgeGdib29zdApgYGAKCgojI0NNRCBsaW5lIG1vZGUgb25seQoKVG8gY29tcGlsZSBYR0Jvb3N0IGFuZCBydW4gaW4gY29tbWFuZCBsaW5lIG1vZGUgaW4gdGhlIFRlcm1pbmFsCmBgYHtzaH0KY3AgbWFrZS9jb25maWcubWsgLi9jb25maWcubWsKZXhwb3J0IENDPS91c3IvbG9jYWwvYmluL2djYwpleHBvcnQgQ1hYPS91c3IvbG9jYWwvYmluL2crKwpleHBvcnQgQ1hYMTE9L3Vzci9sb2NhbC9iaW4vZysrCmV4cG9ydCBDWFgxND0vdXNyL2xvY2FsL2Jpbi9nKysKZXhwb3J0IENYWDE3PS91c3IvbG9jYWwvYmluL2crKwptYWtlIC1qNApgYGAKClByZWZlciB1c2luZyBDTEFORyBpbnN0ZWFkIG9mIEdDQyA/IChpbiBkZXYpCmBgYHtzaH0KZXhwb3J0IENDPS9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvYmluL2NsYW5nCmV4cG9ydCBDWFg9L1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9iaW4vY2xhbmcrKwpleHBvcnQgQ1hYMVg9L1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9iaW4vY2xhbmcrKwpgYGAKCgojI1IgcGFja2FnZQpNb2RpZnkgdGhlIGBjb25maWd1cmVgIGZpbGUgaW5zaWRlIHRoZSBgeGdib29zdC9SLXBhY2thZ2VgIGZvbGRlcjoKCiMjI0luIGEgdGV4dCBlZGl0b3IKYGBge3IgZWRpdCB4Z2Jvb3N0fQojIEdvIHRvIGxpbmUgMTY3NgojIGNoYW5nZQogIGFjX3BrZ19vcGVubXA9bm8KIyB0bwogIGFjX3BrZ19vcGVubXA9eWVzCiNzYXZlIHRoZSBmaWxlIHVuZGVyIHRoZSBzYW1lIG5hbWUKYGBgCgojIyNNYWtldmFycyBjb25maWd1cmF0aW9uIGZvciBYR0Jvb3N0CgoqWEdCb29zdCogcmVxdWlyZXMgdGhlc2UgTWFrZXZhcnMgc3BlY2lmaWNhdGlvbnMuIElmIHlvdSBoYXZlIG90aGVyIGxpbmVzLCBjb21tZW50ICgjKQpiZWZvcmUgY29tcGlsaW5nOgoKYGBge3J9CkNDPS91c3IvbG9jYWwvYmluL2djYwpDWFg9L3Vzci9sb2NhbC9iaW4vZysrCkNYWDExPS91c3IvbG9jYWwvYmluL2crKwpDWFgxND0vdXNyL2xvY2FsL2Jpbi9nKysKQ1hYMTc9L3Vzci9sb2NhbC9iaW4vZysrCmBgYAoKCiMjI0NvbXBpbGUgYFhHQm9vc3RgCgpgYGB7cn0Kc3VkbyBSIENNRCBJTlNUQUxMIFItcGFja2FnZQpgYGAKCiMjVGVzdCBSLXBhY2thZ2UKWW91IHNob3VsZCBzZWUgYSB0aW1lIGRpZmZlcmVuY2UgYmV0d2VlbiBib3RoIHJ1bnMKCmBgYHtyfQpyZXF1aXJlKHhnYm9vc3QpCnggPC0gIG1hdHJpeChybm9ybSgxMDAqMTAwMDApLCAxMDAwMCwgMTAwKQp5IDwtICB4ICUqJSBybm9ybSgxMDApICsgcm5vcm0oMTAwMCkKCnN5c3RlbS50aW1lKHtic3QgPSB4Z2Jvb3N0KGRhdGEgPSB4LCBsYWJlbCA9IHksIG50aHJlYWQgPSAxLCBucm91bmQgPSAxMDAsIHZlcmJvc2UgPSBGQUxTRSl9KQpzeXN0ZW0udGltZSh7YnN0ID0geGdib29zdChkYXRhID0geCwgbGFiZWwgPSB5LCBudGhyZWFkID0gNCwgbnJvdW5kID0gMTAwLCB2ZXJib3NlID0gRkFMU0UpfSkKYGBgCgoKI0xpZ2h0R0JNCgpMaWdodEdCTSByZXF1aXJlcyBhbiBPcGVuTVAtZW5hYmxlZCBjb21waWxlci4gQ3VycmVudGx5LCBpdCBkb2Vzbid0IHdvcmsgd2VsbCB3aXRoCmNsYW5nLCBzbyBtYWtlIHN1cmUgeW91IGhhdmUgdXBkYXRlZCB5b3VyIEdDQyBjb21waWxlciAoaW5zdHJ1Y3Rpb25zIGFib3ZlKS4KQWRkaXRpb25hbGx5LCBMaWdodEdCTSByZXF1aXJlcyBbQ01ha2VdKGh0dHBzOi8vY21ha2Uub3JnL292ZXJ2aWV3LykKCiMjSW5zdGFsbCBDTWFrZQpgYGB7cn0KY2QgRG93bmxvYWRzCndnZXQgaHR0cHM6Ly9jbWFrZS5vcmcvZmlsZXMvdjMuMTAvY21ha2UtMy4xMC4wLXJjMy1EYXJ3aW4teDg2XzY0LmRtZwojIGRvdWJsZS1jbGljayBvbiB0aGUgZGlzayBpbWFnZSBhbmQgZm9sbG93IGluc3RydWN0aW9ucwpgYGAKCgpUbyBhZGQgQ01ha2UgdG8gdGhlIFBBVEg6CgpgYGB7cn0KUEFUSD0iL0FwcGxpY2F0aW9ucy9DTWFrZS5hcHAvQ29udGVudHMvYmluIjoiJFBBVEgiCiMgT3IsIHRvIGluc3RhbGwgc3ltbGlua3MgdG8gJy91c3IvbG9jYWwvYmluJywgcnVuOgpzdWRvICIvQXBwbGljYXRpb25zL0NNYWtlLmFwcC9Db250ZW50cy9iaW4vY21ha2UtZ3VpIiAtLWluc3RhbGwKIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byBhbm90aGVyIGRpcmVjdG9yeSwgcnVuOgpzdWRvICIvQXBwbGljYXRpb25zL0NNYWtlLmFwcC9Db250ZW50cy9iaW4vY21ha2UtZ3VpIiAtLWluc3RhbGw9L3BhdGgvdG8vYmluClRoZW4sIHJ1biB0aGUgZm9sbG93aW5nIGNvbW1hbmRzIHRvIGluc3RhbGwgTGlnaHRHQk06CmBgYAoKIyNEb3dubG9hZCBhbmQgSW5zdGFsbCBMaWdodEdCTQpgYGB7cn0KY2QgRG93bmxvYWRzCmdpdCBjbG9uZSAtLXJlY3Vyc2l2ZSBodHRwczovL2dpdGh1Yi5jb20vTWljcm9zb2Z0L0xpZ2h0R0JNCmNkIExpZ2h0R0JNL1ItcGFja2FnZQpleHBvcnQgQ0M9L3Vzci9sb2NhbC9iaW4vZ2NjIENYWD0vdXNyL2xvY2FsL2Jpbi9nKysKUiBDTUQgSU5TVEFMTCAtLWJ1aWxkIC4gLS1uby1tdWx0aWFyY2gKYGBgCgoKCiNyYW5kb21Gb3Jlc3RTUkMKCltyYW5kb21Gb3Jlc3RTUkNdKGh0dHA6Ly93d3cuY2NzLm1pYW1pLmVkdS9+aGlzaHdhcmFuL3Jmc3JjLmh0bWwpIHJlcXVpcmVzIAp0aGUgR0NDIE9wZW5NUC1lbmFibGVkIGNvbXBpbGVyIHRvIHJ1biBpbiBwYXJhbGxlbC4gClNlZSBpbnN0cnVjdGlvbnMgYWJvdmUgaWYgbm90IGFscmVhZHkgZG9uZS4KCgpDaGVjayB0aGF0IHRoZSBsaW5lcyBiZWxvdyAqKmFyZSBub3QqKiBjb21tZW50ZWQgaW4geW91ciBgfi8uUi9NYWtldmFyc2AgZmlsZToKYGBge3NofQpDQz0vdXNyL2xvY2FsL2Jpbi9nY2MKQ1hYPS91c3IvbG9jYWwvYmluL2crKwpDRkxBR1M9LWcgLU8zIC1XYWxsIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1tdHVuZT1uYXRpdmUgLXBpcGUKQ1hYRkxBR1M9LWcgLU8zIC1XYWxsIC1wZWRhbnRpYyAtc3RkPWMrKzExIC1tdHVuZT1uYXRpdmUgLXBpcGUKUEtHX0NGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wClBLR19DWFhGTEFHUz0tZm9wZW5tcCAtc3RkPWMrKzExCmBgYAoKCgpGcm9tIHRoZSBUZXJtaW5hbCBydW4gdGhlc2Ugc3RlcHMgdG8gY29tcGlsZSByYW5kb21Gb3Jlc3RTUkM6CmBgYHtzaH0KY2Qgfi9Eb3dubG9hZHMKY3VybCAtTyBodHRwOi8vd3d3LmNjcy5taWFtaS5lZHUvfmhpc2h3YXJhbi9yZnNyYy9yYW5kb21Gb3Jlc3RTUkNfMi41LjAudGFyLmd6CnRhciAtenh2ZiByYW5kb21Gb3Jlc3RTUkNfMi41LjAudGFyLmd6CmNkIHJhbmRvbUZvcmVzdFNSQwphdXRvY29uZgpjZCAuLgpSIENNRCBJTlNUQUxMIC0tcHJlY2xlYW4gLS1jbGVhbiByYW5kb21Gb3Jlc3RTUkMKYGBgCgpZb3Ugd2FudCB0byBtYWtlIHN1cmUgdGhhdCB0aGlzIGxpbmUgaXMgcHJpbnRlZCBkdXJpbmcgZXhlY3V0aW9uIG9mIHRoZSBwcmV2aW91cyBjb21tYW5kOgpgY2hlY2tpbmcgd2hldGhlciBPcGVuTVAgd2lsbCB3b3JrIGluIGEgcGFja2FnZS4uLiB5ZXNgCgpJZiB0aGUgY29tcGlsYXRpb24gZmFpbHMgYWZ0ZXIgYGF1dG9jb25mYCwgZm9sbG93IHRoZSBmaXJzdCAzIHN0ZXBzIGluIHRoaXMKW3R1dG9yaWFsXShodHRwOi8vZ2JzLWNsb3VkLXR1dG9yaWFsLnJlYWR0aGVkb2NzLmlvL2VuL2xhdGVzdC8wN19zdGFydF9mcm9tX25ld19pbWFnZS5odG1sP2hpZ2hsaWdodD1hdXRvY29uZiNpbnN0YWxsLWdicy1yYWRzZXEtc29mdHdhcmUtdGltZS1yZXF1aXJlZC0zMG1pbiksIHRvIGluc3RhbGwgYGxpYnNpZ3NlZ3ZgLCBgbTRgIGFuZCBgYXV0b2NvbmZgLiAKCgojcmFuZ2VyCltyYW5nZXJdKGh0dHBzOi8vZ2l0aHViLmNvbS9pbWJzLWhsL3JhbmdlcikgaXMgZWFzeSB0byBpbnN0YWxsLgoKVG8gaW5zdGFsbCB0aGUgcmFuZ2VyIFIgcGFja2FnZSBmcm9tIENSQU46CmBgYHtyfQppbnN0YWxsLnBhY2thZ2VzKCJyYW5nZXIiKQpgYGAKClRvIGluc3RhbGwgdGhlIGRldmVsb3BtZW50IHZlcnNpb24gZnJvbSBHaXRIdWIgdXNpbmcgZGV2dG9vbHMsIHJ1bgpgYGB7cn0KZGV2dG9vbHM6Omluc3RhbGxfZ2l0aHViKCJpbWJzLWhsL3JhbmdlciIpCmBgYAoKI21pc3NSYW5nZXIKW21pc3NSYW5nZXJdKGh0dHBzOi8vZ2l0aHViLmNvbS9tYXllcjc5L21pc3NSYW5nZXIpIGlzIGFsc28gdmVyeSBlYXN5IHRvIGluc3RhbGwuCgpGcm9tIENSQU46CmBgYHtyfQppbnN0YWxsLnBhY2thZ2VzKCJtaXNzUmFuZ2VyIikKYGBgCgoKI3BjYU1ldGhvZHMKVG8gaW5zdGFsbCBbcGNhTWV0aG9kc10oaHR0cHM6Ly9naXRodWIuY29tL2hyZWRlc3RpZy9wY2FNZXRob2RzKSwgZnJvbSBiaW9jb25kdWN0b3I6CgpgYGB7cn0Kc291cmNlKCJodHRwczovL2Jpb2NvbmR1Y3Rvci5vcmcvYmlvY0xpdGUuUiIpCmJpb2NMaXRlKCJwY2FNZXRob2RzIikKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ29tcHV0ZXIgc2V0dXAgZm9yIGdlbm9taWNzIGluIFIiCm91dHB1dDogCiAgaHRtbF9ub3RlYm9vazoKICAgIHRvYzogdHJ1ZQogICAgdG9jX2Zsb2F0OiB0cnVlCi0tLQpUaGlzIHZpZ25ldHRlIHB1cnBvc2VzIGlzIHRvIHNob3cgdXNlcnMgaG93IHRvIGluc3RhbGwgcGFja2FnZXMgcmVxdWlyZWQKZm9yIGltcHV0YXRpb25zIGluc2lkZSBgZ3J1cmAuIFRoZSB2aWduZXR0ZSBpcyBhbHNvIHVzZWZ1bCB0byBwcmVwYXJlIGNvbXB1dGVycwpmb3IgZ2Vub21pYyBhbmFseXNpcyBpbnNpZGUgUi4gCgpUaGVyZSdzIGEgbW9yZSBkZXRhaWxlZCBjb21wdXRlciBzZXR1cCB0dXRvcmlhbCBmb3VuZCBbaGVyZV0oaHR0cDovL2dicy1jbG91ZC10dXRvcmlhbC5yZWFkdGhlZG9jcy5pby9lbi9sYXRlc3QvMDNfY29tcHV0ZXJfc2V0dXAuaHRtbCkKCgpgZ3J1cmAgUkFEc2VxLWJhc2VkIHNpbXVsYXRpb24gZnJhbWV3b3JrIHVzZXMgYHJtZXRhc2ltYCwgYW4gYFJgIHNpbXVsYXRpb24gZW5naW5lLgpUaGlzIHZpZ25ldHRlIHdpbGwgc2hvdyB1c2VycyBob3cgdG8gbW9kaWZ5IGBybWV0YXNpbWAsIHNvCnRoYXQgaXQgY2FuIGJlIHVzZWQgd2l0aCBtb3JlIHRoYW4gMjAwMCBtYXJrZXJzLCB0aGUgY3VycmVudCBidWlsdC1pbiBkZWZhdWx0LiAKV2UgYWxzbyBzaG93IGhvdyB0byBjb21waWxlIGBybWV0YXNpbWAgdG8gaW5zdGFsbCBpdC4KCkFkZGl0aW9uYWxseSwgbWFjT1MgYW5kIExpbnV4IHVzZXJzIHdpbGwgZmluZCB0aGUgaW5zdHJ1Y3Rpb25zIHRvIGluc3RhbGwKYFhHQm9vc3RgLCBgTGlnaHRHQk1gLCBgcmFuZ2VyYCwgYG1pc3NSYW5nZXJgLCBgcmFuZG9tRm9yZXN0U1JDYCBhbmQgCmBwY2FNZXRob2RzYCBzbyB0aGF0IHRoZSBwYWNrYWdlcyB3b3JrcyBpbiBwYXJhbGxlbCwKc29tZSBuZWVkIHRvIGJlIGNvbXBpbGVkIHdpdGggT3Blbk1QIGVuYWJsZWQuCgoKKipUaW1lIHRvIGFsbG93OiBFVEEgfjE1IG1pbioqCgojbWFjT1MKCiMjQXBwbGUncyBDb21tYW5kIExpbmUgVG9vbHMKCk1ha2Ugc3VyZSBpdCdzIGluc3RhbGxlZC4uLmlmIG5vdCwgZm9sbG93IGluc3RydWN0aW9uczoKYGBge3J9Cnhjb2RlLXNlbGVjdCAtLWluc3RhbGwKYGBgCgojI0NvbXBpbGVyCkFwcGxlIGNhbid0IHNoaXAgR05VIENvbXBpbGVyIENvbGxlY3Rpb24gKEdDQykgd2l0aCBPcGVuTVAgZW5hYmxlZCwKc2ltaWxhciBzdG9yeSB3aXRoIENsYW5nIHRoZSBvdGhlciBjb21waWxlciB1c2VkIGluIG1hY09TLiBDb25zZXF1ZW50bHksCmJvdGggbmVlZCB0byBiZSB1cGRhdGVlZCBtYW51YWxseS4KCiMjI1VwZGF0ZSBHQ0MKCkNob29zZSB0aGUgYmluYXJ5IHZlcnNpb24gbnVtYmVyIGJhc2VkIG9uIHlvdXIgT1MuCgoqKkhpZ2ggU2llcnJhLCBTaWVycmEgJiBFbCBDYXBpdGFuOioqIGdjYy03LjEtYmluLnRhci5negoKKipZb3NlbWl0ZToqKiBnY2MtNS4xLWJpbi50YXIuZ3oKCmBgYHtzaH0KY2QgRG93bmxvYWRzCndnZXQgaHR0cDovL3ByZG93bmxvYWRzLnNvdXJjZWZvcmdlLm5ldC9ocGMvZ2NjLTcuMS1iaW4udGFyLmd6I2NoYW5nZSB2ZXJzaW9uIGFjY29yZGluZ2x5CiMgVGhpcyB3aWxsIGluc3RhbGwgdGhlIGNvbXBpbGVyIGluIGAvdXNyL2xvY2FsL2JpbmAKc3VkbyB0YXIgLXp4dmYgZ2NjLTcuMS1iaW4udGFyLmd6IC1DLwojIHRvIHJlbW92ZSB0aGUgcGFja2FnZSBmcm9tIHlvdXIgRG93bmxvYWRzIGRpcmVjdG9yeQpzdWRvIHJtIGdjYy03LjEtYmluLnRhci5negojIHRvIGNoZWNrIHRoZSBpbnN0YWxsYXRpb24KZ2NjIC12CmBgYAoKCiMjI1VwZGF0ZSBDbGFuZwoKV2Ugd2FudCBbY2xhbmddKGh0dHBzOi8vZW4ud2lraXBlZGlhLm9yZy93aWtpL0NsYW5nKSBjb21waWxlciB3aXRoIE9wZW5NUCBlbmFibGVkLgoKYGBge3NofQojVGVybWluYWwKY2QgRG93bmxvYWRzCndnZXQgaHR0cDovL3JlbGVhc2VzLmxsdm0ub3JnLzUuMC4wL2NsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHoKdGFyIC14enZmIGNsYW5nK2xsdm0tNS4wLjAteDg2XzY0LWFwcGxlLWRhcndpbi50YXIueHoKYGBgCgoqKk1vdmUgYW5kIFJlbmFtZSBjbGFuZyoqIHRvIGEgZm9sZGVyIGluIHlvdXIgW1BBVEhdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWw/aGlnaGxpZ2h0PVBBVEgjc2F2ZS10aW1lKToKYGBge3NofQojVGVybWluYWwKc3VkbyBtdiBjbGFuZytsbHZtLTUuMC4wLXg4Nl82NC1hcHBsZS1kYXJ3aW4gfi9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nCmBgYAoKKipEZWxldGUqKiBkb3dubG9hZGVkIGZpbGVzOgpgYGB7c2h9CnN1ZG8gcm0gY2xhbmcrbGx2bS01LjAuMC14ODZfNjQtYXBwbGUtZGFyd2luLnRhci54egpgYGAKCioqTW9kaWZ5IHlvdXIgW1BBVEhdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWw/aGlnaGxpZ2h0PVBBVEgjc2F2ZS10aW1lKSoqCgpPcGVuIHRoZSBbYC5iYXNoX3Byb2ZpbGVgXShodHRwOi8vZ2JzLWNsb3VkLXR1dG9yaWFsLnJlYWR0aGVkb2NzLmlvL2VuL2xhdGVzdC8wM19jb21wdXRlcl9zZXR1cC5odG1sP2hpZ2hsaWdodD1iYXNoX3Byb2ZpbGUjc2F2ZS10aW1lKSBmaWxlIHdpdGggVGVybWluYWwgKm5hbm8qIG9yIFtUZXh0V3JhbmdsZXJdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwjaW5zdGFsbC10ZXh0d3JhbmdsZXIpIG9yIGFub3RoZXIgdGV4dCBlZGl0b3I6CmBgYHtzaH0KZXhwb3J0IENfSU5DTFVERV9QQVRIPS9pbnN0YWxsL3ByZWZpeC9pbmNsdWRlOiRIT01FL0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvaW5jbHVkZS9jbGFuZy1jOiRDX0lOQ0xVREVfUEFUSApleHBvcnQgQ1BMVVNfSU5DTFVERV9QQVRIPS9pbnN0YWxsL3ByZWZpeC9pbmNsdWRlOiRIT01FL0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvaW5jbHVkZS9jKys6JENQTFVTX0lOQ0xVREVfUEFUSApgYGAKCiNMaW51eAoKTWFrZSBzdXJlIHlvdSBoYXZlIEdDQyBhbmQgQ0xBTkcgd2l0aCBPcGVuTVAgZW5hYmxlZC4KU2V2ZXJhbCBmbGF2b3JzIGF2YWlsYWJsZSwgY2hlY2sgZm9yIHRoZSBwcm9wZXIgW2xpbmtdKGh0dHA6Ly9yZWxlYXNlcy5sbHZtLm9yZy9kb3dubG9hZC5odG1sKQoKCgojTWFrZXZhcnMgZmlsZQoKWW91IG5lZWQgdG8gdGVsbCBSIGhvdyB0byB1c2UgdGhlIGNvbXBpbGVycy4gVGhpcyBtaWdodCBjaGFuZ2UgZnJvbSBvbmUgcGFja2FnZQp0byBhbm90aGVyLiBOb3RoaW5nIGlzIHNpbXBsZSwgeW91IGtub3cgdGhpcyBieSBub3cuLi4KQWxsIHRoaXMgaXMgZG9uZSB0aHJvdWdoIFIncyBgfi8uUi9NYWtldmFyc2AgZmlsZS4KCkJlbG93LCBhcmUgZXhhY3RseSB0aGUgc2FtZSBzdGVwcyByZXF1aXJlZCB0byBpbnN0YWxsIFtyYW5kb21Gb3Jlc3RTUkNdKGh0dHA6Ly93d3cuY2NzLm1pYW1pLmVkdS9+aGlzaHdhcmFuL3Jmc3JjLmh0bWwpIGFuZCAKW2RhdGEudGFibGVdKGh0dHBzOi8vZ2l0aHViLmNvbS9SZGF0YXRhYmxlL2RhdGEudGFibGUpIHRvIHdvcmsgaW4gcGFyYWxsZWwuClRoaXMgaXMgZGV0YWlsZWQgaW4gdGhpcyB2aWduZXR0ZTogW3ZpZ25ldHRlX2ltcHV0YXRpb25zX3BhcmFsbGVsXShodHRwczovL2dpdGh1Yi5jb20vdGhpZXJyeWdvc3NlbGluL2dydXIvYmxvYi9tYXN0ZXIvdmlnbmV0dGVzL3ZpZ25ldHRlX2ltcHV0YXRpb25zX3BhcmFsbGVsLlJtZCkKCldpdGggbWFjT1MgdXNlIFtUZXh0V3JhbmdsZXJdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwjaW5zdGFsbC10ZXh0d3JhbmdsZXIpIHRvIG9wZW4gdGhlIGZpbGUgd2l0aCBgU2hvdyBoaWRkZW4gaXRlbXNgIHR1cm5lZCBgT05gLiBZb3Ugd2FudCB0aGVzZSBsaW5lczoKYGBge3NofQpDQz0vdXNyL2xvY2FsL2Jpbi9nY2MKQ1hYPS91c3IvbG9jYWwvYmluL2crKwpGQz0vdXNyL2xvY2FsL2Jpbi9nZm9ydHJhbgpGNzc9L3Vzci9sb2NhbC9iaW4vZ2ZvcnRyYW4KUEtHX0xJQlMgPSAtZm9wZW5tcCAtbGdvbXAKUEtHX0NGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wClBLR19DWFhGTEFHUz0tZm9wZW5tcCAtc3RkPWMrKzExCkNGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wClNITElCX09QRU5NUF9DRkxBR1MgPSAtZm9wZW5tcApTSExJQl9PUEVOTVBfQ1hYRkxBR1MgPSAtZm9wZW5tcApTSExJQl9PUEVOTVBfRkNGTEFHUyA9IC1mb3Blbm1wClNITElCX09QRU5NUF9GRkxBR1MgPSAtZm9wZW5tcApGTElCUz0tTC91c3IvbG9jYWwvbGliL2djYy94ODZfNjQtYXBwbGUtZGFyd2luMTUuNi4wLzcuMS4wL2ZpbmNsdWRlICMgY2hhbmdlIGFjY29yZGluZyB0byB5b3VyIGNvbXB1dGVyIGNvbXBpbGVyIHZlcnNpb24KQ0ZMQUdTPS1tdHVuZT1uYXRpdmUgLWcgLU8yIC1XYWxsIC1wZWRhbnRpYyAtV2NvbnZlcnNpb24KQ1hYRkxBR1M9LW10dW5lPW5hdGl2ZSAtZyAtTzIgLVdhbGwgLXBlZGFudGljIC1XY29udmVyc2lvbgpgYGAKCklmIHlvdSBkb24ndCBoYXZlIHRoZSBmaWxlLCB1c2Ugc3VkbyBuYW5vIGluIHRoZSBUZXJtaW5hbCB0byBjcmVhdGUgb25lOgpgYGB7c2h9CmNkIH4Kc3VkbyBta2RpciB+Ly5SCnN1ZG8gbmFubyB+Ly5SL01ha2V2YXJzCmBgYApDb3B5L3Bhc3RlIHRoZSBzZWN0aW9uIGFib3ZlLiBTYXZlIGFuZCBFeGl0IHdpdGg6IGBjcnQtb2AsIGBlbnRlcmAsIGBjcnQteGAuCgojYHJtZXRhc2ltYApIYW5nIGluIHRoZXJlIGl0J3MgYWxtb3N0IG92ZXIuLi4KCgojI0Rvd25sb2FkCkRvd25sb2FkIHRoZSBsYXRlc3QgZ2l0aHViIHJlbGVhc2Ugb2YgQWxsYW4gU3RyYW5kJ3MgKipybWV0YXNpbSoqCmBgYHtzaH0KY2QgRG93bmxvYWRzCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL3N0cmFuZGEvcm1ldGFzaW0vYXJjaGl2ZS9tYXN0ZXIuemlwCnVuemlwIG1hc3Rlci56aXAKYGBgCgojI01BWExPQ0kKCjIwMDAgbG9jaSBpcyB0aGUgYnVpbHQtaW4gbWF4aW11bS4gVG8gdXNlIG1vcmUsIHlvdSBuZWVkIHRvIG1vZGlmeSBybWV0YXNpbSBiZWZvcmUgY29tcGlsaW5nLgpXaXRoIGEgdGV4dCBlZGl0b3IgW2UuZy4gVGV4dFdyYW5nbGVyIHdpdGggbWFjT1NdKGh0dHA6Ly9nYnMtY2xvdWQtdHV0b3JpYWwucmVhZHRoZWRvY3MuaW8vZW4vbGF0ZXN0LzAzX2NvbXB1dGVyX3NldHVwLmh0bWwjaW5zdGFsbC10ZXh0d3JhbmdsZXIpLCBtb2RpZnkgdGhlIGBjb25zdC5oYCBmaWxlIGluIHRoZSBgc3JjYCBmb2xkZXI6IGBybWV0YXNpbS1tYXN0ZXIvc3JjL2NvbnN0LmhgLgpOYXZpZ2F0ZSB0byAqKmxhbmUgMzMqKiBhbmQgY2hhbmdlIHRoZSBpbnRlZ2VyIHRvIHRoZSBkZXNpcmVkIG1heGltdW0gbnVtYmVyIG9mIGxvY2kuCgpgYGB7c2h9CiNkZWZpbmUgTUFYTE9DSSAgICAgICAgICAgICAgIDIwMDAKYGBgCgpgYGB7c2h9CiNkZWZpbmUgTUFYTE9DSSAgICAgICAgICAgICAgIDIwMDAwCmBgYAoKIyNNYWtldmFycyBjb25maWd1cmF0aW9uCipybWV0YXNpbSogcmVxdWlyZXMgdGhlc2UgTWFrZXZhcnMgc3BlY2lmaWNhdGlvbnMuIElmIHlvdSBoYXZlIG90aGVyIGxpbmVzLCBjb21tZW50ICgjKQpiZWZvcmUgY29tcGlsaW5nOgoKCmBgYHtzaH0KQ0M9L1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9iaW4vY2xhbmcgIyAtZm9wZW5tcApDQz0vVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2Jpbi9jbGFuZwpDWFg9L1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9iaW4vY2xhbmcrKwpDWFgxWD0vVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2Jpbi9jbGFuZysrCkZMSUJTPS1ML1VzZXJzL3RoaWVycnkvRHJvcGJveC9wcm9ncmFtcy9jbGFuZy9saWIKTERGTEFHUz0tTC9Vc2Vycy90aGllcnJ5L0Ryb3Bib3gvcHJvZ3JhbXMvY2xhbmcvbGliIC1ML3Vzci9sb2NhbC9vcHQvZ2V0dGV4dC9saWIKQ1BQRkxBR1M9LUkvVXNlcnMvdGhpZXJyeS9Ecm9wYm94L3Byb2dyYW1zL2NsYW5nL2luY2x1ZGUgLUkvdXNyL2xvY2FsL29wdC9nZXR0ZXh0L2luY2x1ZGUKU0hMSUJfT1BFTk1QX0NGTEFHUz0gLWZvcGVubXAKU0hMSUJfT1BFTk1QX0ZDRkxBR1M9IC1mb3Blbm1wClNITElCX09QRU5NUF9GRkxBR1M9IC1mb3Blbm1wClNITElCX09QRU5NUF9DWFhGTEFHUz0gLWZvcGVubXAKYGBgCgoKIyNDb21waWxlCmBgYHtzaH0KUiBDTUQgSU5TVEFMTCAicm1ldGFzaW0tbWFzdGVyIiAjIFRlcm1pbmFsIGNvbW1hbmQKc3VkbyBybSAtUiBybWV0YXNpbS1tYXN0ZXIgbWFzdGVyLnppcCAjIHRvIHJlbW92ZSB0aGUgZm9sZGVycyBubyBsb25nZXIgcmVxdWlyZWQKYGBgCgojYFhHQm9vc3RgCgojI0Rvd25sb2FkIHRoZSBnaXRodWIgdmVyc2lvbgpgYGB7c2h9CiMgdGVybWluYWwKY2QgRG93bmxvYWRzCmdpdCBjbG9uZSAtLXJlY3Vyc2l2ZSBodHRwczovL2dpdGh1Yi5jb20vZG1sYy94Z2Jvb3N0CmNkIHhnYm9vc3QKYGBgCgojI01vZGlmaWNhdGlvbgpNb2RpZnkgaW4gYSB0ZXh0IGVkaXRvciB0aGUgYGNvbmZpZ3VyZWAgZmlsZSBpbnNpZGUgdGhlIGB4Z2Jvb3N0L1ItcGFja2FnZWAgZm9sZGVyOgpgYGB7c2h9CiMgR28gdG8gbGluZSAxNjc2CiMgY2hhbmdlCiAgYWNfcGtnX29wZW5tcD1ubwojIHRvCiAgYWNfcGtnX29wZW5tcD15ZXMKI3NhdmUgdGhlIGZpbGUgdW5kZXIgdGhlIHNhbWUgbmFtZQpgYGAKCiMjTWFrZXZhcnMgY29uZmlndXJhdGlvbgoKYFhHQm9vc3RgIHJlcXVpcmVzIHRoZXNlIE1ha2V2YXJzIHNwZWNpZmljYXRpb25zLiBJZiB5b3UgaGF2ZSBvdGhlciBsaW5lcywgY29tbWVudCAoIykKYmVmb3JlIGNvbXBpbGluZzoKYGBge3NofQpDQz0vdXNyL2xvY2FsL2Jpbi9nY2MKQ1hYPS91c3IvbG9jYWwvYmluL2crKwpDWFgxMT0vdXNyL2xvY2FsL2Jpbi9nKysKQ1hYMTQ9L3Vzci9sb2NhbC9iaW4vZysrCkNYWDE3PS91c3IvbG9jYWwvYmluL2crKwpgYGAKCgojI0NvbXBpbGUKYGBge3NofQpzdWRvIFIgQ01EIElOU1RBTEwgUi1wYWNrYWdlCmBgYAoKIyNUZXN0IFItcGFja2FnZQpZb3Ugc2hvdWxkIHNlZSBhIHRpbWUgZGlmZmVyZW5jZSBiZXR3ZWVuIGJvdGggcnVucwpgYGB7cn0KcmVxdWlyZSh4Z2Jvb3N0KQp4IDwtICBtYXRyaXgocm5vcm0oMTAwKjEwMDAwKSwgMTAwMDAsIDEwMCkKeSA8LSAgeCAlKiUgcm5vcm0oMTAwKSArIHJub3JtKDEwMDApCgpzeXN0ZW0udGltZSh7YnN0ID0geGdib29zdChkYXRhID0geCwgbGFiZWwgPSB5LCBudGhyZWFkID0gMSwgbnJvdW5kID0gMTAwLCB2ZXJib3NlID0gRkFMU0UpfSkKc3lzdGVtLnRpbWUoe2JzdCA9IHhnYm9vc3QoZGF0YSA9IHgsIGxhYmVsID0geSwgbnRocmVhZCA9IDQsIG5yb3VuZCA9IDEwMCwgdmVyYm9zZSA9IEZBTFNFKX0pCmBgYAoKCiNgTGlnaHRHQk1gCgpgTGlnaHRHQk1gIHJlcXVpcmVzIGFuIE9wZW5NUC1lbmFibGVkIGNvbXBpbGVyLiBDdXJyZW50bHksIGl0IGRvZXNuJ3Qgd29yayB3ZWxsIHdpdGgKY2xhbmcsIHNvIG1ha2Ugc3VyZSB5b3UgaGF2ZSB1cGRhdGVkIHlvdXIgR0NDIGNvbXBpbGVyIChpbnN0cnVjdGlvbnMgYWJvdmUpLgpBZGRpdGlvbmFsbHksIGBMaWdodEdCTWAgcmVxdWlyZXMgW0NNYWtlXShodHRwczovL2NtYWtlLm9yZy9vdmVydmlldy8pCgojI0Rvd25sb2FkIGFuZCBpbnN0YWxsIENNYWtlCmBgYHtzaH0KY2QgRG93bmxvYWRzCndnZXQgaHR0cHM6Ly9jbWFrZS5vcmcvZmlsZXMvdjMuMTAvY21ha2UtMy4xMC4wLXJjMy1EYXJ3aW4teDg2XzY0LmRtZwojIGRvdWJsZS1jbGljayBvbiB0aGUgZGlzayBpbWFnZSBhbmQgZm9sbG93IGluc3RydWN0aW9ucwpgYGAKCgpUbyBhZGQgQ01ha2UgdG8gdGhlIFBBVEg6CmBgYHtzaH0KUEFUSD0iL0FwcGxpY2F0aW9ucy9DTWFrZS5hcHAvQ29udGVudHMvYmluIjoiJFBBVEgiCiMgT3IsIHRvIGluc3RhbGwgc3ltbGlua3MgdG8gJy91c3IvbG9jYWwvYmluJywgcnVuOgpzdWRvICIvQXBwbGljYXRpb25zL0NNYWtlLmFwcC9Db250ZW50cy9iaW4vY21ha2UtZ3VpIiAtLWluc3RhbGwKIyBPciwgdG8gaW5zdGFsbCBzeW1saW5rcyB0byBhbm90aGVyIGRpcmVjdG9yeSwgcnVuOgpzdWRvICIvQXBwbGljYXRpb25zL0NNYWtlLmFwcC9Db250ZW50cy9iaW4vY21ha2UtZ3VpIiAtLWluc3RhbGw9L3BhdGgvdG8vYmluClRoZW4sIHJ1biB0aGUgZm9sbG93aW5nIGNvbW1hbmRzIHRvIGluc3RhbGwgTGlnaHRHQk06CmBgYAoKIyNEb3dubG9hZCBhbmQgSW5zdGFsbCBMaWdodEdCTQpgYGB7c2h9CmNkIERvd25sb2FkcwpnaXQgY2xvbmUgLS1yZWN1cnNpdmUgaHR0cHM6Ly9naXRodWIuY29tL01pY3Jvc29mdC9MaWdodEdCTQpjZCBMaWdodEdCTS9SLXBhY2thZ2UKZXhwb3J0IENDPS91c3IvbG9jYWwvYmluL2djYyBDWFg9L3Vzci9sb2NhbC9iaW4vZysrClIgQ01EIElOU1RBTEwgLS1idWlsZCAuIC0tbm8tbXVsdGlhcmNoCmBgYAoKCgojYHJhbmRvbUZvcmVzdFNSQ2AKW3JhbmRvbUZvcmVzdFNSQ10oaHR0cDovL3d3dy5jY3MubWlhbWkuZWR1L35oaXNod2FyYW4vcmZzcmMuaHRtbCkgcmVxdWlyZXMgCnRoZSBHQ0MgT3Blbk1QLWVuYWJsZWQgY29tcGlsZXIgdG8gcnVuIGluIHBhcmFsbGVsLiAKU2VlIGluc3RydWN0aW9ucyBhYm92ZSBpZiBub3QgYWxyZWFkeSBkb25lLgoKCiMjTWFrZXZhcnMgY29uZmlndXJhdGlvbgpDaGVjayB0aGF0IHRoZSBsaW5lcyBiZWxvdyAqKmFyZSBub3QqKiBjb21tZW50ZWQgaW4geW91ciBgfi8uUi9NYWtldmFyc2AgZmlsZToKYGBge3NofQpDQz0vdXNyL2xvY2FsL2Jpbi9nY2MKQ1hYPS91c3IvbG9jYWwvYmluL2crKwpDRkxBR1M9LWcgLU8zIC1XYWxsIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1tdHVuZT1uYXRpdmUgLXBpcGUKQ1hYRkxBR1M9LWcgLU8zIC1XYWxsIC1wZWRhbnRpYyAtc3RkPWMrKzExIC1tdHVuZT1uYXRpdmUgLXBpcGUKUEtHX0NGTEFHUz0gLU8zIC1XYWxsIC1waXBlIC1wZWRhbnRpYyAtc3RkPWdudTk5IC1mb3Blbm1wClBLR19DWFhGTEFHUz0tZm9wZW5tcCAtc3RkPWMrKzExCmBgYAoKIyNEb3dubG9hZCBhbmQgaW5zdGFsbApGcm9tIHRoZSBUZXJtaW5hbCBydW4gdGhlc2Ugc3RlcHMgdG8gZG93bmxvYWQgYW5kIGNvbXBpbGUgcmFuZG9tRm9yZXN0U1JDOgpgYGB7c2h9CmNkIH4vRG93bmxvYWRzCmN1cmwgLU8gaHR0cDovL3d3dy5jY3MubWlhbWkuZWR1L35oaXNod2FyYW4vcmZzcmMvcmFuZG9tRm9yZXN0U1JDXzIuNS4wLnRhci5negp0YXIgLXp4dmYgcmFuZG9tRm9yZXN0U1JDXzIuNS4wLnRhci5negpjZCByYW5kb21Gb3Jlc3RTUkMKYXV0b2NvbmYKY2QgLi4KUiBDTUQgSU5TVEFMTCAtLXByZWNsZWFuIC0tY2xlYW4gcmFuZG9tRm9yZXN0U1JDCmBgYAoKWW91IHdhbnQgdG8gbWFrZSBzdXJlIHRoYXQgdGhpcyBsaW5lIGlzIHByaW50ZWQgZHVyaW5nIGV4ZWN1dGlvbiBvZiB0aGUgcHJldmlvdXMgY29tbWFuZDoKYGNoZWNraW5nIHdoZXRoZXIgT3Blbk1QIHdpbGwgd29yayBpbiBhIHBhY2thZ2UuLi4geWVzYAoKSWYgdGhlIGNvbXBpbGF0aW9uIGZhaWxzIGFmdGVyIGBhdXRvY29uZmAsIGZvbGxvdyB0aGUgZmlyc3QgMyBzdGVwcyBpbiB0aGlzClt0dXRvcmlhbF0oaHR0cDovL2dicy1jbG91ZC10dXRvcmlhbC5yZWFkdGhlZG9jcy5pby9lbi9sYXRlc3QvMDdfc3RhcnRfZnJvbV9uZXdfaW1hZ2UuaHRtbD9oaWdobGlnaHQ9YXV0b2NvbmYjaW5zdGFsbC1nYnMtcmFkc2VxLXNvZnR3YXJlLXRpbWUtcmVxdWlyZWQtMzBtaW4pLCB0byBpbnN0YWxsIGBsaWJzaWdzZWd2YCwgYG00YCBhbmQgYGF1dG9jb25mYC4gCgoKI2ByYW5nZXJgCltyYW5nZXJdKGh0dHBzOi8vZ2l0aHViLmNvbS9pbWJzLWhsL3JhbmdlcikgaXMgZWFzeSB0byBpbnN0YWxsLgpgYGB7cn0KaW5zdGFsbC5wYWNrYWdlcygicmFuZ2VyIikKYGBgCgojYG1pc3NSYW5nZXJgClttaXNzUmFuZ2VyXShodHRwczovL2dpdGh1Yi5jb20vbWF5ZXI3OS9taXNzUmFuZ2VyKSBpcyBhbHNvIHZlcnkgZWFzeSB0byBpbnN0YWxsLgpgYGB7cn0KaW5zdGFsbC5wYWNrYWdlcygibWlzc1JhbmdlciIpCmBgYAoKCiNgcGNhTWV0aG9kc2AKVG8gaW5zdGFsbCBbcGNhTWV0aG9kc10oaHR0cHM6Ly9naXRodWIuY29tL2hyZWRlc3RpZy9wY2FNZXRob2RzKSwgZnJvbSBiaW9jb25kdWN0b3I6CmBgYHtyfQpzb3VyY2UoImh0dHBzOi8vYmlvY29uZHVjdG9yLm9yZy9iaW9jTGl0ZS5SIikKYmlvY0xpdGUoInBjYU1ldGhvZHMiKQpgYGAK</div>
 
 
 </div>
