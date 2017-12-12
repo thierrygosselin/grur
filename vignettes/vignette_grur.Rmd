@@ -39,6 +39,14 @@ Apple can't ship GNU Compiler Collection (GCC) with OpenMP enabled,
 similar story with Clang the other compiler used in macOS. Consequently,
 both need to be updateed manually.
 
+The command below fro both GCC and Clang will:
+
+* change directory to your downloads
+* download the compiler's binaries 
+* uncompress and move folders (`bin`, `include`, `lib`, `libexec` and `share`) of the compiler on your computer `/usr/local` directory.
+* remove the downloaded file
+* check the version of gcc
+
 ###Update GCC
 
 Choose the binary version number based on your OS.
@@ -50,50 +58,57 @@ Choose the binary version number based on your OS.
 ```{sh}
 cd Downloads
 wget http://prdownloads.sourceforge.net/hpc/gcc-7.1-bin.tar.gz#change version accordingly
-# This will install the compiler in `/usr/local/bin`
 sudo tar -zxvf gcc-7.1-bin.tar.gz -C/
-# to remove the package from your Downloads directory
-sudo rm gcc-7.1-bin.tar.gz
-# to check the installation
-gcc -v
 ```
 
+```{sh}
+sudo rm gcc-7.1-bin.tar.gz
+gcc -v
+```
 
 ###Update Clang
 
 We want [clang](https://en.wikipedia.org/wiki/Clang) compiler with OpenMP enabled.
 
 ```{sh}
-#Terminal
 cd Downloads
 wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
-tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+sudo tar -xzvf clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -C/usr/local --strip-components 1
 ```
 
-**Move and Rename clang** to a folder in your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time):
-```{sh}
-#Terminal
-sudo mv clang+llvm-5.0.0-x86_64-apple-darwin ~/Dropbox/programs/clang
-```
 
-**Delete** downloaded files:
 ```{sh}
 sudo rm clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+clang -v
 ```
 
-**Modify your [PATH](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time)**
-
-Open the [`.bash_profile`](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=bash_profile#save-time) file with Terminal *nano* or [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) or another text editor:
-```{sh}
-export C_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/clang-c:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/install/prefix/include:$HOME/Dropbox/programs/clang/include/c++:$CPLUS_INCLUDE_PATH
-```
 
 #Linux
 
 Make sure you have GCC and CLANG with OpenMP enabled.
 Several flavors available, check for the proper [link](http://releases.llvm.org/download.html)
 
+#Install R
+
+To install R v.3.4.3 *Kite-Eating Tree* released on 2017/11/30 download the
+installer and follow the instructions
+```{sh}
+cd Downloads
+wget https://cran.r-project.org/bin/macosx/R-3.4.3.pkg
+```
+
+
+
+**To remove R completely from macOS**
+```{sh}
+sudo rm -rf /Library/Frameworks/R.framework /Applications/R.app \
+   /usr/bin/R /usr/bin/Rscript
+```
+
+#Rstudio
+
+To download RStudio, check thin [link](https://www.rstudio.com/products/rstudio/download/#download)
+and download the installer for your OS.
 
 
 #Makevars file
@@ -101,10 +116,6 @@ Several flavors available, check for the proper [link](http://releases.llvm.org/
 You need to tell R how to use the compilers. This might change from one package
 to another. Nothing is simple, you know this by now...
 All this is done through R's `~/.R/Makevars` file.
-
-Below, are exactly the same steps required to install [randomForestSRC](http://www.ccs.miami.edu/~hishwaran/rfsrc.html) and 
-[data.table](https://github.com/Rdatatable/data.table) to work in parallel.
-This is detailed in this vignette: [vignette_imputations_parallel](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_imputations_parallel.Rmd)
 
 With macOS use [TextWrangler](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) to open the file with `Show hidden items` turned `ON`. You want these lines:
 ```{sh}
@@ -133,9 +144,22 @@ sudo nano ~/.R/Makevars
 ```
 Copy/paste the section above. Save and Exit with: `crt-o`, `enter`, `crt-x`.
 
-#`rmetasim`
-Hang in there it's almost over...
 
+#Installing Libraries
+
+Below is how I setup most of my computers after a clean macOS install.
+I start with **devtools** and **tidyverse** than **grur** my packge with the 
+higher nnumber of dependencies, this way it's installing automatically 90%
+of the packages I need (including **radiator**).
+```{r}
+if (!require("devtools")) install.packages("devtools") # to install
+install.packages(tidyverse)
+devtools::install_github("thierrygosselin/grur")
+devtools::install_github("thierrygosselin/assigner")
+```
+
+
+#`rmetasim`
 
 ##Download
 Download the latest github release of Allan Strand's **rmetasim**
@@ -165,13 +189,13 @@ before compiling:
 
 
 ```{sh}
-CC=/Users/thierry/Dropbox/programs/clang/bin/clang # -fopenmp
-CC=/Users/thierry/Dropbox/programs/clang/bin/clang
-CXX=/Users/thierry/Dropbox/programs/clang/bin/clang++
-CXX1X=/Users/thierry/Dropbox/programs/clang/bin/clang++
-FLIBS=-L/Users/thierry/Dropbox/programs/clang/lib
-LDFLAGS=-L/Users/thierry/Dropbox/programs/clang/lib -L/usr/local/opt/gettext/lib
-CPPFLAGS=-I/Users/thierry/Dropbox/programs/clang/include -I/usr/local/opt/gettext/include
+CC=/usr/local/bin/clang # -fopenmp
+CC=/usr/local/bin/clang
+CXX=/usr/local/bin/clang++
+CXX1X=/usr/local/bin/clang++
+FLIBS=-L/usr/local/lib
+LDFLAGS=-L/usr/local/lib -L/usr/local/opt/gettext/lib
+CPPFLAGS=-I/usr/local/include -I/usr/local/opt/gettext/include
 SHLIB_OPENMP_CFLAGS= -fopenmp
 SHLIB_OPENMP_FCFLAGS= -fopenmp
 SHLIB_OPENMP_FFLAGS= -fopenmp
