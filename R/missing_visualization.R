@@ -620,7 +620,7 @@ missing_visualization <- function(
   blacklists.stats <- blacklists <- NULL
   
   # FH -------------------------------------------------------------------------
-  message("Calulation of FH: a measure of IBDg")
+  message("Calculation of FH: a measure of IBDg")
   fh <- radiator::ibdg_fh(data = tidy.data, verbose = FALSE)
   # fh <- ibdg_fh(data = tidy.data, verbose = FALSE)
   
