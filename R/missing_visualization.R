@@ -175,10 +175,9 @@ missing_visualization <- function(
   blacklist.id = NULL,
   blacklist.genotype = NULL,
   whitelist.markers = NULL,
-  monomorphic.out = TRUE,
-  max.marker = NULL,
-  snp.ld = NULL,
   common.markers = FALSE,
+  monomorphic.out = TRUE,
+  snp.ld = NULL,
   filename = NULL,
   parallel.core = parallel::detectCores() - 1,
   write.plot = TRUE
@@ -207,8 +206,23 @@ missing_visualization <- function(
   # import data ----------------------------------------------------------------
   message("\nImporting data")
   if (!is.null(filename)) filename <- stringi::stri_join(path.folder, "/", filename)
+  
+  # Check data.type, might be able to skip long import and filters
   data.type <- radiator::detect_genomic_format(data)
-  if (data.type %in% c("tbl_df", "fst.file")) {
+  
+  if (is.null(blacklist.id) && is.null(blacklist.genotype) && is.null(whitelist.markers) &&
+      !monomorphic.out && is.null(snp.ld) && !common.markers && is.null(pop.select)) {
+    if (data.type %in% c("tbl_df", "fst.file")) {
+      skip.import <- TRUE
+    } else {
+      skip.import <- FALSE
+    }
+  } else {
+    skip.import <- FALSE
+  }
+  
+  
+  if (skip.import) {
     want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN")
     if (data.type == "tbl_df") {
       tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
@@ -228,7 +242,6 @@ missing_visualization <- function(
       blacklist.genotype = blacklist.genotype,
       whitelist.markers = whitelist.markers,
       monomorphic.out = monomorphic.out,
-      max.marker = max.marker,
       snp.ld = snp.ld,
       common.markers = common.markers,
       strata = strata,
