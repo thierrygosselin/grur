@@ -60,7 +60,7 @@ tidy_sim <- function(sim.directory, write.tidy = TRUE, parallel.core = parallel:
         assign(x = sim, value = data, envir = envir)
       # }
       if (write.tidy) {
-        fst::write.fst(x = eval(as.name(sim)), path = stringi::stri_join(path, "/", sim, ".rad"), compress = 85)
+        #fst::write.fst(x = eval(as.name(sim)), path = stringi::stri_join(path, "/", sim, ".rad"), compress = 85)
       }
       
     }#End extract_save

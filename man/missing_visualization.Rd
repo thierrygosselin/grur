@@ -9,8 +9,8 @@ missing_visualization(data, vcf.metadata = FALSE, strata = NULL,
   ind.missing.geno.threshold = c(2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90),
   pop.levels = NULL, pop.labels = NULL, pop.select = NULL,
   blacklist.id = NULL, blacklist.genotype = NULL,
-  whitelist.markers = NULL, monomorphic.out = TRUE, max.marker = NULL,
-  snp.ld = NULL, common.markers = FALSE, filename = NULL,
+  whitelist.markers = NULL, common.markers = FALSE,
+  monomorphic.out = TRUE, snp.ld = NULL, filename = NULL,
   parallel.core = parallel::detectCores() - 1, write.plot = TRUE)
 }
 \arguments{
@@ -138,33 +138,30 @@ separators that interfere with some packages or codes:
 \code{_}.
 Default \code{whitelist.markers = NULL} for no whitelist of markers.}
 
+\item{common.markers}{(optional) Logical. Default: \code{common.markers = TRUE},
+will only keep markers in common (genotyped) between all the populations.}
+
 \item{monomorphic.out}{(optional) Should the monomorphic
 markers present in the dataset be filtered out ?
 Default: \code{monomorphic.out = TRUE}.}
 
-\item{max.marker}{(integer, optional) For large PLINK files,
-useful to subsample marker number. e.g. if the data set
-contains 200 000 markers and \code{max.marker = 10000}, 10000 markers are
-subsampled randomly from the 200000 markers. If you need specific markers,
-use \code{whitelist.markers} argument.
-Default: \code{max.marker = NULL}.}
-
 \item{snp.ld}{(optional) \strong{For data with locus and SNP info, like VCF and DArT file}.
 SNP short distance linkage disequilibrium pruning. With anonymous markers from
 RADseq/GBS de novo discovery, you can minimize linkage disequilibrium (LD) by
-choosing among these 4 options:
-\code{snp.ld = "random"} for a random selection of 1 SNP on the read,
-\code{snp.ld = "first"} for the first one on the read...,
-\code{snp.ld = "last"} for the last SNP on the read and
-\code{snp.ld = "middle"} for locus with > 2 SNPs/read the option to select at random
+choosing among these 5 options:
+\enumerate{
+\item \code{snp.ld = "random"} for a random selection of 1 SNP on the read,
+\item \code{snp.ld = "first"} for the first one on the read...,
+\item \code{snp.ld = "last"} for the last SNP on the read and
+\item \code{snp.ld = "middle"} for locus with > 2 SNPs/read the option to select at random
 one SNP between the first and the last SNP on the read. If the locus as <= 2
 SNPs on the read, the first one is selected. Note that for that last option,
-the numbers are reported. For long distance linkage
-disequilibrium pruning, see details below.
-Default: \code{snp.ld = NULL}.}
-
-\item{common.markers}{(optional) Logical. Default: \code{common.markers = TRUE},
-will only keep markers in common (genotyped) between all the populations.}
+the numbers are reported.
+\item \code{snp.ld = "maf"} will select the SNP on the locus with the maximum global
+Minor Allele Frequency (MAF).
+}
+For long distance linkage disequilibrium pruning, see details below.
+Default: \code{snp.ld = NULL}, for no pruning.}
 
 \item{filename}{(optional) Name of the tidy data set,
 written to the directory created by the function.}

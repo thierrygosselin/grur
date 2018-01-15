@@ -351,7 +351,7 @@
 # @importFrom base split
 #' @importFrom readr write_lines write_tsv
 #' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
-#' @importFrom fst write.fst
+# @importFrom fst write.fst
 #' @importFrom Matrix Matrix
 # @importFrom lightgbm lgb.Dataset lgb.train
 # @importFrom randomForestSRC impute.rfsrc
@@ -1278,7 +1278,8 @@ Please follow the vignette for install instructions", call. = FALSE)
             dplyr::group_by(MARKERS) %>%
             dplyr::mutate(GT_N = factorize_gt(GT)) %>%
             dplyr::ungroup(.)
-          fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
+            readr::write_tsv(x = data, path = "imputation_factor_dictionary.rad")
+          #fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
           data.boost <- data %>%
             dplyr::select(MARKERS, STRATA = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
             dplyr::arrange(MARKERS, STRATA, INDIVIDUALS) %>%
@@ -1296,7 +1297,7 @@ Please follow the vignette for install instructions", call. = FALSE)
             dplyr::group_by(MARKERS) %>%
             dplyr::mutate(GT_N = factorize_gt(GT)) %>%
             dplyr::ungroup(.)
-          fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
+          #fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
           
           data.boost <- data %>%
             dplyr::select(MARKERS, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
@@ -1555,7 +1556,7 @@ Please follow the vignette for install instructions", call. = FALSE)
           filename, "_subsample.markers_", subsample.markers, ".rad")
       }
       if (verbose) message("Writing the imputed data: \n", tidy.name)
-      fst::write.fst(x = data.imp, path = tidy.name, compress = 85)
+      #fst::write.fst(x = data.imp, path = tidy.name, compress = 85)
     }
     
     # Missing after imputation:
@@ -2497,7 +2498,8 @@ factorize_gt <- function(x) {
 
 defactorize_gt <- function(data.to.change,
                            data.with.info = "imputation_factor_dictionary.rad") {
-  data.with.info <- fst::read.fst(path = data.with.info)
+  #data.with.info <- fst::read.fst(path = data.with.info)
+  data.with.info <- readr::read_tsv(data.with.info)
   
   clean.id <- dplyr::distinct(.data = data.with.info, INDIVIDUALS, INDIVIDUALS_N)
   clean.gt <- dplyr::distinct(.data = data.with.info, MARKERS, GT, GT_N) %>%

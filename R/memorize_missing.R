@@ -58,7 +58,7 @@
 #' @rdname memorize_missing
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
 #' @importFrom radiator tidy_genomic_data
-#' @importFrom fst write.fst
+# @importFrom fst write.fst
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
@@ -153,7 +153,7 @@ memorize_missing <- function(
     message("\nWriting file to working directory")
     message("use:\n??fst::read.st \nfor documentation on how to import dataframe
 of missing patterns back in R")
-    fst::write.fst(x = missing.memories, path = filename)
+    #fst::write.fst(x = missing.memories, path = filename)
   }
   
   # Results --------------------------------------------------------------------

@@ -228,12 +228,12 @@ missing_visualization <- function(
       tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
       data <- NULL
     }
-    if (data.type == "fst.file") {
-      import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
-      import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
-      tidy.data <- fst::read.fst(path = data, columns = import.col)
-      import.col <- want <- NULL
-    }
+    #if (data.type == "fst.file") {
+     # import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
+      #import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
+      #tidy.data <- fst::read.fst(path = data, columns = import.col)
+      #import.col <- want <- NULL
+    #}
   } else {
     tidy.data <- radiator::tidy_genomic_data(
       data = data,
@@ -377,7 +377,7 @@ missing_visualization <- function(
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
   input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
   
-  fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
+  #fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
   input.rda <- list.files(path = path.folder, pattern = "input.rda.temp", full.names = TRUE)
   
   # euclidean distances between the rows

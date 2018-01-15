@@ -33,7 +33,6 @@ Imports:
     pbmcapply,
     pegas,
     radiator,
-    fst (>= 0.7.2),
     purrrlyr,
     strataG,
     rmetasim,

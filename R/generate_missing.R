@@ -319,7 +319,7 @@ missing_from_memory <- function(
   missing.column <- memorize.missing$column
 
   if (is.vector(mem.data)) {
-    mem.data <- fst::read.fst(mem.data)
+    #mem.data <- fst::read.fst(mem.data)
     if (!tibble::has_name(mem.data, missing.column)) stop("Check column naming in missing pattern dataframe")
   } else {
     mem.data <- mem.data
