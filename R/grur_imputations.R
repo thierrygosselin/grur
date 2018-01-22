@@ -885,7 +885,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     have <- colnames(data)
     
     # For haplotype VCF
-    if (!biallelic && ref.column) {
+    if (!biallelic && ref.column && tibble::has_name(input, "GT_VCF_NUC")) {
       want <- c("MARKERS", "CHROM", "LOCUS", "POS", "STRATA", "INDIVIDUALS", "GT_VCF_NUC", "GL")
       selected.columns <- purrr::keep(.x = have, .p = have %in% want)
       
