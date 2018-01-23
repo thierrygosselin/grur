@@ -885,7 +885,9 @@ Please follow the vignette for install instructions", call. = FALSE)
     have <- colnames(data)
     
     # For haplotype VCF
-    if (!biallelic && ref.column && tibble::has_name(input, "GT_VCF_NUC")) {
+      if (!biallelic && ref.column && tibble::has_name(data, "GT_VCF_NUC")) {
+      haplo.vcf.check <- TRUE
+      
       want <- c("MARKERS", "CHROM", "LOCUS", "POS", "STRATA", "INDIVIDUALS", "GT_VCF_NUC", "GL")
       selected.columns <- purrr::keep(.x = have, .p = have %in% want)
       
@@ -894,6 +896,8 @@ Please follow the vignette for install instructions", call. = FALSE)
         dplyr::mutate(GT = replace(GT_VCF_NUC, which(GT_VCF_NUC == "./."), NA)) %>%
         dplyr::select(-GT_VCF_NUC)
     } else {
+      haplo.vcf.check <- FALSE
+      
       want <- c("MARKERS", "CHROM", "LOCUS", "POS", "STRATA", "INDIVIDUALS", "GT", "GL")
       selected.columns <- purrr::keep(.x = have, .p = have %in% want)
       
@@ -1503,14 +1507,14 @@ Please follow the vignette for install instructions", call. = FALSE)
               "\n    2 options:",
               "\n    run the function again with hierarchical.levels = 'global'",
               "\n    use common.markers = TRUE when using hierarchical.levels = 'strata'")
-      if (!biallelic && ref.column) {
+      if (haplo.vcf.check) {
         data.imp$GT <- stringi::stri_replace_na(str = data.imp$GT, replacement = "./.")
       } else {
         data.imp$GT <- stringi::stri_replace_na(str = data.imp$GT, replacement = "000000")
       }
     }
     
-    if (!biallelic && ref.column) {
+    if (haplo.vcf.check) {
       data.imp <- dplyr::rename(data.imp, GT_VCF_NUC = GT)
     }
     

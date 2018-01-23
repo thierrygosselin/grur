@@ -159,6 +159,7 @@
 #' @importFrom cowplot plot_grid align_plots
 #' @importFrom tidyr spread gather
 #' @importFrom purrr map flatten_dbl flatten keep map_df
+#' @importFrom fst read.fst write.fst
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com} and Eric Archer \email{eric.archer@@noaa.gov}
 
@@ -228,12 +229,12 @@ missing_visualization <- function(
       tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
       data <- NULL
     }
-    #if (data.type == "fst.file") {
-     # import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
-      #import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
-      #tidy.data <- fst::read.fst(path = data, columns = import.col)
-      #import.col <- want <- NULL
-    #}
+    if (data.type == "fst.file") {
+    import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
+    import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
+    tidy.data <- fst::read.fst(path = data, columns = import.col)
+    import.col <- want <- NULL
+    }
   } else {
     tidy.data <- radiator::tidy_genomic_data(
       data = data,
@@ -377,7 +378,7 @@ missing_visualization <- function(
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
   input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
   
-  #fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
+  fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
   input.rda <- list.files(path = path.folder, pattern = "input.rda.temp", full.names = TRUE)
   
   # euclidean distances between the rows
@@ -735,9 +736,8 @@ missing_visualization <- function(
   # # Save tidy Note to myself: think it's saved when people use filename
   # saved via tidy_genomic_data.
   # fst::write.fst(x = tidy.data, path = file.path(path.folder, "tidy.data.rad"))
-  # tidy.data <- NULL
-  # test <- res$missing.genotypes.markers.overall
-  
+  tidy.data <- NULL
+
   markers.missing.geno.threshold <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ,0.8, 0.9)
   whitelists <- purrr::map(
     .x = markers.missing.geno.threshold,

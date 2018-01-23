@@ -40,7 +40,8 @@ Imports:
     cowplot,
     ggpubr,
     Matrix,
-    ggridges
+    ggridges,
+    fst
 Suggests:
     xgboost,
     ranger,
@@ -51,7 +52,8 @@ Suggests:
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
-    github::kvnkuang/pbmcapply
+    github::kvnkuang/pbmcapply,
+    github::fstPackage/fst@b6eadb4
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr
