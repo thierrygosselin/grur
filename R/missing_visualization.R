@@ -390,9 +390,7 @@ missing_visualization <- function(
   
   # for metric PCoA/MDS
   # ibm <- ape::pcoa(D = d) 
-  ibm <- ape::pcoa(
-    D = stats::dist(
-      x = input.pcoa, method = distance.method)) #Legendre's ape
+  ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method)) #Legendre's ape
   input.pcoa <- NULL
   
   # ibm$correction # test
