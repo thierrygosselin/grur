@@ -9,7 +9,7 @@
 
 #' @param num.loci (integer) Number of independent RADseq loci.
 #' To use more than 2000 loci, \pkg{rmetasim} needs to be modified
-#' (\href{https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_rmetasim_installation.Rmd}{vignette}).
+#' (\href{https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_grur.Rmd}{vignette}).
 #' Default: \code{num.loci = 1000}.
 
 #' @param div.time  (integer) Time since divergence of populations.
