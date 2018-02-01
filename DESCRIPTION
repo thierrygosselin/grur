@@ -52,8 +52,7 @@ Suggests:
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
-    github::kvnkuang/pbmcapply,
-    github::fstPackage/fst@b6eadb4
+    github::kvnkuang/pbmcapply
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr

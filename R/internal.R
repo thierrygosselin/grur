@@ -691,7 +691,7 @@ missing_rda <- function(
 ) {
   res <- list()
   if (is.vector(data)) {
-    #res$data.pcoa <- fst::read.fst(data)
+    res$data.pcoa <- fst::read.fst(data)
   } else {
     res$data.pcoa <- dplyr::ungroup(data)
   }
