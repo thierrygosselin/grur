@@ -1,6 +1,6 @@
 Package: grur
 Type: Package
-Title: grur: an R package tailored for RADseq data imputations
+Title: RADseq data imputations
 Version: 0.0.9
 Date: 2017-10-27
 Encoding: UTF-8
