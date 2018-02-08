@@ -1,6 +1,6 @@
 Package: grur
 Type: Package
-Title: RADseq data imputations
+Title: Imputations of RADseq data
 Version: 0.0.9
 Date: 2017-10-27
 Encoding: UTF-8
