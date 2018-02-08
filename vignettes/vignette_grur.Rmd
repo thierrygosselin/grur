@@ -120,7 +120,7 @@ All this is done through R's `~/.R/Makevars` file.
 If you don't have the file, the fastest way is to use the built-in nano editor in the Terminal to create one:
 ```{sh}
 cd ~
-sudo mkdir ~/.R
+mkdir ~/.R
 ```
 
 ```{sh}

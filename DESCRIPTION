@@ -9,7 +9,7 @@ Authors@R: c(
   person("Eric", "Archer", email = "eric.archer@noaa.gov", role = c("aut"))
   )
 Maintainer: Thierry Gosselin <thierrygosselin@icloud.com>
-Description: grur: an R package tailored for RADseq data imputations.
+Description: RADseq data imputations.
 Depends:
     R (>= 3.2.3)
 Imports:

@@ -667,7 +667,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' @title missing_rda
 #' @description The function uses Permutation test Anova and
 #' Redundancy Analysis to highlight potential patterns of missingness in the data
-#' basedon the strata provided
+#' based on the strata provided
 #' @rdname missing_rda
 #' @importFrom dplyr group_by left_join summarise mutate filter ungroup select arrange
 #' @importFrom tidyr gather spread
