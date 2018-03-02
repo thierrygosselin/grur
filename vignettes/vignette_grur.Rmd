@@ -23,7 +23,7 @@ Additionally, macOS and Linux users will find the instructions to install
 some need to be compiled with OpenMP enabled.
 
 
-**Time to allow: ETA ~15 min**
+**Time to allow: ETA ~20 min**
 
 #macOS
 
@@ -356,4 +356,21 @@ To install [pcaMethods](https://github.com/hredestig/pcaMethods), from bioconduc
 ```{r}
 source("https://bioconductor.org/biocLite.R")
 biocLite("pcaMethods")
+```
+
+#`fastsimcoal2`
+To install [fastsimcoal2 v.2.6.0.3](http://cmpg.unibe.ch/software/fastsimcoal2/), to use in 
+`grur::simulate_rad`:
+```{sh}
+# In a new Terminal window
+#LINUX
+wget http://cmpg.unibe.ch/software/fastsimcoal2/downloads/fsc26_linux64.zip
+unzip fsc26_linux64.zip
+sudo mv fsc26_linux64/fsc26 /usr/local/bin/fsc26
+sudo chmod 777 /usr/local/bin/fsc26
+#macOS
+wget http://cmpg.unibe.ch/software/fastsimcoal2/downloads/fsc26_mac64.zip
+unzip fsc26_mac64.zip
+sudo mv fsc26_mac64/fsc26 /usr/local/bin/fsc26
+sudo chmod 777 /usr/local/bin/fsc26
 ```

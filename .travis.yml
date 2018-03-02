@@ -13,3 +13,6 @@ notifications:
 
 apt_packages:
   - libgsl0-dev
+os:
+  - linux
+  - osx
