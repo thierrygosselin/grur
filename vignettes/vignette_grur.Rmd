@@ -168,7 +168,7 @@ devtools::install_github("thierrygosselin/assigner")
 #`rmetasim`
 
 ##Download
-Download the latest github release of Allan Strand's **rmetasim**
+Download the latest github release (3.1.7) of Allan Strand's **rmetasim**
 ```{sh}
 cd Downloads
 wget https://github.com/stranda/rmetasim/archive/master.zip

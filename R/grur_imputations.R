@@ -342,7 +342,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom dplyr distinct group_by ungroup rename arrange tally filter select select_ one_of mutate mutate_all summarise left_join funs bind_rows
 #' @importFrom tidyr gather unite drop_na
-#' @importFrom purrr map flatten keep discard flatten_chr flatten_dbl flatten_lgl
+#' @importFrom purrr map flatten keep discard flatten_chr flatten_dbl flatten_lgl safely
 #' @importFrom purrrlyr invoke_rows
 #' @importFrom stringi stri_replace_na
 #' @importFrom tibble has_name as_data_frame
