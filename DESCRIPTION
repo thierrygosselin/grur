@@ -41,7 +41,7 @@ Imports:
     ggpubr,
     Matrix,
     ggridges,
-    fst
+    fst (>= 0.8.4)
 Suggests:
     xgboost,
     ranger,
