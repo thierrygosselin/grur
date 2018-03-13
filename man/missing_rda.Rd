@@ -10,6 +10,6 @@ missing_rda(data, strata, permutations = 1000,
 \description{
 The function uses Permutation test Anova and
 Redundancy Analysis to highlight potential patterns of missingness in the data
-basedon the strata provided
+based on the strata provided
 }
 \keyword{internal}
