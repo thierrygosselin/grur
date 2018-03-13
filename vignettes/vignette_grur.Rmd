@@ -159,7 +159,7 @@ higher nnumber of dependencies, this way it's installing automatically 90%
 of the packages I need (including **radiator**).
 ```{r}
 if (!require("devtools")) install.packages("devtools") # to install
-install.packages(tidyverse)
+install.packages("tidyverse")
 devtools::install_github("thierrygosselin/grur")
 devtools::install_github("thierrygosselin/assigner")
 ```
