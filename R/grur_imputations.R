@@ -803,6 +803,10 @@ Please follow the vignette for install instructions", call. = FALSE)
     }
     strata.df <- NULL
 
+    if (tibble::has_name(data, "POP_ID") && !tibble::has_name(data, "STRATA")) {
+      data <- dplyr::rename(data, STRATA = POP_ID)
+    }
+    
     # Subsampling markers ------------------------------------------------------
     if (!is.null(subsample.markers)) {
       # subsample.markers <- 500
@@ -1742,7 +1746,6 @@ grur_imputer <- function(
 #' @description imputations using Ranger package and predictive mean matching of missRanger
 #' @rdname impute_genotypes
 #' @keywords internal
-#' @export
 #' @export
 
 impute_genotypes <- function(
