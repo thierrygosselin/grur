@@ -490,7 +490,7 @@ Please follow the vignette for install instructions", call. = FALSE)
         "num.tree", "nodesize", "nsplit", "nimpute", "ncp", "boosting",
         "objective", "learning_rate",
         "feature_fraction", "bagging_fraction", "bagging_freq",
-        "max_depth", "min_data_in_leaf", "num_leaves",
+        "min_data_in_leaf", "num_leaves",
         "early_stopping_rounds", "iteration.subsample"))
     
     if (length(unknowned_param) > 0) {
@@ -507,7 +507,7 @@ Please follow the vignette for install instructions", call. = FALSE)
                                "nimpute", "ncp",
                                "boosting", "objective", "learning_rate",
                                "feature_fraction", "bagging_fraction", "bagging_freq",
-                               "max_depth", "min_data_in_leaf", "num_leaves",
+                               "min_data_in_leaf", "num_leaves",
                                "early_stopping_rounds", "iteration.subsample"
                              )]
     
@@ -624,7 +624,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     if (!is.null(boost.dots[["max_depth"]])) {
       max_depth <- boost.dots[["max_depth"]]
     } else {
-      if (imputation.method == "boost") max_depth = 6
+      if (imputation.method == "xgboost") max_depth = 6
       if (imputation.method == "lightgbm") max_depth = -1# infinite depth
     }
     
@@ -1525,7 +1525,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     # Compute REF/ALT allele... might have change depending on prop of missing values
     if (verbose) message("Adjusting REF/ALT alleles to account for imputations...")
     data.imp <- radiator::change_alleles(
-      data = data.imp,
+      data = dplyr::rename(data.imp, POP_ID = STRATA),
       biallelic = biallelic,
       parallel.core = parallel.core,
       verbose = verbose)$input
@@ -1533,7 +1533,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     if (tibble::has_name(data.imp, "POLYMORPHIC.x")) data.imp <- dplyr::select(data.imp, -POLYMORPHIC.x)
     if (tibble::has_name(data.imp, "POLYMORPHIC.y")) data.imp <- dplyr::select(data.imp, -POLYMORPHIC.y)
     
-    
+    data.imp <- dplyr::rename(data.imp, STRATA = POP_ID)
     # Integrate markers.meta columns and sort
     if (!is.null(markers.meta)) {
       want <- c( "MARKERS", "CHROM", "LOCUS", "POS", "STRATA",
