@@ -268,7 +268,9 @@ whitelists_markers_generator <- function(x, y, path.folder) {
     dplyr::select(dplyr::one_of(markers.meta)) %>% 
     dplyr::distinct(MARKERS, .keep_all = TRUE)
   
-  if (length(whitelist.missing.geno$MARKERS) > 0) {
+  n.whitelisted.markers <- nrow(whitelist.missing.geno)
+  n.markers <- nrow(y)
+  if (n.whitelisted.markers > 0 && n.whitelisted.markers < n.markers) {
     whitelist.name <- stringi::stri_join("whitelist.markers.missing.max.", x)
     readr::write_tsv(
       whitelist.missing.geno,
@@ -673,7 +675,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' @importFrom tidyr gather spread
 #' @importFrom purrr map flatten_chr keep
 #' @importFrom broom tidy
-# @importFrom fst read.fst
+#' @importFrom fst read.fst
 #' @importFrom ape pcoa
 #' @importFrom adespatial dist.ldc
 #' @importFrom stats as.formula

@@ -160,6 +160,8 @@
 #' @importFrom tidyr spread gather
 #' @importFrom purrr map flatten_dbl flatten keep map_df
 #' @importFrom fst read.fst write.fst
+#' @importFrom data.table as.data.table dcast.data.table melt.data.table
+
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com} and Eric Archer \email{eric.archer@@noaa.gov}
 
@@ -370,8 +372,15 @@ missing_visualization <- function(
   
   input.pcoa <- tidy.data %>%
     dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
-    dplyr::group_by(POP_ID, INDIVIDUALS) %>%
-    tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
+    data.table::as.data.table(.) %>%
+    data.table::dcast.data.table(
+      data = .,
+      formula = POP_ID + INDIVIDUALS ~ MARKERS,
+      value.var = "GT_MISSING_BINARY"
+    ) %>%
+    tibble::as_data_frame(.) %>% 
+    # dplyr::group_by(INDIVIDUALS, POP_ID) %>%
+    # tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
     dplyr::ungroup(.)
   
   # we need rownames for this
@@ -741,7 +750,8 @@ missing_visualization <- function(
     .x = markers.missing.geno.threshold,
     .f = whitelists_markers_generator,
     y = res$missing.genotypes.markers.overall,
-    path.folder = path.folder) %>% purrr::flatten(.)
+    path.folder = path.folder) %>%
+    purrr::flatten(.)
   
   message("Whitelist(s) of markers generated: ", length(whitelists))
   whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 

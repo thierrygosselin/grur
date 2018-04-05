@@ -26,7 +26,6 @@ Imports:
     broom,
     vegan,
     parallel,
-    amap,
     magrittr,
     stats,
     utils,
@@ -41,7 +40,8 @@ Imports:
     ggpubr,
     Matrix,
     ggridges,
-    fst (>= 0.8.4)
+    fst (>= 0.8.4),
+    data.table
 Suggests:
     xgboost,
     ranger,

@@ -1192,6 +1192,8 @@ Please follow the vignette for install instructions", call. = FALSE)
         if (verbose) message("On-the-fly-imputations using Random Forests algorithm")
         
         # Parallel computations options for randomForestSRC
+        rf.option <- getOption("rf.cores")
+        mc.option <- getOption("mc.cores")
         options(rf.cores = parallel.core, mc.cores = parallel.core)
         
         # prepare data
@@ -1240,6 +1242,10 @@ Please follow the vignette for install instructions", call. = FALSE)
           data.imp <- decoding_haplotypes(
             data = data.imp, parallel.core = parallel.core)
         }
+        
+        
+        # Restore original Parallel computations options
+        options(rf.cores = rf.option, mc.cores = mc.option)
       }# End on-the-fly-imputations using RF
       
       # Random Forest imputation as a prediction problem -------------------------
