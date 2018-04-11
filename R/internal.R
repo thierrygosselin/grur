@@ -685,7 +685,6 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' @keywords internal
 #' @export
 
-
 missing_rda <- function(
   data, strata, 
   permutations = 1000, 
@@ -693,22 +692,12 @@ missing_rda <- function(
 ) {
   res <- list()
   if (is.vector(data)) {
-    res$data.pcoa <- radiator::read_rad(data)
+    res$data.pcoa <- radiator::read_rad(data) %>% 
+      dplyr::ungroup(.)
   } else {
     res$data.pcoa <- dplyr::ungroup(data)
   }
-  res$data.pcoa <- dplyr::ungroup(res$data.pcoa)
   data <- NULL
-  
-  # res$data.pcoa <- dplyr::ungroup(data) %>% 
-  #   dplyr::select(INDIVIDUALS, MARKERS, GT_BIN) %>%
-  #   dplyr::mutate(GT_BIN = as.numeric(dplyr::if_else(is.na(GT_BIN), "1", "0"))) %>%
-  #   dplyr::group_by(INDIVIDUALS) %>% 
-  #   tidyr::spread(data = ., key = MARKERS, value = GT_BIN) %>% 
-  #   dplyr::ungroup(.) %>% 
-  #   dplyr::select(-INDIVIDUALS) %>% 
-  #   tibble::remove_rownames(.)
-  # suppressWarnings(rownames(res$data.pcoa) <- strata$INDIVIDUALS)
   
   # PCoA on Jaccard distance (binary)
   res$data.pcoa <- ape::pcoa(
@@ -719,6 +708,7 @@ missing_rda <- function(
     rn = strata$INDIVIDUALS)
   # D is Euclidean because the function outputs D[jk] = sqrt(1-S[jk])
   
+  # Anova on the pcoa data
   rda_anova <- function(
     strata.select, 
     data.pcoa, 
@@ -777,7 +767,7 @@ missing_rda <- function(
     
     message("\nHypothesis based on the strata provided")
     message("    Null Hypothesis (H0): No pattern of missingness in the data between strata")
-    message("    Null Hypothesis (H0): Presence of pattern(s) of missingness in the data between strata\n")
+    message("    Alternative Hypothesis (H1): Presence of pattern(s) of missingness in the data between strata\n")
     # message("    p-value: ", data.anova$p.value[1], "\n")
     print(p.value.message)
     message("    note: low p-value -> reject the null hypothesis\n")
