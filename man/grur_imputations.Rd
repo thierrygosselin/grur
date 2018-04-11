@@ -101,9 +101,7 @@ that will be used to initialize the random generator. With default,
 a random number is generated. Currently not implemented for XGBoost and LightGBM.
 Default: \code{random.seed = NULL}.}
 
-\item{filename}{(optional) The function uses \code{\link[fst]{write.fst}},
-to write the tidy data frame in
-the working directory. The file extension appended to
+\item{filename}{(optional) The file extension appended to
 the \code{filename} provided is \code{.rad}.
 With default: \code{filename = NULL}, the imputed tidy data frame is
 in the global environment only (i.e. not written in the working directory...).}

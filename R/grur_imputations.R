@@ -141,9 +141,7 @@
 #' Default: \code{cpu_boost = parallel::detectCores() / 2}.
 
 
-#' @param filename (optional) The function uses \code{\link[fst]{write.fst}},
-#' to write the tidy data frame in
-#' the working directory. The file extension appended to
+#' @param filename (optional) The file extension appended to
 #' the \code{filename} provided is \code{.rad}.
 #' With default: \code{filename = NULL}, the imputed tidy data frame is
 #' in the global environment only (i.e. not written in the working directory...).
@@ -343,7 +341,7 @@
 #' @importFrom dplyr distinct group_by ungroup rename arrange tally filter select select_ one_of mutate mutate_all summarise left_join funs bind_rows
 #' @importFrom tidyr gather unite drop_na
 #' @importFrom purrr map flatten keep discard flatten_chr flatten_dbl flatten_lgl safely
-#' @importFrom purrrlyr invoke_rows
+# @importFrom purrrlyr invoke_rows
 #' @importFrom stringi stri_replace_na
 #' @importFrom tibble has_name as_data_frame
 #' @importFrom stats predict reformulate as.formula
@@ -351,7 +349,6 @@
 # @importFrom base split
 #' @importFrom readr write_lines write_tsv
 #' @importFrom radiator tidy_wide change_alleles detect_biallelic_markers
-# @importFrom fst write.fst
 #' @importFrom Matrix Matrix
 # @importFrom lightgbm lgb.Dataset lgb.train
 # @importFrom randomForestSRC impute.rfsrc
@@ -762,11 +759,8 @@ Please follow the vignette for install instructions", call. = FALSE)
     message("\nSeed: ", random.seed)
     
     # Import data --------------------------------------------------------------
-    if (is.vector(data)) {
-      data <- radiator::tidy_wide(data = data, import.metadata = TRUE)
-    }
-    data <- dplyr::ungroup(data)
-    
+    data <- radiator::tidy_wide(data = data, import.metadata = TRUE)
+
     # strata--------------------------------------------------------------------
     if (!is.null(strata)) {
       if (tibble::has_name(data, "POP_ID")) data <- dplyr::select(data, -POP_ID)
@@ -802,7 +796,7 @@ Please follow the vignette for install instructions", call. = FALSE)
       data <- dplyr::left_join(data, strata.df, by = "INDIVIDUALS")
     }
     strata.df <- NULL
-
+    
     if (tibble::has_name(data, "POP_ID") && !tibble::has_name(data, "STRATA")) {
       data <- dplyr::rename(data, STRATA = POP_ID)
     }
@@ -889,7 +883,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     have <- colnames(data)
     
     # For haplotype VCF
-      if (!biallelic && ref.column && tibble::has_name(data, "GT_VCF_NUC")) {
+    if (!biallelic && ref.column && tibble::has_name(data, "GT_VCF_NUC")) {
       haplo.vcf.check <- TRUE
       
       want <- c("MARKERS", "CHROM", "LOCUS", "POS", "STRATA", "INDIVIDUALS", "GT_VCF_NUC", "GL")
@@ -1292,7 +1286,7 @@ Please follow the vignette for install instructions", call. = FALSE)
             dplyr::group_by(MARKERS) %>%
             dplyr::mutate(GT_N = factorize_gt(GT)) %>%
             dplyr::ungroup(.)
-            readr::write_tsv(x = data, path = "imputation_factor_dictionary.rad")
+          readr::write_tsv(x = data, path = "imputation_factor_dictionary.rad")
           #fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
           data.boost <- data %>%
             dplyr::select(MARKERS, STRATA = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
@@ -1791,24 +1785,24 @@ impute_genotypes <- function(
   
   if (!is.null(data.gl)) {
     # mean GL per sample
-    case.weights <- suppressWarnings(
-      dplyr::select(.data = data.complete, INDIVIDUALS) %>%
-        dplyr::left_join(data.gl, by = "INDIVIDUALS") %>%
-        dplyr::ungroup(.) %>%
-        dplyr::select(-dplyr::one_of(c("STRATA", "INDIVIDUALS"))) %>%
-        purrrlyr::invoke_rows(.f = purrr::lift_vd(mean), .to = "GL", .collate = "cols") %>%
-        dplyr::select(GL) %>%
-        purrr::flatten_dbl(.)
-    )
+    # case.weights <- suppressWarnings(
+    #   dplyr::select(.data = data.complete, INDIVIDUALS) %>%
+    #     dplyr::left_join(data.gl, by = "INDIVIDUALS") %>%
+    #     dplyr::ungroup(.) %>%
+    #     dplyr::select(-dplyr::one_of(c("STRATA", "INDIVIDUALS"))) %>%
+    #     purrrlyr::invoke_rows(.f = purrr::lift_vd(mean), .to = "GL", .collate = "cols") %>%
+    #     dplyr::select(GL) %>%
+    #     purrr::flatten_dbl(.)
+    # )
     # mean GL per markers
-    split.select.weights <- suppressWarnings(
-      dplyr::select(.data = data.complete, INDIVIDUALS) %>%
-        dplyr::left_join(data.gl, by = "INDIVIDUALS") %>%
-        dplyr::ungroup(.) %>%
-        dplyr::select(-dplyr::one_of(c(m, "STRATA", "INDIVIDUALS"))) %>%
-        dplyr::summarise_all(.tbl = ., .funs = mean) %>%
-        purrr::flatten_dbl(.)
-    )
+    # split.select.weights <- suppressWarnings(
+    #   dplyr::select(.data = data.complete, INDIVIDUALS) %>%
+    #     dplyr::left_join(data.gl, by = "INDIVIDUALS") %>%
+    #     dplyr::ungroup(.) %>%
+    #     dplyr::select(-dplyr::one_of(c(m, "STRATA", "INDIVIDUALS"))) %>%
+    #     dplyr::summarise_all(.tbl = ., .funs = mean) %>%
+    #     purrr::flatten_dbl(.)
+    # )
   } else {
     case.weights <- NULL
     split.select.weights <- NULL

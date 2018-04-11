@@ -675,13 +675,13 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' @importFrom tidyr gather spread
 #' @importFrom purrr map flatten_chr keep
 #' @importFrom broom tidy
-#' @importFrom fst read.fst
 #' @importFrom ape pcoa
 #' @importFrom adespatial dist.ldc
 #' @importFrom stats as.formula
 #' @importFrom stringi stri_join
 #' @importFrom broom tidy
 #' @importFrom vegan anova.cca rda
+#' @importFrom radiator read_rad
 #' @keywords internal
 #' @export
 
@@ -693,7 +693,7 @@ missing_rda <- function(
 ) {
   res <- list()
   if (is.vector(data)) {
-    res$data.pcoa <- fst::read.fst(data)
+    res$data.pcoa <- radiator::read_rad(data)
   } else {
     res$data.pcoa <- dplyr::ungroup(data)
   }

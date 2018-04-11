@@ -19,7 +19,6 @@ Imports:
     tibble,
     tidyr,
     ggplot2,
-    vcfR (>= 1.3.0),
     stringi,
     ape,
     adespatial,
@@ -30,19 +29,15 @@ Imports:
     stats,
     utils,
     pbmcapply,
-    pegas,
     radiator,
-    purrrlyr,
     strataG,
-    rmetasim,
     rlang,
     cowplot,
     ggpubr,
     Matrix,
-    ggridges,
-    fst (>= 0.8.4),
     data.table
 Suggests:
+    rmetasim,
     xgboost,
     ranger,
     missRanger,
@@ -52,7 +47,6 @@ Suggests:
     rmarkdown
 Remotes:
     github::thierrygosselin/radiator,
-    github::kvnkuang/pbmcapply
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr

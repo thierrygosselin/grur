@@ -27,7 +27,7 @@
 #' environment only.
 #' 
 #' \code{grur} takes advantage of the lightweight and speedy file reading/writing
-#' package \pkg{fst} (\emph{Lightning Fast Serialization of Data Frames for R})
+#' package \code{fst} (\emph{Lightning Fast Serialization of Data Frames for R})
 #' to write the dataframe to the working directory. This file can be used inside
 #' \code{\link[grur]{generate_missing}} function.
 
@@ -58,7 +58,6 @@
 #' @rdname memorize_missing
 #' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
 #' @importFrom radiator tidy_genomic_data
-# @importFrom fst write.fst
 
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 

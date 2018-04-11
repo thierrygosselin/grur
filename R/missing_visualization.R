@@ -155,11 +155,10 @@
 #' @importFrom ape pcoa
 #' @importFrom stats dist lm
 #' @importFrom tibble data_frame
-#' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh detect_all_missing
+#' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh detect_all_missing write_rad
 #' @importFrom cowplot plot_grid align_plots
 #' @importFrom tidyr spread gather
 #' @importFrom purrr map flatten_dbl flatten keep map_df
-#' @importFrom fst read.fst write.fst
 #' @importFrom data.table as.data.table dcast.data.table melt.data.table
 
 
@@ -232,9 +231,9 @@ missing_visualization <- function(
       data <- NULL
     }
     if (data.type == "fst.file") {
-    import.col <- colnames(fst::read.fst(path = data, from = 1, to = 1))
+    import.col <- colnames(radiator::read_rad(data = data, from = 1, to = 1))
     import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
-    tidy.data <- fst::read.fst(path = data, columns = import.col)
+    tidy.data <- radiator::read_rad(data = data, columns = import.col)
     import.col <- want <- NULL
     }
   } else {
@@ -387,7 +386,7 @@ missing_visualization <- function(
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
   input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
   
-  fst::write.fst(x = input.pcoa, path = file.path(path.folder, "input.rda.temp"), compress = 85)
+  radiator::write_rad(data = input.pcoa, path = file.path(path.folder, "input.rda.temp"))
   input.rda <- list.files(path = path.folder, pattern = "input.rda.temp", full.names = TRUE)
   
   # euclidean distances between the rows

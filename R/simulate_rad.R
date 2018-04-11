@@ -74,7 +74,6 @@
 #' @importFrom readr write_tsv
 #' @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
 # @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
-#' @import rmetasim
 #' @export
 simulate_rad <- function(
   num.pops = 5,
@@ -95,6 +94,13 @@ simulate_rad <- function(
   cat("#######################################################################\n")
   cat("######################### grur::simulate_rad ##########################\n")
   cat("#######################################################################\n")
+  
+  # Check if rmetasim installed ------------------------------------------------
+    if (!requireNamespace("rmetasim", quietly = TRUE)) {
+      stop("rmetasim needed for this function to work.
+Please follow the vignette for install instructions", call. = FALSE)
+    }
+  
   timing <- proc.time()
   
   num.pops <- sort(unique(num.pops))
