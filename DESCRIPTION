@@ -13,40 +13,40 @@ Description: RADseq data imputations.
 Depends:
     R (>= 3.2.3)
 Imports:
+    adespatial,
+    ape,
+    broom,
+    cowplot,
+    data.table,
     dplyr (>= 0.7.0),
+    ggplot2,
+    ggpubr,
+    magrittr,
+    Matrix,
+    parallel,
+    pbmcapply,
     purrr,
+    radiator,
     readr,
+    rlang,
+    stats,
+    strataG,
+    stringi,
     tibble,
     tidyr,
-    ggplot2,
-    stringi,
-    ape,
-    adespatial,
-    broom,
-    vegan,
-    parallel,
-    magrittr,
-    stats,
     utils,
-    pbmcapply,
-    radiator,
-    strataG,
-    rlang,
-    cowplot,
-    ggpubr,
-    Matrix,
-    data.table
+    vegan
 Suggests:
-    rmetasim,
-    xgboost,
-    ranger,
+    knitr,
+    lightgbm,
     missRanger,
     randomForestSRC,
-    lightgbm,
-    knitr,
-    rmarkdown
+    ranger,
+    rmarkdown,
+    rmetasim,
+    xgboost
 Remotes:
-    github::thierrygosselin/radiator,
+    github::thierrygosselin/radiator
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr

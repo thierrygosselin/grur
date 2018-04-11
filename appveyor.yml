@@ -16,10 +16,11 @@ install:
 environment:
   global:
     USE_RTOOLS: true
+    _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 build_script:
   - travis-tool.sh install_github thierrygosselin/radiator
-  - travis-tool.sh install_deps
+  #- travis-tool.sh install_deps
   - travis-tool.sh install_r R.oo R.utils
 
 test_script:
