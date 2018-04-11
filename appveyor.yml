@@ -15,8 +15,8 @@ install:
 # Adapt as necessary starting from here
 environment:
   global:
-    USE_RTOOLS: true
-    _R_CHECK_FORCE_SUGGESTS_=FALSE
+    USE_RTOOLS: true,
+    -_R_CHECK_FORCE_SUGGESTS_=FALSE
 
 build_script:
   - travis-tool.sh install_github thierrygosselin/radiator
