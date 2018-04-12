@@ -59,6 +59,8 @@ stone models.
 Inside the function, allele frequency can be created with
 \href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal2} and then used
 inside \href{https://github.com/stranda/rmetasim}{rmetasim} simulation engine.
+The function requires \href{https://github.com/EricArcher/strataG}{strataG}
+to be installed.
 }
 \details{
 \strong{fastsimcoal2: }
@@ -89,8 +91,20 @@ The following arguments can be specified as single values or vectors:
  the parameters that generated the data and a "\code{label}" attribute which 
  is the label of the set of scenarios that were run.
 }
+\examples{
+\dontrun{
+require(strataG)
+require(rmetasim)
+library(grur)
+sim <- grur::simulate_rad(
+num.pops = 3, num.loci = 200, div.time = 1000, ne = c(50,200),
+nm = c(0, 0.1), theta = 0.2, mig.type = c("island", "stepping.stone"), 
+num.reps = 3, num.rms.gens = 5, label = NULL, fsc.exec = "fsc26", 
+parallel.core = 4)
+}
+}
 \seealso{
-\code{\link[strataG]{strataG}}
+\href{https://github.com/EricArcher/strataG}{strataG}
 }
 \author{
 Eric Archer \email{eric.archer@noaa.gov} and Thierry Gosselin \email{thierrygosselin@icloud.com}

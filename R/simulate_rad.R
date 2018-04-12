@@ -4,6 +4,10 @@
 #' Inside the function, allele frequency can be created with
 #' \href{http://cmpg.unibe.ch/software/fastsimcoal2/}{fastsimcoal2} and then used
 #' inside \href{https://github.com/stranda/rmetasim}{rmetasim} simulation engine.
+#' The function requires \href{https://github.com/EricArcher/strataG}{strataG}
+#' to be installed.
+#' 
+#' 
 #' @param num.pops (integer) Number of populations.
 #' Default: \code{num.pops = 5}.
 
@@ -35,6 +39,17 @@
 #' execution.
 #' Default: \code{parallel.core = parallel::detectCores() - 1}.
 
+#' @examples 
+#' \dontrun{
+#' require(strataG)
+#' require(rmetasim)
+#' library(grur)
+#' sim <- grur::simulate_rad(
+#' num.pops = 3, num.loci = 200, div.time = 1000, ne = c(50,200),
+#' nm = c(0, 0.1), theta = 0.2, mig.type = c("island", "stepping.stone"), 
+#' num.reps = 3, num.rms.gens = 5, label = NULL, fsc.exec = "fsc26", 
+#' parallel.core = 4)
+#' }
 
 #' @details 
 #' \strong{fastsimcoal2: }
@@ -67,12 +82,12 @@
 
 #' @return invisibly, the label used to name output files
 
-#' @seealso \code{\link[strataG]{strataG}}
+#' @seealso \href{https://github.com/EricArcher/strataG}{strataG}
 
 #' @author Eric Archer \email{eric.archer@@noaa.gov} and Thierry Gosselin \email{thierrygosselin@@icloud.com}
 #' 
 #' @importFrom readr write_tsv
-#' @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
+# @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
 # @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
 #' @export
 simulate_rad <- function(
@@ -100,6 +115,10 @@ simulate_rad <- function(
       stop("rmetasim needed for this function to work.
 Please follow the vignette for install instructions", call. = FALSE)
     }
+  if (!requireNamespace("strataG", quietly = TRUE)) {
+    stop("strataG needed for this function to work
+         Install with install.packages('strataG')", call. = FALSE)
+  }
   
   timing <- proc.time()
   
