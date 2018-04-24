@@ -58,6 +58,8 @@
 #' For \code{missing_visualization} function, use additional columns in the strata
 #' file to store metadata that you want to look for pattern of missingness.
 #' e.g. lanes, chips, sequencers, etc.
+#' Note that you need different values inside the \code{STRATA} for the function
+#' to work.
 #' Default: \code{strata = NULL}.
 
 #' @param strata.select (optional, character) Use this argument to select the column
@@ -279,7 +281,9 @@ missing_visualization <- function(
   # # check strata.select
   # if (!isTRUE(unique(strata.select %in% strata.col))) stop("strata.select not matching columns in strata")
 
-    
+  strata.select <- c("POP_ID", "LANES")
+  tidy.data <- tibble::data_frame(INDIVIDUALS = c("1", "2", "3", "4"), POP_ID = c("1", "2", "1", "2"), LANES = c("1", "1", "2", "2"))
+  
   strata.df <- suppressWarnings(
     dplyr::ungroup(tidy.data) %>%
       dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
@@ -288,6 +292,16 @@ missing_visualization <- function(
       #                    "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
       dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
 
+  # Check if stata have different values
+  check.levels <- function(x) nlevels(factor(x)) > 1
+  strata.check <- dplyr::select(strata.df, -INDIVIDUALS) %>% 
+    dplyr::distinct(strata.select) %>% 
+    dplyr::summarise_all(.tbl = ., .funs = check.levels) %>% 
+    purrr::flatten_lgl(.) %>% 
+    unique
+  if (!isTRUE(strata.check)) stop("more than 1 value in strata groupings required")
+  check.levels <- strata.check <- NULL
+  
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
   if (tibble::has_name(tidy.data, "GT_BIN")) {
     tidy.data <- dplyr::mutate(
