@@ -156,7 +156,11 @@ Change log, version, new features and bug history lives in the [NEWS.md file](ht
 
 **grur v.0.0.10 2018-04-26**
 
-`grur's` dependencies: \* I transferred to `Suggests` section these packages: lightgbm, missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG, xgboost. \* Functions thate requires specific package will now say so. \* Reason: people only interested in `missing_visualization` don't have to install all the required packages required for imputations or simulations. `simulate_rad`: with the latest R release (3.5.0), Check now throw a new note: **Note: next used in wrong context: no loop is visible at simulate\_rad.R:189** I replaced `next` inside `sapply` with `while`.
+`grur's` dependencies:
+
+-   I transferred to `Suggests` section these packages: lightgbm, missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG, xgboost.
+-   Functions thate requires specific package will now say so.
+-   Reason: people only interested in `missing_visualization` don't have to install all the required packages required for imputations or simulations. `simulate_rad`: with the latest R release (3.5.0), Check now throw a new note: **Note: next used in wrong context: no loop is visible at simulate\_rad.R:189** I replaced `next` inside `sapply` with `while`.
 
 **grur v.0.0.9 2017-10-27**
 

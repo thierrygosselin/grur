@@ -1,6 +1,7 @@
 # grur v.0.0.10 2018-04-26
 
 `grur's` dependencies:
+
   * I transferred to `Suggests` section these packages: 
   lightgbm, missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG,
   xgboost.
