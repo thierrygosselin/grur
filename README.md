@@ -5,7 +5,7 @@ grur<img src="README_grur_logo.png" align="right"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.9-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2018--04--25-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.10-orange.svg)](commits/master) [![Last-changedate](https://img.shields.io/badge/last%20change-2018--04--26-brightgreen.svg)](/commits/master)
 
 ------------------------------------------------------------------------
 
@@ -84,11 +84,12 @@ Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vuj
 
 #### Troubleshooting
 
--   `rmetasim` needs to be modified in order to simulate more than 2000 markers [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)
--   **Parallel computing**: follow the steps in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install the packages with OpenMP-enabled compiler.
--   [Installation problems.](https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_installation_problems.Rmd)
+-   `rmetasim` needs to be modified in order to simulate more than 2000 markers [notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)
+-   **Parallel computing**: follow the steps in this [notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0) to install the packages with OpenMP-enabled compiler and conduct imputations in parallel.
+-   [Installation problems.](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)
 -   **Windows users**: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 -   The R GUI is unstable with functions using parallel ([more info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)), so I recommend using [RStudio](https://www.rstudio.com/products/rstudio/download/) for a better experience.
+-   Running codes in chunks inside R Notebook might cause problem, run it outside in the console.
 
 Features
 --------
@@ -153,19 +154,18 @@ New features
 
 Change log, version, new features and bug history lives in the [NEWS.md file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
 
+**grur v.0.0.10 2018-04-26**
+
+`grur's` dependencies: \* I transferred to `Suggests` section these packages: lightgbm, missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG, xgboost. \* Functions thate requires specific package will now say so. \* Reason: people only interested in `missing_visualization` don't have to install all the required packages required for imputations or simulations. `simulate_rad`: with the latest R release (3.5.0), Check now throw a new note: **Note: next used in wrong context: no loop is visible at simulate\_rad.R:189** I replaced `next` inside `sapply` with `while`.
+
 **grur v.0.0.9 2017-10-27**
 
 -   `lightGBM` option to conduct the imputations is fully functional
 
-**grur v.0.0.8 2017-10-24**
-
--   worked on `missing_visualization` to get better output figures with large number of pop
--   worked on imputation algorithm to prep for the use of `lightGBM` package
-
 #### Roadmap of future developments
 
 -   Integrate more imputation method.
--   Workflow tutorial and vignettes to further explore some problems.
+-   Workflow tutorial to further explore some problems.
 -   Use Shiny and ggvis (when subplots and/or facets becomes available for ggvis).
 -   Until publication **grur** will change rapidly, stay updated with releases and contribute with bug reports.
 -   Suggestions ?

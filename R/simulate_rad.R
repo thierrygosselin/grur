@@ -186,8 +186,9 @@ Please follow the vignette for install instructions", call. = FALSE)
   sapply(1:nrow(sc.df), function(i) {
     # i <- 1#test
     fname <- file.path(label, paste("gtypes", i, "rdata", sep = "."))
-    if (file.exists(fname)) next
-    
+    while (!file.exists(fname)) {
+    # remove next because with latest R and Checks it's throwing this note:
+      # Note: next used in wrong context: no loop is visible at simulate_rad.R:189 
     sc <- as.list(sc.df[i, ])
     sc$mig.mat <- sc$mig.mat[[1]]
     
@@ -229,7 +230,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     message("saving fastsimcoal and rmetasim results")
     save(fsc.list, sim.data, file = fname)
     fname
-  })
+  }})
   timing <- proc.time() - timing
   message("\nComputation time: ", round(timing[[3]]), " sec")
   cat("#################### grur::simulate_rad completed #####################\n")

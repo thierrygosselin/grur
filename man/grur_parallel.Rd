@@ -12,7 +12,7 @@ grur_mclapply_win(X, FUN, ..., mc.preschedule = TRUE, mc.set.seed = TRUE,
 
 .grur_parallel_mc(X, FUN, ..., mc.preschedule = TRUE, mc.set.seed = TRUE,
   mc.silent = FALSE, mc.cores = getOption("mc.cores", 2L),
-  mc.cleanup = TRUE, mc.allow.recursive = TRUE)
+  mc.cleanup = TRUE, mc.allow.recursive = TRUE, affinity.list = NULL)
 
 .grur_parallel(X, FUN, ..., mc.style = "ETA", mc.substyle = NA,
   mc.cores = getOption("mc.cores", 2L),

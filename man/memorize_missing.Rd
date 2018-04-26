@@ -33,7 +33,7 @@ environment only.
 \code{grur} takes advantage of the lightweight and speedy file reading/writing
 package \code{fst} (\emph{Lightning Fast Serialization of Data Frames for R})
 to write the dataframe to the working directory. This file can be used inside
-\code{\link[grur]{generate_missing}} function.}
+\code{generate_missing} (coming soon) function.}
 }
 \value{
 A tidy dataframe in the global environment with columns: 

@@ -1,8 +1,8 @@
 Package: grur
 Type: Package
 Title: Imputations of RADseq data
-Version: 0.0.9
-Date: 2017-10-27
+Version: 0.0.10
+Date: 2018-04-26
 Encoding: UTF-8
 Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
@@ -11,7 +11,7 @@ Authors@R: c(
 Maintainer: Thierry Gosselin <thierrygosselin@icloud.com>
 Description: RADseq data imputations.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.4.0)
 Imports:
     adespatial,
     ape,

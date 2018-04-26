@@ -50,6 +50,8 @@ have the required column names (\code{INDIVIDUALS} and \code{STRATA}).
 For \code{missing_visualization} function, use additional columns in the strata
 file to store metadata that you want to look for pattern of missingness.
 e.g. lanes, chips, sequencers, etc.
+Note that you need different values inside the \code{STRATA} for the function
+to work.
 Default: \code{strata = NULL}.}
 
 \item{strata.select}{(optional, character) Use this argument to select the column
