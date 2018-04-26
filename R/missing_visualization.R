@@ -227,7 +227,7 @@ missing_visualization <- function(
   
   
   if (skip.import) {
-    want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN")
+    want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN", strata.select)
     if (data.type == "tbl_df") {
       tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
       data <- NULL
@@ -238,6 +238,28 @@ missing_visualization <- function(
     tidy.data <- radiator::read_rad(data = data, columns = import.col)
     import.col <- want <- NULL
     }
+    
+    # include strata (remove prior strata, pop_id info)
+    if (!is.null(strata)) {
+      if (is.vector(strata)) {
+        strata.info <- readr::read_tsv(
+          file = strata,
+          col_types = readr::cols(.default = readr::col_character()))
+      } else {
+        strata.info <- strata
+      }
+      if (tibble::has_name(strata.info, "STRATA")) {
+        strata.info <- dplyr::rename(strata.info, POP_ID = STRATA)
+      }
+      tidy.data <- suppressWarnings(
+        tidy.data %>% 
+          dplyr::select(-dplyr::one_of(c("POP_ID", "STRATA"))) %>% 
+          dplyr::left_join(strata.info, by = "INDIVIDUALS"))
+    }
+    
+    # # check strata.select
+    # if (!isTRUE(unique(strata.select %in% strata.col))) stop("strata.select not matching columns in strata")
+    
   } else {
     tidy.data <- radiator::tidy_genomic_data(
       data = data,
@@ -258,38 +280,12 @@ missing_visualization <- function(
     )
   }
   
-  # strata.df --------------------------------------------------------
-  # if (is.vector(strata)) {
-  #   strata.col <- readr::read_tsv(
-  #     file = strata,
-  #     n_max = 1,
-  #     na = "-",
-  #     col_names = FALSE,
-  #     col_types = readr::cols(.default = readr::col_character())) %>%
-  #     tidyr::gather(data = .,key = DELETE, value = WANT) %>%
-  #     dplyr::mutate(WANT = stringi::stri_replace_all_fixed(str = WANT, pattern = c("STRATA"), replacement = "POP_ID", vectorize_all = FALSE)) %>%
-  #     dplyr::select(-DELETE) %>%
-  #     purrr::flatten_chr(.)
-  # } else {
-  #   strata.col <- colnames(strata)
-  #   strata.col <- stringi::stri_replace_all_fixed(
-  #     str = strata.col,
-  #     pattern = c("STRATA"),
-  #     replacement = "POP_ID",
-  #     vectorize_all = FALSE)
-  # }
-  # # check strata.select
-  # if (!isTRUE(unique(strata.select %in% strata.col))) stop("strata.select not matching columns in strata")
-
-  strata.select <- c("POP_ID", "LANES")
-  tidy.data <- tibble::data_frame(INDIVIDUALS = c("1", "2", "3", "4"), POP_ID = c("1", "2", "1", "2"), LANES = c("1", "1", "2", "2"))
+  # strata.select <- c("POP_ID", "LANES")
+  # tidy.data <- tibble::data_frame(INDIVIDUALS = c("1", "2", "3", "4"), POP_ID = c("1", "2", "1", "2"), LANES = c("1", "1", "2", "2"))
   
   strata.df <- suppressWarnings(
     dplyr::ungroup(tidy.data) %>%
       dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
-      # dplyr::select(
-      #   -dplyr::one_of(c("MARKERS", "CHROM", "LOCUS", "POS", "ID", "COL", "REF", "ALT",
-      #                    "GT_VCF", "GT_VCF_NUC", "GT", "GT_BIN"))) %>% 
       dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
 
   # Check if stata have different values
@@ -299,7 +295,9 @@ missing_visualization <- function(
     dplyr::summarise_all(.tbl = ., .funs = check.levels) %>% 
     purrr::flatten_lgl(.) %>% 
     unique
-  if (!isTRUE(strata.check)) stop("more than 1 value in strata groupings required")
+  if (length(strata.check) > 1 || !isTRUE(strata.check)) {
+    stop("more than 1 value in strata groupings required")
+  }
   check.levels <- strata.check <- NULL
   
   # New column with GT_MISSING_BINARY O for missing 1 for not missing...
