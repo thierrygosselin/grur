@@ -33,7 +33,7 @@ library(grur)
 Options and required packages
 -----------------------------
 
-Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install required packages for the selected imputation options below:
+Please follow instructions in the [Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0) to install required packages for the selected imputation options below:
 
 <table>
 <colgroup>
@@ -52,17 +52,17 @@ Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vuj
 <tr class="odd">
 <td align="left"><strong>imputation.method = &quot;lightgbm&quot;</strong></td>
 <td align="center"><code>lightgbm</code></td>
-<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
+<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = &quot;xgboost&quot;</strong></td>
 <td align="center"><code>xgboost</code></td>
-<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
+<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>imputation.method = &quot;rf&quot;</strong></td>
 <td align="center"><code>randomForestSRC</code></td>
-<td><a href="https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0">vignette</a></td>
+<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = &quot;rf_pred&quot;</strong></td>

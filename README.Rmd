@@ -77,14 +77,14 @@ library(grur)
 
 ## Options and required packages
 
-Please follow instructions in the [vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0) to install required packages for the
+Please follow instructions in the [Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0) to install required packages for the
 selected imputation options below:
 
 | imputation options | package | install instructions |
 |:-------------------|:-------------------------:|-------------------------------|
-|**imputation.method = "lightgbm"**|`lightgbm`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
-|**imputation.method = "xgboost"**|`xgboost`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
-|**imputation.method = "rf"**|`randomForestSRC`|[vignette](https://www.dropbox.com/s/yfxgr8vujvv2kut/vignette_grur.nb.html?dl=0)|
+|**imputation.method = "lightgbm"**|`lightgbm`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
+|**imputation.method = "xgboost"**|`xgboost`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
+|**imputation.method = "rf"**|`randomForestSRC`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
 |**imputation.method = "rf_pred"**|`ranger`|`install.packages("ranger")`|
 |**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`<br>`biocLite("pcaMethods")`|
 |**if using pmm > 0**|`missRanger`|`install.packages("missRanger")`|
