@@ -31,24 +31,23 @@ tidy_sim <- function(sim.directory, write.tidy = TRUE, parallel.core = parallel:
           str = ., pattern = ".",
           replacement = "", vectorize_all = FALSE) %>%
         stringi::stri_pad_left(str = ., width = 2, pad = "0"))
-    tidy.sim <- purrr::map(.x = sim.data, .f = radiator::tidy_gtypes)
-    names(tidy.sim) <- stringi::stri_join(
+    sim.data <- purrr::map(.x = sim.data, .f = radiator::tidy_gtypes)
+    # tidy.sim <- purrr::map(.x = sim.data, .f = radiator::tidy_gtypes)
+    names(sim.data) <- stringi::stri_join(
       sim.name,
       "_iteration_",
-      stringi::stri_pad_left(str = seq(1, length(tidy.sim)), width = 2, pad = "0")
+      stringi::stri_pad_left(str = seq(1, length(sim.data)), width = 2, pad = "0")
     )
     if (write.tidy) {
-      # message("Writing simulations in tidy format in folder")
+      message("Writing simulations in tidy format in folder")
       path.folder <- stringi::stri_join(sim.directory,"/", sim.name, sep = "")
       dir.create(file.path(path.folder))
     } else {
       path.folder <- NULL
     }
     
-    extract_save <- function(x, data, sim, path = NULL, write.tidy = TRUE, write.obj = FALSE) {
+    extract_save <- function(x, sim.data, sim, path.folder = NULL, write.tidy = TRUE, write.obj = FALSE) {
       # x <- 1
-      # data <- tidy.sim
-      # path <- path.folder
       # sim <- sim.name
       sim <- stringi::stri_join(sim, "_iteration_", stringi::stri_pad_left(str = x, width = 2, pad = "0"))
       # if (write.obj) {
@@ -57,20 +56,23 @@ tidy_sim <- function(sim.directory, write.tidy = TRUE, parallel.core = parallel:
       # small hack to remove note in R CMD Check
       pos <- 1
       envir <- as.environment(pos)
-        assign(x = sim, value = data, envir = envir)
+      assign(x = sim, value = sim.data, envir = envir)
       # }
       if (write.tidy) {
-        #fst::write.fst(x = eval(as.name(sim)), path = stringi::stri_join(path, "/", sim, ".rad"), compress = 85)
+        radiator::write_rad(data = eval(as.name(sim)), path = file.path(path.folder, stringi::stri_join(sim, ".rad")))
       }
       
     }#End extract_save
     
     purrr::walk2(
-      .x = 1:length(tidy.sim),
-      .y = tidy.sim,
+      .x = 1:length(sim.data),
+      .y = sim.data,
       .f = extract_save,
-      sim = sim.name, path = path.folder, write.tidy = write.tidy, write.obj = FALSE)
-    return(tidy.sim)
+      sim = sim.name,
+      path.folder = path.folder, 
+      write.tidy = write.tidy, 
+      write.obj = FALSE)
+    return(sim.data)
   }
   # serial test
   # res <- purrr::map(
