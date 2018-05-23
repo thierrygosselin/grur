@@ -6,7 +6,7 @@
 \usage{
 simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000, ne = c(50,
   500), nm = c(0, 0.1, 0.5, 1, 5), theta = 0.2, mig.type = c("island",
-  "stepping.stone"), num.reps = 10, num.rms.gens = 5, label = NULL,
+  "stepping.stone"), num.reps = 3, num.rms.gens = 10, label = NULL,
   fsc.exec = "fsc26", parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
@@ -38,7 +38,7 @@ Default: \code{num.reps = 10}.}
 
 \item{num.rms.gens}{(integer) Number of \code{rmetasim} generations to establish
 linkage disequilibrium.
-Default: \code{num.rms.gens = 5}.}
+Default: \code{num.rms.gens = 10}.}
 
 \item{label}{(integer) Label for the output folder. With default \code{label = NULL},
 the label will be "\code{sim.results.YYYYMMDD.HHMM}".}

@@ -30,7 +30,7 @@
 #' Default: \code{num.reps = 10}.
 #' @param num.rms.gens (integer) Number of \code{rmetasim} generations to establish
 #' linkage disequilibrium.
-#' Default: \code{num.rms.gens = 5}.
+#' Default: \code{num.rms.gens = 10}.
 #' @param label (integer) Label for the output folder. With default \code{label = NULL},
 #' the label will be "\code{sim.results.YYYYMMDD.HHMM}".
 #' @param fsc.exec (character) Name of fastsimcoal executable. See details.
@@ -98,8 +98,8 @@ simulate_rad <- function(
   nm = c(0, 0.1, 0.5, 1, 5),
   theta = 0.2,
   mig.type = c("island", "stepping.stone"),
-  num.reps = 10,
-  num.rms.gens = 5,
+  num.reps = 3,
+  num.rms.gens = 10,
   label = NULL,
   fsc.exec = "fsc26",
   parallel.core = parallel::detectCores() - 1
