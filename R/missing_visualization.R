@@ -194,6 +194,28 @@ missing_visualization <- function(
   timing <- proc.time()
   res <- list() #empty list to store results
   
+  # For testing
+  
+  # vcf.metadata = FALSE
+  # strata = NULL
+  # strata.select = "POP_ID"
+  # distance.method = "euclidean"
+  # ind.missing.geno.threshold = c(2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90)
+  # pop.levels = NULL
+  # pop.labels = NULL
+  # pop.select = NULL
+  # blacklist.id = NULL
+  # blacklist.genotype = NULL
+  # whitelist.markers = NULL
+  # common.markers = FALSE
+  # monomorphic.out = TRUE
+  # snp.ld = NULL
+  # filename = NULL
+  # parallel.core = parallel::detectCores() - 1
+  # write.plot = TRUE
+  
+  
+  
   # manage missing arguments -----------------------------------------------------
   if (missing(data)) stop("Input file missing")
   if (!is.null(pop.levels) & is.null(pop.labels)) pop.labels <- pop.levels
@@ -279,9 +301,6 @@ missing_visualization <- function(
       verbose = FALSE
     )
   }
-  
-  # strata.select <- c("POP_ID", "LANES")
-  # tidy.data <- tibble::data_frame(INDIVIDUALS = c("1", "2", "3", "4"), POP_ID = c("1", "2", "1", "2"), LANES = c("1", "1", "2", "2"))
   
   strata.df <- suppressWarnings(
     dplyr::ungroup(tidy.data) %>%
@@ -410,7 +429,8 @@ missing_visualization <- function(
   
   # for metric PCoA/MDS
   # ibm <- ape::pcoa(D = d) 
-  ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method)) #Legendre's ape
+  #Legendre's pcoa in ape
+  ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
   input.pcoa <- NULL
   
   # ibm$correction # test
@@ -765,10 +785,12 @@ missing_visualization <- function(
     purrr::flatten(.)
   
   message("Whitelist(s) of markers generated: ", length(whitelists))
-  whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 
+  if (length(whitelists) > 0) {
+    whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 
     tidyr::gather(data = ., key = "WHITELIST", value = "n") %>%
     dplyr::transmute(WHITELIST = stringi::stri_join(WHITELIST, n, sep = " = "))
   message("    Number of markers whitelisted per whitelist generated:\n", stringi::stri_join("    ", whitelists.stats$WHITELIST, collapse = "\n"))
+  }
   # res <- c(res, whitelists)
   whitelists.stats <- whitelists <- NULL
   
