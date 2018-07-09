@@ -1,8 +1,8 @@
 Package: grur
 Type: Package
 Title: Imputations of RADseq data
-Version: 0.0.10
-Date: 2018-04-26
+Version: 0.0.11
+Date: 2018-07-09
 Encoding: UTF-8
 Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
@@ -19,7 +19,7 @@ Imports:
     cowplot,
     data.table,
     dplyr (>= 0.7.0),
-    ggplot2,
+    ggplot2 (>= 3.0.0),
     ggpubr,
     magrittr,
     Matrix,

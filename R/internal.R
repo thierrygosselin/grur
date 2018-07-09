@@ -215,13 +215,13 @@ ind_genotyped_helper <- function(x) {
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
     ggplot2::scale_x_continuous(name = "Individual's missing genotyped threshold (percent)", breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
     ggplot2::scale_y_continuous(name = "Individuals\n(blacklisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
-    ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = axis.title.element.text.fig,
       axis.title.y = axis.title.element.text.fig,
       axis.text.x = axis.text.element.text.fig,
       axis.text.y = axis.text.element.text.fig
     ) +
+    ggplot2::theme_bw() +
     ggplot2::facet_grid(~POP_ID)
   # plot.ind.geno.threshold
   return(plot.ind.geno.threshold)
@@ -366,13 +366,13 @@ markers_genotyped_helper <- function(x, y) {
     ggplot2::geom_point(size = 2, shape = 21, fill = "white") +
     ggplot2::scale_x_continuous(name = "Marker's missing genotyped threshold (percent)", breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
     ggplot2::scale_y_continuous(name = "Markers\n(whitelisted number)", breaks = y.breaks, limits = c(0, y.breaks.max)) +
-    ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.text.x = ggplot2::element_text(size = 8, family = "Helvetica"),#, angle = 90, hjust = 1, vjust = 0.5),
       strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
     ) +
+    ggplot2::theme_bw() +
     ggplot2::facet_grid(~POP_ID)
   # plot.markers.geno.threshold
   return(plot.markers.geno.threshold)
@@ -420,13 +420,13 @@ generate_pcoa_plot <- function(
       ggplot2::labs(x = stringi::stri_join("PCo", pcx, " [", variance.component[pcx,2], "]")) +
       ggplot2::labs(y = stringi::stri_join("PCo", pcy, " [", variance.component[pcy,2], "]")) +
       ggplot2::scale_size_area(name = "Individual's\nmissing genotypes\n(percent)", max_size = 4) +
-      ggplot2::theme_bw() +
       ggplot2::theme(
         axis.title.x = element.text.fig,
         axis.title.y = element.text.fig,
         legend.title = element.text.fig,
         legend.text = element.text.fig
-      )
+      ) +
+      ggplot2::theme_bw()
     ibm_plot_name <- stringi::stri_join(
       "ibm.plot.pco", pcx, ".pco", pcy, ".strata.", strata.select)
     pcoa.plots[[ibm_plot_name]] <- ibm.plot
@@ -635,7 +635,6 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
       y = "Missing genotypes (mean percentage)",
       size = "Markers missing (number)"
     ) +
-    ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = axis.title.element,
       axis.text.x = axis.text.element,
@@ -644,6 +643,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
       legend.title = axis.title.element,
       legend.text = axis.text.element
     ) +
+    ggplot2::theme_bw() +
     ggplot2::facet_wrap(~ STRATA_SELECT)
   # fig
   

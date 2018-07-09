@@ -1,3 +1,9 @@
+# grur v.0.0.11 2018-07-09
+
+* grur ready for R 3.5.1 "Feather Spray" released on 2018/07/05
+* grur updated to work with ggplot2 v.3.0.0
+
+
 # grur v.0.0.10 2018-04-26
 
 `grur's` dependencies:

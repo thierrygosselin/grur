@@ -545,7 +545,6 @@ missing_visualization <- function(
     ggplot2::scale_fill_manual(values = c("grey", "black")) +
     ggplot2::labs(y = "Markers") +
     ggplot2::labs(x = "Individuals") +
-    ggplot2::theme_bw() +
     ggplot2::theme(
       panel.grid.minor.x = ggplot2::element_blank(),
       panel.grid.major.y = ggplot2::element_blank(),
@@ -556,6 +555,7 @@ missing_visualization <- function(
       axis.text.y = ggplot2::element_blank(),
       axis.ticks.y = ggplot2::element_blank()
     ) +
+    ggplot2::theme_bw() +
     ggplot2::facet_grid(~POP_ID, scales = "free", space = "free_x")
   # res$heatmap
   
@@ -592,7 +592,6 @@ missing_visualization <- function(
       ggplot2::labs(y = "Individual's missing genotypes (proportion)") +
       ggplot2::labs(x = "Populations") +
       ggplot2::labs(colour = "Populations") +
-      ggplot2::theme_bw() +
       ggplot2::theme(
         legend.position = "none",
         panel.grid.minor.x = ggplot2::element_blank(),
@@ -602,6 +601,7 @@ missing_visualization <- function(
         axis.title.y = axis.title.element.text.fig,
         axis.text.y = axis.text.element.text.fig
       ) +
+      ggplot2::theme_bw() +
       ggplot2::coord_flip())
   # res$missing.genotypes.ind.plots
   
@@ -612,14 +612,15 @@ missing_visualization <- function(
       ggplot2::geom_histogram() +
       ggplot2::labs(x = "Individual's missing genotypes (proportion)") +
       ggplot2::labs(y = "Individuals (number)") +
-      ggplot2::theme_bw() +
       ggplot2::theme(
         legend.position = "none",
         axis.title.x = axis.title.element.text.fig,
         axis.title.y = axis.title.element.text.fig,
         axis.text.x = axis.text.element.text.fig,
         axis.text.y = axis.text.element.text.fig
-      ))
+      ) +
+      ggplot2::theme_bw()
+    )
   # res$missing.genotypes.ind.histo
   
   # helper plot for individual's genotyped threshold
@@ -693,14 +694,14 @@ missing_visualization <- function(
     # labs(title = "Correlation between missingness and inbreeding coefficient") +
     ggplot2::labs(y = "Individual IBDg (FH)") +
     ggplot2::labs(x = "Missing genotype (proportion)") +
-    ggplot2::theme_bw() +
     ggplot2::theme(
       axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       legend.title = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       legend.text = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
       strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
-    )
+    ) +
+    ggplot2::theme_bw()
   
   # merge plots
   plots <- cowplot::align_plots(
@@ -805,7 +806,6 @@ missing_visualization <- function(
       ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
       ggplot2::labs(y = "Marker's missing genotypes (proportion)", x = "Populations",
                     colour = "Populations") +
-      ggplot2::theme_bw() +
       ggplot2::theme(
         legend.position = "none",
         panel.grid.minor.x = ggplot2::element_blank(),
@@ -815,6 +815,7 @@ missing_visualization <- function(
         axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
         axis.text.y = ggplot2::element_text(size = 10, family = "Helvetica")
       ) +
+      ggplot2::theme_bw() +
       ggplot2::coord_flip())
   # res$missing.genotypes.markers.plots
   
@@ -823,14 +824,15 @@ missing_visualization <- function(
       ggplot2::geom_histogram() +
       ggplot2::labs(x = "Marker's missing genotypes (proportion)") +
       ggplot2::labs(y = "Markers (number)") +
-      ggplot2::theme_bw() +
       ggplot2::theme(
         legend.position = "none",
         axis.title.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
         axis.title.y = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold"),
         axis.text.x = ggplot2::element_text(size = 10, family = "Helvetica"),
         strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
-      ))
+      ) +
+      ggplot2::theme_bw()
+    )
   # res$markers.histo
   
   # helper plot for markers's genotyped threshold
