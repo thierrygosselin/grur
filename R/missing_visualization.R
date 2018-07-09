@@ -440,7 +440,6 @@ missing_visualization <- function(
   # ibm$trace # test
   
   # Should broken_stick values be reported?
-  
   # variance
   variance.component <-  tibble::data_frame(EIGENVALUES = ibm$values$Eigenvalues) %>%
     dplyr::mutate(
@@ -492,6 +491,7 @@ missing_visualization <- function(
   variance.component <- pc.to.do <- NULL
   
   # RDA missing data analysis --------------------------------------------------
+  message("\nRedundancy analysis...\n")
   res$rda.analysis <- missing_rda(data = input.rda, strata = strata.df, 
     permutations = 1000, parallel.core = parallel.core)
   
@@ -589,9 +589,9 @@ missing_visualization <- function(
       ggplot2::geom_jitter(alpha = 0.5) +
       ggplot2::geom_violin(trim = TRUE, fill = NA) +
       ggplot2::geom_boxplot(width = 0.1, fill = NA, outlier.colour = NA, outlier.fill = NA) +
-      ggplot2::labs(y = "Individual's missing genotypes (proportion)") +
-      ggplot2::labs(x = "Populations") +
-      ggplot2::labs(colour = "Populations") +
+      ggplot2::labs(x = "Populations", 
+                    y = "Individual's missing genotypes (proportion)",
+                    colour = "Populations") +
       ggplot2::theme(
         legend.position = "none",
         panel.grid.minor.x = ggplot2::element_blank(),
@@ -610,8 +610,8 @@ missing_visualization <- function(
     data = res$missing.genotypes.ind,
     ggplot2::aes(x = MISSING_GENOTYPE_PROP)) +
       ggplot2::geom_histogram() +
-      ggplot2::labs(x = "Individual's missing genotypes (proportion)") +
-      ggplot2::labs(y = "Individuals (number)") +
+      ggplot2::labs(x = "Individual's missing genotypes (proportion)",
+                    y = "Individuals (number)") +
       ggplot2::theme(
         legend.position = "none",
         axis.title.x = axis.title.element.text.fig,
@@ -675,13 +675,10 @@ missing_visualization <- function(
   # FH -------------------------------------------------------------------------
   message("Calculation of FH: a measure of IBDg")
   fh <- radiator::ibdg_fh(data = tidy.data, verbose = FALSE)
-  # fh <- ibdg_fh(data = tidy.data, verbose = FALSE)
-  
   res$missing.genotypes.ind.fh <- suppressWarnings(
     dplyr::full_join(
       res$missing.genotypes.ind,
       fh$fh
-      # dplyr::select(.data = fh, INDIVIDUALS, FH)
       , by = c("INDIVIDUALS", "POP_ID")
     )
   )
@@ -716,12 +713,6 @@ missing_visualization <- function(
   fh <- plots <- bottom.row.plot <- NULL
   
   if (write.plot) {
-    # ggplot2::ggsave(
-    #   filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.plots.pdf"),
-    #   plot = res$missing.genotypes.ind.fh.plots,
-    #   width = n.pop * 4, height = n.pop * 2.5,
-    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
-    
     cowplot::save_plot(
       filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.fh.combined.plots.pdf"),
       plot = res$missing.genotypes.ind.fh.combined.plots, 
