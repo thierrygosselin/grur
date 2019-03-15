@@ -537,7 +537,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
   
   data <- dplyr::rename(
     .data = data,
-    STRATA_SELECT = .data[[rlang::UQ(strata.select)]])
+    STRATA_SELECT = .data[[!!(strata.select)]])
   
   n.strata <- dplyr::n_distinct(data$STRATA_SELECT)
   
@@ -686,18 +686,19 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' @export
 
 missing_rda <- function(
-  data, strata, 
+  data, 
+  strata, 
   permutations = 1000, 
   parallel.core = parallel::detectCores() - 1
 ) {
   res <- list()
   if (is.vector(data)) {
-    res$data.pcoa <- radiator::read_rad(data) %>% 
-      dplyr::ungroup(.)
+    res$data.pcoa <- radiator::read_rad(data)
   } else {
-    res$data.pcoa <- dplyr::ungroup(data)
+    res$data.pcoa <- data
   }
   data <- NULL
+  res$data.pcoa %<>% dplyr::ungroup(.)
   
   # PCoA on Jaccard distance (binary)
   res$data.pcoa <- ape::pcoa(
@@ -736,7 +737,7 @@ missing_rda <- function(
     
     # Check how many strata.select are used and messages -----------------------
     # if (length(strata.select) > 1) {
-    message("\nRedundancy Analysis using strata: ",
+    message("Redundancy Analysis using strata: ",
             stringi::stri_join(strata.select, collapse = ", "))
     rda_strata_name <- stringi::stri_join("rda.strata", strata.select, collapse = "_", sep = "_")
     anova_strata_name <- stringi::stri_join("anova.strata.", strata.select, collapse = "_", sep = "_")

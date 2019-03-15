@@ -53,8 +53,6 @@ using depth-wise tree growth.
 \item \code{imputation.method = "lightgbm"} for a light and fast 
 leaf-wise tree growth gradient boosting algorithm (in devel).
 
-\item \code{imputation.method = "bpca"} Multiple Correspondence Analysis (in devel).
-
 \code{imputation.method = NULL} the function will stop.
 Default: \code{imputation.method = NULL}.
 }}
@@ -105,8 +103,7 @@ genotypes.
 Random forests (predictive and on-the-fly-imputations); 
 Extreme gradient tree boosting (XGBoost);
 Fast, distributed, high performance gradient
-boosting (LightGBM) and
-Multiple Correspondence Analysis (MCA). Furthermore, the module allows to
+boosting (LightGBM). Furthermore, the module allows to
 compare these algorithms with the classic Strawman imputation
 (~ max/mean/mode: the most frequently observed, i.e. non-missing, genotypes is used).
 \item \strong{Hierarchical level: } Imputations conducted by strata or globally.
@@ -341,8 +338,6 @@ Documented in \href{https://lightgbm.readthedocs.io/en/latest/index.html}{LightG
 \item \code{nimpute}
 }
 Documented in \href{https://kogalur.github.io/randomForestSRC/index.html}{randomForestSRC}
-
-Multiple Correspondence Analysis option available (upcomming):
 }
 
 \section{Life cycle}{

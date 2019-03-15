@@ -201,15 +201,14 @@ missing_visualization <- function(
     func.name = as.list(sys.call())[[1]],
     fd = rlang::fn_fmls_names(),
     args.list = as.list(environment()),
-    dotslist = rlang::dots_list(..., .homonyms = "error", .check_assign = TRUE), 
-    keepers = c(
+    dotslist = rlang::dots_list(..., .homonyms = "error", .check_assign = TRUE),
+    keepers = "path.folder",
+    deprecated = c(
       "pop.levels", "pop.labels", "pop.select", "blacklist.id", "blacklist.genotype",
       "common.markers", "monomorphic.out", "snp.ld"
     ),
     verbose = TRUE
   )
-  
-  
   
   # For testing
   
@@ -221,74 +220,125 @@ missing_visualization <- function(
   # filename = NULL
   # parallel.core = parallel::detectCores() - 1
   # write.plot = TRUE
-  
+  # path.folder = NULL
   
   
   # manage missing arguments -----------------------------------------------------
-  if (missing(data)) stop("Input file missing")
+  if (missing(data)) rlang::abort("Input file missing")
+  # Folders---------------------------------------------------------------------
+  path.folder <- radiator::generate_folder(
+    f = path.folder,
+    rad.folder = "missing_visualization",
+    internal = FALSE,
+    file.date = file.date,
+    prefix_int = FALSE,
+    verbose = verbose)
+  if (!is.null(filename)) filename <- file.path(path.folder, filename)
   
-  # Date and time --------------------------------------------------------------
-  path.folder.message <- stringi::stri_join("missing_visualization_", file.date, sep = "")
-  path.folder <- stringi::stri_join(getwd(),"/", "missing_visualization_", file.date, sep = "")
-  dir.create(file.path(path.folder))
+  # write the dots file
+  radiator::write_rad(
+    data = rad.dots,
+    path = path.folder,
+    filename = stringi::stri_join("grur_missing_visualization_data_args_", file.date, ".tsv"),
+    tsv = TRUE,
+    internal = FALSE,
+    verbose = verbose
+  )
   
-  message("Folder created: \n", path.folder.message)
   # import data ----------------------------------------------------------------
   message("\nImporting data")
-  if (!is.null(filename)) filename <- stringi::stri_join(path.folder, "/", filename)
-  
-  # Check data.type, might be able to skip long import and filters
   data.type <- radiator::detect_genomic_format(data)
-  skip.import <- FALSE
-  if (skip.import) {
-    want <- c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN", strata.select)
-    if (data.type == "tbl_df") {
-      tidy.data <- suppressWarnings(dplyr::select(data, dplyr::one_of(want)))
-      data <- NULL
-    }
-    if (data.type == "fst.file") {
-    import.col <- colnames(radiator::read_rad(data = data, from = 1, to = 1))
-    import.col <- purrr::discard(.x = import.col, .p = !import.col %in% want)
-    tidy.data <- radiator::read_rad(data = data, columns = import.col)
-    import.col <- want <- NULL
-    }
-    
-    # include strata (remove prior strata, pop_id info)
-    if (!is.null(strata)) {
-      if (is.vector(strata)) {
-        strata.info <- readr::read_tsv(
-          file = strata,
-          col_types = readr::cols(.default = readr::col_character()))
-      } else {
-        strata.info <- strata
+  if (data.type %in% c("SeqVarGDSClass", "gds.file", "vcf.file")) {
+    # GDS & VCF
+    if (data.type %in% c("SeqVarGDSClass", "gds.file", "vcf.file")) {
+      want <- unique(c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT_BIN", strata.select))
+      
+      if (!"SeqVarTools" %in% utils::installed.packages()[,"Package"]) {
+        rlang::abort('Please install SeqVarTools for this option:\n
+                   install.packages("BiocManager")
+                   BiocManager::install("SeqVarTools")')
       }
-      if (tibble::has_name(strata.info, "STRATA")) {
-        strata.info <- dplyr::rename(strata.info, POP_ID = STRATA)
+      
+      if (data.type == "vcf.file") {
+        data <- radiator::read_vcf(
+          data = data, 
+          strata = strata, 
+          vcf.stats = FALSE,
+          parallel.core = parallel.core, 
+          verbose = FALSE, 
+          internal = TRUE, 
+          path.folder = path.folder)
+        data.type <- "SeqVarGDSClass"
+        # tidy.data <- gds2tidy(gds = gds, parallel.core = parallel.core, 
       }
+      if (data.type == "gds.file") {
+        data <- radiator::read_rad(data, verbose = verbose)
+        data.type <- "SeqVarGDSClass"
+      }
+      
+      individuals <- radiator:::generate_id_stats(
+        gds = data, 
+        coverage = FALSE,
+        path.folder = path.folder, 
+        file.date = file.date, 
+        parallel.core = parallel.core, 
+        verbose = TRUE)
+      id.na.stats <- individuals$stats
+      individuals <- individuals$info
+      strata.df <- dplyr::select(individuals, -c(MISSING_PROP, HETEROZYGOSITY)) %>% 
+        dplyr::rename(POP_ID = STRATA)
+      
       tidy.data <- suppressWarnings(
-        tidy.data %>% 
-          dplyr::select(-dplyr::one_of(c("POP_ID", "STRATA"))) %>% 
-          dplyr::left_join(strata.info, by = "INDIVIDUALS"))
+        radiator:::gds2tidy(
+          gds = data,
+          calibrate.alleles = FALSE,
+          parallel.core = parallel.core
+        ) %>% 
+          dplyr::select(dplyr::one_of(want)) %>% 
+          dplyr::mutate(
+            GT_MISSING_BINARY = dplyr::if_else(is.na(GT_BIN), 0L, 1L)
+            )
+      )
     }
-    
-    # # check strata.select
-    # if (!isTRUE(unique(strata.select %in% strata.col))) stop("strata.select not matching columns in strata")
     
   } else {
-    tidy.data <- radiator::tidy_genomic_data(
-      data = data,
-      strata = strata,
-      filename = filename,
-      parallel.core = parallel.core,
-      verbose = FALSE
+    want <- unique(c("MARKERS", "CHROM", "LOCUS", "POS", "INDIVIDUALS", "POP_ID", "GT", "GT_BIN", strata.select))
+    tidy.data <- suppressWarnings(
+      radiator::tidy_genomic_data(
+        data = data,
+        strata = strata,
+        filename = filename,
+        parallel.core = parallel.core,
+        vcf.metadata = FALSE,
+        vcf.stats = FALSE,
+        verbose = FALSE, 
+        internal = TRUE
+      ) %>% 
+        dplyr::select(dplyr::one_of(want))
     )
+    
+    strata.df <- suppressWarnings(
+      dplyr::ungroup(tidy.data) %>%
+        dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
+        dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
+    
+    # New column with GT_MISSING_BINARY O for missing 1 for not missing...
+    if (tibble::has_name(tidy.data, "GT_BIN")) {
+      tidy.data <- dplyr::mutate(
+        .data = tidy.data,
+        GT_MISSING_BINARY = dplyr::if_else(is.na(GT_BIN), "0", "1"),
+        GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
+      )
+    } else {
+      tidy.data <- dplyr::mutate(
+        .data = tidy.data,
+        GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
+        GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
+      )
+    }
   }
   
-  strata.df <- suppressWarnings(
-    dplyr::ungroup(tidy.data) %>%
-      dplyr::select(dplyr::one_of(c("INDIVIDUALS", "POP_ID", strata.select))) %>% 
-      dplyr::distinct(INDIVIDUALS, .keep_all = TRUE))
-
+  
   # Check if stata have different values
   check.levels <- function(x) nlevels(factor(x)) > 1
   strata.check <- dplyr::select(strata.df, dplyr::one_of(strata.select)) %>% 
@@ -301,20 +351,7 @@ missing_visualization <- function(
   }
   check.levels <- strata.check <- NULL
   
-  # New column with GT_MISSING_BINARY O for missing 1 for not missing...
-  if (tibble::has_name(tidy.data, "GT_BIN")) {
-    tidy.data <- dplyr::mutate(
-      .data = tidy.data,
-      GT_MISSING_BINARY = dplyr::if_else(is.na(GT_BIN), "0", "1"),
-      GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
-    )
-  } else {
-    tidy.data <- dplyr::mutate(
-      .data = tidy.data,
-      GT_MISSING_BINARY = dplyr::if_else(GT == "000000", "0", "1"),
-      GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
-    )
-  }
+  
   # some statistics  -----------------------------------------------------------
   message("\nInformations:")
   strata.stats <- strata.df %>%
@@ -390,7 +427,7 @@ missing_visualization <- function(
       formula = POP_ID + INDIVIDUALS ~ MARKERS,
       value.var = "GT_MISSING_BINARY"
     ) %>%
-    tibble::as_data_frame(.) %>% 
+    tibble::as_tibble(.) %>% 
     # dplyr::group_by(INDIVIDUALS, POP_ID) %>%
     # tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
     dplyr::ungroup(.)
@@ -399,57 +436,23 @@ missing_visualization <- function(
   suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
   input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
   
-  radiator::write_rad(data = input.pcoa, path = file.path(path.folder, "input.rda.temp"))
-  input.rda <- list.files(path = path.folder, pattern = "input.rda.temp", full.names = TRUE)
+  radiator::write_rad(data = input.pcoa, path = file.path(path.folder, "input.rda.temp.rad"))
+  input.rda <- list.files(path = path.folder, pattern = "input.rda.temp.rad", full.names = TRUE)
   
-  # euclidean distances between the rows
-  # distance.method <- "euclidean"
-  # d <- stats::dist(x = input.pcoa, method = distance.method)
-  
-  # alternative tested
-  # d <- vegan::vegdist(x = input.pcoa, method = distance.method) # longer than stats::dist
-  
-  # for metric PCoA/MDS
-  # ibm <- ape::pcoa(D = d) 
   #Legendre's pcoa in ape
   ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
   input.pcoa <- NULL
   
-  # ibm$correction # test
-  # ibm$note # test
-  # ibm$values # test
-  # ibm$vectors # test
-  # ibm$trace # test
-  
   # Should broken_stick values be reported?
   # variance
-  variance.component <-  tibble::data_frame(EIGENVALUES = ibm$values$Eigenvalues) %>%
+  variance.component <-  tibble::tibble(EIGENVALUES = ibm$values$Eigenvalues) %>%
     dplyr::mutate(
       VARIANCE_PROP = round(EIGENVALUES/sum(EIGENVALUES), 2)
     )
-  # alternative tested giving the same results:
-  # ibm <- stats::cmdscale(d, eig = TRUE, k = 2)
-  
-  # for non-metric PCoA/MDS
-  # ibm <- MASS::isoMDS(d, k=2) # k is the number of dim
-  
-  # alternative: sammon
-  # ibm <- MASS::sammon(d, k =2)
-  
-  # all gives the same results...
-  
-  # prep the data for figure:
-  # for MASS::isoMDS and stats::cmdscale
-  # res$vectors <- tibble::data_frame(INDIVIDUALS = rownames(ibm$points), V1 = ibm$points[,1], V2 = ibm$points[,2]) %>%
-  #   dplyr::inner_join(strata.df, by = "INDIVIDUALS")
-  # res$vectors <- tibble::data_frame(INDIVIDUALS = rownames(ibm$vectors), V1 = ibm$vectors[,1], V2 = ibm$vectors[,2]) %>%
-  # dplyr::inner_join(strata.df, by = "INDIVIDUALS")
-  
-  # with vegan and ape
   
   res$vectors <- dplyr::inner_join(
     strata.missing,
-    tibble::rownames_to_column(df = data.frame(ibm$vectors), var = "INDIVIDUALS")
+    tibble::as_tibble(x = data.frame(ibm$vectors), rownames = "INDIVIDUALS")
     , by = "INDIVIDUALS"
   )
   
@@ -473,9 +476,9 @@ missing_visualization <- function(
   variance.component <- pc.to.do <- NULL
   
   # RDA missing data analysis --------------------------------------------------
-  message("\nRedundancy analysis...\n")
+  message("Redundancy analysis...")
   res$rda.analysis <- missing_rda(data = input.rda, strata = strata.df, 
-    permutations = 1000, parallel.core = parallel.core)
+                                  permutations = 1000, parallel.core = parallel.core)
   
   file.remove(input.rda)
   
@@ -525,8 +528,7 @@ missing_visualization <- function(
     ggplot2::ggplot(data = .,(ggplot2::aes(y = MARKERS, x = as.character(INDIVIDUALS)))) +
     ggplot2::geom_tile(ggplot2::aes(fill = Missingness)) +
     ggplot2::scale_fill_manual(values = c("grey", "black")) +
-    ggplot2::labs(y = "Markers") +
-    ggplot2::labs(x = "Individuals") +
+    ggplot2::labs(y = "Markers", x = "Individuals") +
     ggplot2::theme(
       panel.grid.minor.x = ggplot2::element_blank(),
       panel.grid.major.y = ggplot2::element_blank(),
@@ -546,18 +548,6 @@ missing_visualization <- function(
   
   # Individuals-----------------------------------------------------------------
   message("Missingness per individuals")
-  # res$missing.genotypes.ind <- tidy.data %>%
-  #   dplyr::select(MARKERS, INDIVIDUALS, POP_ID, GT_MISSING_BINARY) %>%
-  #   dplyr::group_by(INDIVIDUALS, POP_ID) %>%
-  #   dplyr::summarise(
-  #     MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
-  #     MARKER_NUMBER = length(MARKERS),
-  #     MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
-  #     PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
-  #   ) %>%
-  #   dplyr::ungroup(.) %>%
-  #   dplyr::arrange(POP_ID, INDIVIDUALS)
-  
   # Figures
   axis.title.element.text.fig <- ggplot2::element_text(
     size = 12, family = "Helvetica", face = "bold")
@@ -602,7 +592,7 @@ missing_visualization <- function(
         axis.text.y = axis.text.element.text.fig
       ) +
       ggplot2::theme_bw()
-    )
+  )
   # res$missing.genotypes.ind.histo
   
   # helper plot for individual's genotyped threshold
@@ -628,12 +618,6 @@ missing_visualization <- function(
       plot = res$missing.genotypes.ind.combined.plots, 
       base_height = n.pop * 1,
       base_aspect_ratio = 2.5, ncol = 2, nrow = 2, limitsize = FALSE)
-    
-    # ggplot2::ggsave(
-    #   filename = stringi::stri_join(path.folder, "/missing.genotypes.ind.plots.pdf"),
-    #   plot = res$missing.genotypes.ind.combined.plots,
-    #   width = n.pop * 2.5, height = n.pop * 1,
-    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
   }
   # res$missing.genotypes.ind.plots
   
@@ -656,7 +640,7 @@ missing_visualization <- function(
   
   # FH -------------------------------------------------------------------------
   message("Calculation of FH: a measure of IBDg")
-  fh <- radiator::ibdg_fh(data = tidy.data, verbose = FALSE)
+  fh <- radiator::ibdg_fh(data = tidy.data, path.folder = path.folder, verbose = FALSE)
   res$missing.genotypes.ind.fh <- suppressWarnings(
     dplyr::full_join(
       res$missing.genotypes.ind,
@@ -749,7 +733,7 @@ missing_visualization <- function(
   # saved via tidy_genomic_data.
   # fst::write.fst(x = tidy.data, path = file.path(path.folder, "tidy.data.rad"))
   tidy.data <- NULL
-
+  
   markers.missing.geno.threshold <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ,0.8, 0.9)
   whitelists <- purrr::map(
     .x = markers.missing.geno.threshold,
@@ -761,9 +745,9 @@ missing_visualization <- function(
   message("Whitelist(s) of markers generated: ", length(whitelists))
   if (length(whitelists) > 0) {
     whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 
-    tidyr::gather(data = ., key = "WHITELIST", value = "n") %>%
-    dplyr::transmute(WHITELIST = stringi::stri_join(WHITELIST, n, sep = " = "))
-  message("    Number of markers whitelisted per whitelist generated:\n", stringi::stri_join("    ", whitelists.stats$WHITELIST, collapse = "\n"))
+      tidyr::gather(data = ., key = "WHITELIST", value = "n") %>%
+      dplyr::transmute(WHITELIST = stringi::stri_join(WHITELIST, n, sep = " = "))
+    message("    Number of markers whitelisted per whitelist generated:\n", stringi::stri_join("    ", whitelists.stats$WHITELIST, collapse = "\n"))
   }
   # res <- c(res, whitelists)
   whitelists.stats <- whitelists <- NULL
@@ -805,7 +789,7 @@ missing_visualization <- function(
         strip.text.x = ggplot2::element_text(size = 10, family = "Helvetica", face = "bold")
       ) +
       ggplot2::theme_bw()
-    )
+  )
   # res$markers.histo
   
   # helper plot for markers's genotyped threshold
@@ -826,13 +810,6 @@ missing_visualization <- function(
   plots <- top.row.plot <- NULL
   
   if (write.plot) {
-    # ggplot2::ggsave(
-    #   filename = stringi::stri_join(
-    #     path.folder, "/missing.genotypes.markers.combined.plots.pdf"),
-    #   plot = res$missing.genotypes.markers.combined.plots,
-    #   width = n.pop * 4, height = n.pop * 2.5,
-    #   dpi = 600, units = "cm", useDingbats = FALSE, limitsize = FALSE)
-    
     cowplot::save_plot(
       filename = stringi::stri_join(
         path.folder, "/missing.genotypes.markers.combined.plots.pdf"),
@@ -844,7 +821,5 @@ missing_visualization <- function(
   # Results --------------------------------------------------------------------
   return(res)
 }
-
-
 # Internal nested functions ----------------------------------------------------
 # Are now moved in file: internal.R

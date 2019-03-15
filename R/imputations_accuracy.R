@@ -32,15 +32,27 @@
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
 imputations_accuracy <- function(obs, imp) {
+  cat("################################################################################\n")
+  cat("########################## grur::imputations_accuracy ##########################\n")
+  cat("################################################################################\n")
   
-  cat("#######################################################################\n")
-  cat("###################### grur: imputations_accuracy #########################\n")
-  cat("#######################################################################\n")
-  timing <- proc.time()
+  # Cleanup---------------------------------------------------------------------
+  file.date <- format(Sys.time(), "%Y%m%d@%H%M")
+  if (verbose) message("Execution date/time: ", file.date)
+  old.dir <- getwd()
+  opt.change <- getOption("width")
+  options(width = 70)
+  timing <- proc.time()# for timing
+  #back to the original directory and options
+  on.exit(setwd(old.dir), add = TRUE)
+  on.exit(options(width = opt.change), add = TRUE)
+  on.exit(timing <- proc.time() - timing, add = TRUE)
+  on.exit(if (verbose) message("\nComputation time, overall: ", round(timing[[3]]), " sec"), add = TRUE)
+  on.exit(if (verbose) cat("############################ imputations_accuracy ##############################\n"), add = TRUE)
   
   # manage missing arguments -----------------------------------------------------
-  if (missing(obs)) stop("obs data/file missing")
-  if (missing(imp)) stop("imp data/file missing")
+  if (missing(obs)) rlang::abort("obs data/file missing")
+  if (missing(imp)) rlang::abort("imp data/file missing")
   
   # import data ----------------------------------------------------------------
   
@@ -143,10 +155,6 @@ imputations_accuracy <- function(obs, imp) {
   names(res)[[4]] <- "Misclassification Error: by markers"
   names(res)[[5]] <- "Misclassification Error: overall"
   print(res)
-  
-  timing <- proc.time() - timing
-  message("\nComputation time: ", round(timing[[3]]), " sec")
-  cat("############################## completed ##############################\n")
   return(res)
 }#End imputations_accuracy
 
@@ -162,40 +170,35 @@ imputations_accuracy <- function(obs, imp) {
 
 import_imputations <- function(data) {
   if (is.vector(data)) {
-    res <- suppressMessages(
+    data <- suppressMessages(
       radiator::tidy_genomic_data(
         data = data,
-        vcf.metadata = FALSE,
-        monomorphic.out = FALSE,
-        common.markers = FALSE,
         verbose = FALSE
       ))
-  } else {
-    res <- data
-  }
+  } 
   
-  if (!"MARKERS" %in% colnames(res) & "LOCUS" %in% colnames(res)) {
-    res <- dplyr::rename(.data = res, MARKERS = LOCUS)
+  if (!"MARKERS" %in% colnames(data) & "LOCUS" %in% colnames(data)) {
+    data %<>% dplyr::rename(MARKERS = LOCUS)
   }
   
   # check columns
   want <- c("POP_ID", "INDIVIDUALS", "MARKERS", "GT")
-  if (FALSE %in% unique(tibble::has_name(res, want))) {
-    stop("\nData frame of imputations data should include columns:
+  if (FALSE %in% unique(tibble::has_name(data, want))) {
+    rlang::abort("\nData frame of imputations data should include columns:
 POP_ID, INDIVIDUALS, MARKERS, GT")
   }
   
   # scan for missing
-  if ("000000" %in% unique(res$GT)) {
+  if ("000000" %in% unique(data$GT)) {
     message("Data provided still contains missing genotypes,
 accuracy will be mesured on common non-missing genotypes")
   }
   
-  res <- res %>% 
+  data %<>% 
     dplyr::select(POP_ID, INDIVIDUALS, MARKERS, GT) %>%
     dplyr::mutate_all(.tbl = ., .funs = as.character) %>% 
     dplyr::arrange(POP_ID, INDIVIDUALS, MARKERS)
-  return(res)
+  return(data)
 }#End import_imputations
 
 # data_stats--------------------------------------------------------------------
@@ -207,12 +210,12 @@ accuracy will be mesured on common non-missing genotypes")
 
 
 data_stats <- function(data) {
-  res <- data %>%
+  data %<>% 
     dplyr::summarise(
       POP_ID = dplyr::n_distinct(POP_ID),
       INDIVIDUALS = dplyr::n_distinct(INDIVIDUALS),
       MARKERS = dplyr::n_distinct(MARKERS)
     ) %>%
     tidyr::gather(data = ., key = GROUPS, value = N)
-  return(res)
+  return(data)
 }#End data_stats

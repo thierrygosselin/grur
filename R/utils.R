@@ -31,3 +31,14 @@ NULL
 #' @usage lhs \%<>\% rhs
 NULL
 
+# dplyr n ----------------------------------------------------------------------
+# The number of observations in the current group.
+#' @title The number of observations in the current group.
+#' @description Check dplyr
+#' @name n
+#' @rdname n
+#' @keywords internal
+#' @export
+#' @importFrom dplyr n
+#' @usage n()
+NULL
