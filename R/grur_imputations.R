@@ -1591,7 +1591,6 @@ grur_imputer <- function(
   pmm = 0,
   random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
-  # markers.linkage = "multivariate",
   hierarchical.levels = "strata",
   markers.list = markers.list,
   verbose = verbose
@@ -1600,8 +1599,8 @@ grur_imputer <- function(
   
   data %<>% 
     dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
-    dplyr::group_by(INDIVIDUALS, STRATA) %>%
     dplyr::mutate(GT = replace(GT, which(is.na(GT)), "missing")) %>%
+    dplyr::group_by(INDIVIDUALS, STRATA) %>%
     tidyr::spread(data = ., key = MARKERS, value = GT) %>%
     dplyr::ungroup(.)
   
@@ -1672,9 +1671,7 @@ grur_imputer <- function(
                                        .funs = as.character, exclude = NA)
   
   
-  # results --------------------------------------------------------------------
-  
-  
+  # results
   return(data.imp)
 } #End grur_imputer
 
