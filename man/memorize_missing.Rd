@@ -4,15 +4,17 @@
 \alias{memorize_missing}
 \title{Memorize missingness pattern and randomize attributes}
 \usage{
-memorize_missing(data, strata = NULL, randomize = NULL, filename = NULL)
+memorize_missing(data, strata = NULL, randomize = NULL,
+  filename = NULL)
 }
 \arguments{
-\item{data}{12 options: VCF (SNPs or Haplotypes,
-to make the vcf population ready, see details below),
+\item{data}{12 options for input: VCFs (SNPs or Haplotypes,
+to make the vcf population ready),
 plink, stacks haplotype file, genind (library(adegenet)),
 genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
-and a data frame in long/tidy or wide format.
-\emph{See details} of \code{\link[radiator]{tidy_genomic_data}}.}
+and a data frame in long/tidy or wide format. To verify that radiator detect
+your file format use \code{\link{detect_genomic_format}} (see example below).
+Documented in \strong{Input genomic datasets} of \code{\link{tidy_genomic_data}}.}
 
 \item{strata}{(optional/required) Required for VCF and haplotypes files,
 optional for the other formats supported.

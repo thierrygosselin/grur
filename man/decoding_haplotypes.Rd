@@ -4,8 +4,8 @@
 \alias{decoding_haplotypes}
 \title{decoding_haplotypes}
 \usage{
-decoding_haplotypes(data = NULL, parallel.core = parallel::detectCores() -
-  1)
+decoding_haplotypes(data = NULL,
+  parallel.core = parallel::detectCores() - 1)
 }
 \description{
 separate snp group merged with encoding_snp

@@ -6,18 +6,21 @@
 \alias{.grur_parallel}
 \title{hack to switch function for parallel computation based on OS}
 \usage{
-grur_mclapply_win(X, FUN, ..., mc.preschedule = TRUE, mc.set.seed = TRUE,
-  mc.silent = FALSE, mc.cores = NULL, mc.cleanup = TRUE,
-  mc.allow.recursive = TRUE)
+grur_mclapply_win(X, FUN, ..., mc.preschedule = TRUE,
+  mc.set.seed = TRUE, mc.silent = FALSE, mc.cores = NULL,
+  mc.cleanup = TRUE, mc.allow.recursive = TRUE)
 
-.grur_parallel_mc(X, FUN, ..., mc.preschedule = TRUE, mc.set.seed = TRUE,
-  mc.silent = FALSE, mc.cores = getOption("mc.cores", 2L),
-  mc.cleanup = TRUE, mc.allow.recursive = TRUE, affinity.list = NULL)
+.grur_parallel_mc(X, FUN, ..., mc.preschedule = TRUE,
+  mc.set.seed = TRUE, mc.silent = FALSE,
+  mc.cores = getOption("mc.cores", 2L), mc.cleanup = TRUE,
+  mc.allow.recursive = TRUE, affinity.list = NULL)
 
 .grur_parallel(X, FUN, ..., mc.style = "ETA", mc.substyle = NA,
   mc.cores = getOption("mc.cores", 2L),
   ignore.interactive = getOption("ignore.interactive", F),
-  max.vector.size = getOption("max.vector.size", 1024L))
+  max.vector.size = getOption("max.vector.size", 1024L),
+  mc.preschedule = TRUE, mc.set.seed = TRUE, mc.cleanup = TRUE,
+  mc.allow.recursive = TRUE)
 }
 \arguments{
 \item{X}{see \pkg{parallel} \code{\link{mclapply}}}
@@ -55,9 +58,5 @@ The code below was inspired from
 \href{https://github.com/kvnkuang/pbmcapply}{Kevin Kuang},
 \href{https://github.com/psolymos/pbapply}{Peter Solymos} and
 \href{https://github.com/EricArcher/}{Eric Archer}.
-
-functions on Windows.
-
-functions on Windows.
 }
 \keyword{internal}

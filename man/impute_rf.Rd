@@ -4,8 +4,8 @@
 \alias{impute_rf}
 \title{impute_rf}
 \usage{
-impute_rf(x, num.tree = 10, nodesize = 1, nsplit = 10, nimpute = 10,
-  verbose = FALSE, hierarchical.levels = "strata")
+impute_rf(x, num.tree = 10, nodesize = 1, nsplit = 10,
+  nimpute = 10, verbose = FALSE, hierarchical.levels = "strata")
 }
 \description{
 on-the-fly-imputations using randomForestSRC package

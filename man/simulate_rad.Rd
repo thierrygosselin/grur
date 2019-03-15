@@ -4,10 +4,11 @@
 \alias{simulate_rad}
 \title{Simulate RADseq data}
 \usage{
-simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000, ne = c(50,
-  500), nm = c(0, 0.1, 0.5, 1, 5), theta = 0.2, mig.type = c("island",
-  "stepping.stone"), num.reps = 3, num.rms.gens = 10, label = NULL,
-  fsc.exec = "fsc26", parallel.core = parallel::detectCores() - 1)
+simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000,
+  ne = c(50, 500), nm = c(0, 0.1, 0.5, 1, 5), theta = 0.2,
+  mig.type = c("island", "stepping.stone"), num.reps = 3,
+  num.rms.gens = 10, label = NULL, fsc.exec = "fsc26",
+  parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
 \item{num.pops}{(integer) Number of populations.

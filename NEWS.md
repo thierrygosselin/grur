@@ -1,3 +1,18 @@
+# grur v.0.1.0 2019-03-15
+
+* several commits will come with this in the next 2 weeks
+* `missing_visualization`: is getting an upgrade. Will work with GDS file/object.
+* `grur_imputations`: will be fully reviewed and updated to work with GDS.
+* `radiator::genomic_converter`: is now integrated at the end of the imputation 
+module, instead of the later. This will reduce duplication codes for me, and help pass
+CRAN...
+* New documentations.
+* Several arguments are now deprecated or moved to the advance section. Read documentation.
+* new life cycle section in `grur_imputations`
+* Requirement to pass some test before imputations will be generated so that
+user with bad data don't waist time with imputations!
+
+
 # grur v.0.0.11 2018-07-09
 
 * grur ready for R 3.5.1 "Feather Spray" released on 2018/07/05
