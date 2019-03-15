@@ -15,8 +15,7 @@
 #' Random forests (predictive and on-the-fly-imputations); 
 #' Extreme gradient tree boosting (XGBoost);
 #' Fast, distributed, high performance gradient
-#' boosting (LightGBM) and
-#' Multiple Correspondence Analysis (MCA). Furthermore, the module allows to
+#' boosting (LightGBM). Furthermore, the module allows to
 #' compare these algorithms with the classic Strawman imputation
 #' (~ max/mean/mode: the most frequently observed, i.e. non-missing, genotypes is used).
 #' \item \strong{Hierarchical level: } Imputations conducted by strata or globally.
@@ -95,8 +94,6 @@
 #' 
 #' \item \code{imputation.method = "lightgbm"} for a light and fast 
 #' leaf-wise tree growth gradient boosting algorithm (in devel).
-#'
-#' \item \code{imputation.method = "bpca"} Multiple Correspondence Analysis (in devel).
 #'
 #' \code{imputation.method = NULL} the function will stop.
 #' Default: \code{imputation.method = NULL}.
@@ -310,7 +307,7 @@
 #' }
 #' Documented in \href{https://kogalur.github.io/randomForestSRC/index.html}{randomForestSRC}
 #' 
-#' Multiple Correspondence Analysis option available (upcomming):
+# Multiple Correspondence Analysis option available (upcomming):
 # \emph{ncp}.
 # Refer to \code{\link[missMDA]{imputeMCA}} for argument documentation.
 
@@ -470,46 +467,41 @@ grur_imputations <- function(
   
   if (imputation.method == "lightgbm") {
     if (!requireNamespace("lightgbm", quietly = TRUE)) {
-      stop("lightgbm needed for this imputation option to work.
-Please follow the vignette for install instructions", call. = FALSE)
+      rlang::abort("lightgbm needed for this imputation option to work.
+Please follow the vignette for install instructions")
     }
   }
   
   if (imputation.method == "xgboost") {
     if (!requireNamespace("xgboost", quietly = TRUE)) {
-      stop("xgboost needed for this imputation option to work.
-Please follow the vignette for install instructions", call. = FALSE)
+      rlang::abort("xgboost needed for this imputation option to work.
+Please follow the vignette for install instructions")
     }
   }
   
   if (imputation.method == "rf") {
     if (!requireNamespace("randomForestSRC", quietly = TRUE)) {
-      stop("randomForestSRC needed for this imputation option to work.
-Please follow the vignette for install instructions", call. = FALSE)
+      rlang::abort("randomForestSRC needed for this imputation option to work.
+Please follow the vignette for install instructions")
     }
   }
   
   if (imputation.method == "rf_pred") {
     if (!requireNamespace("ranger", quietly = TRUE)) {
-      stop("ranger needed for this imputation option to work.
-           Please follow the vignette for install instructions", call. = FALSE)
+      rlang::abort("ranger needed for this imputation option to work.
+           Please follow the vignette for install instructions")
     }
   }
   
-  if (imputation.method == "bpca") stop("Imputations with bpca is under heavy testing... try again soon!")
+  if (imputation.method == "bpca") rlang::abort("Imputations with bpca is under heavy testing... try again soon!")
   # if (imputation.method == "bpca") {
   #   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
-  #     stop("pcaMethods needed for this imputation option to work.
-  #          Please follow the vignette for install instructions", call. = FALSE)
+  #     rlang::abort("pcaMethods needed for this imputation option to work.
+  #          Please follow the vignette for install instructions")
   #   }
   # }
   
-  if (pmm > 0) {
-    if (!requireNamespace("missRanger", quietly = TRUE)) {
-      stop("missRanger needed for this imputation option to work.
-           Please follow the vignette for install instructions", call. = FALSE)
-    }
-  }
+  
   
   
   # Options selected & Messages ------------------------------------------------
@@ -536,7 +528,12 @@ Please follow the vignette for install instructions", call. = FALSE)
   if (is.null(pmm)) pmm <- 0
   if (is.null(cpu.boost)) cpu.boost <- parallel::detectCores() / 2
   if (is.null(subsample.markers)) subsample.markers <- 1
-
+  if (pmm > 0) {
+    if (!requireNamespace("missRanger", quietly = TRUE)) {
+      rlang::abort("missRanger needed for this imputation option to work.
+           Please follow the vignette for install instructions")
+    }
+  }
   # randomForestSRC arguments ------------------------------------------------
   
   # @param num.tree (integer, optional) The number of trees to grow
@@ -661,11 +658,11 @@ Please follow the vignette for install instructions", call. = FALSE)
       message("    predictive mean matching: ", pmm, "\n")
     }
     
-    if (imputation.method == "bpca") {
-      # message("Multiple Correspondence Analysis options:")
-      # message("    number of dimentions used to predict the missing values: ", ncp)
-      # message("    MCA algorithm: Regularized")
-    }
+    # if (imputation.method == "bpca") {
+    #   # message("Multiple Correspondence Analysis options:")
+    #   # message("    number of dimentions used to predict the missing values: ", ncp)
+    #   # message("    MCA algorithm: Regularized")
+    # }
     
     message("Number of CPUs used during grur's operations: ", parallel.core)
     if (!is.null(filename)) message("Filename: ", filename)
@@ -732,11 +729,11 @@ Please follow the vignette for install instructions", call. = FALSE)
   if (!is.null(strata)) {
     strata.df <- radiator::read_strata(strata = strata, verbose = verbose) %$% strata
     if (!rlang::has_name(strata.df, "STRATA")) {
-      stop("strata file/object requires a columns named: STRATA")
+      rlang::abort("strata file/object requires a columns named: STRATA")
     }
     
     if (!rlang::has_name(strata.df, "INDIVIDUALS")) {
-      stop("strata file/object requires a columns named: INDIVIDUALS")
+      rlang::abort("strata file/object requires a columns named: INDIVIDUALS")
     }
     data %<>% radiator::join_strata(data = ., strata = strata.df, verbose = verbose)
   }
@@ -771,7 +768,7 @@ Please follow the vignette for install instructions", call. = FALSE)
   if (imputation.method == "rf") package.used <- "randomForestSRC"
   if (imputation.method == "xgboost") package.used <- "xgboost"
   if (imputation.method == "lightgbm") package.used <- "lightgbm"
-  if (imputation.method %in% c("max", "rf_pref", "bpca")) package.used <- NULL
+  if (imputation.method %in% c("max", "rf_pred", "bpca")) package.used <- NULL
   
   if (!is.null(package.used)) {
     message("\nNote: If you have speed issues:")
@@ -894,10 +891,10 @@ Please follow the vignette for install instructions", call. = FALSE)
         ) %>% dplyr::bind_rows(.) %>%
           dplyr::bind_rows(data.one.snp)
       } else {
-        data <- purrr::map(.x = locus.multiple.snp,
-                           .f = encoding_snp,
-                           data = data.multiple.snp) %>%
-          dplyr::bind_rows(.) %>%
+        data <- purrr::map_dfr(
+          .x = locus.multiple.snp,
+          .f = encoding_snp,
+          data = data.multiple.snp) %>% 
           dplyr::bind_rows(data.one.snp)
       }
       
@@ -1190,26 +1187,27 @@ Please follow the vignette for install instructions", call. = FALSE)
       if (verbose) message("Using Random Forests algorithm as a prediction problem, take a break...")
       
       if (hierarchical.levels == "strata") {
-        data.imp <- purrr::map(.x = data,
-                               .f = grur_imputer,
-                               hierarchical.levels = hierarchical.levels,
-                               num.tree = num.tree,
-                               pmm = pmm,
-                               random.seed = random.seed,
-                               parallel.core = parallel.core) %>%
-          dplyr::bind_rows(.)
+        data.imp <- purrr::map_dfr(
+          .x = data,
+          .f = grur_imputer,
+          hierarchical.levels = hierarchical.levels,
+          num.tree = num.tree,
+          pmm = pmm,
+          random.seed = random.seed,
+          parallel.core = parallel.core) 
       }
       
       # Random Forests global
       if (hierarchical.levels == "global") { # Globally/overall
         # if (verbose) message("Imputations computed globally, take a break...")
         data.rf.imp <- list() # to store results
-        data.rf.imp <- grur_imputer(data = data,
-                                    hierarchical.levels = hierarchical.levels,
-                                    num.tree = num.tree,
-                                    pmm = pmm,
-                                    random.seed = random.seed,
-                                    parallel.core = parallel.core)
+        data.rf.imp <- grur_imputer(
+          data = data,
+          hierarchical.levels = hierarchical.levels,
+          num.tree = num.tree,
+          pmm = pmm,
+          random.seed = random.seed,
+          parallel.core = parallel.core)
       } # End imputation RF global
       
       
@@ -1438,15 +1436,7 @@ Please follow the vignette for install instructions", call. = FALSE)
     }# End boost
     
     
-    # Baysian PCA here -------------------------------------------------------
-    # if (imputation.method == "bpca") {
-    # 
-    # }
-    
-    
-    # }# End mca
-    
-  } # End imputation RF, xgboost lightgbm and MCA
+  } # End imputation RF, xgboost lightgbm
   
   # prep results ---------------------------------------------------------------
   
@@ -1529,8 +1519,9 @@ Please follow the vignette for install instructions", call. = FALSE)
               grur_imputations_error.txt
               email the problem to the author: thierrygosselin@icloud.com")
   }
-  
-  res$data.imp <- data.imp
+  # make sure that the class of the imputed dataset is a tibble
+  # return(data.imp)
+  res$data.imp <- tibble::as_tibble(data.imp)
   data.imp <- NULL
   # genomic_converter-----------------------------------------------------------
   if (!is.null(output)) {
@@ -1548,7 +1539,7 @@ Please follow the vignette for install instructions", call. = FALSE)
   
   
   # RESULTS---------------------------------------------------------------------
-  return(data.imp)
+  return(res)
 } # End imputations
 
 # Internal functions -------------------------  --------------------------------
@@ -1572,7 +1563,7 @@ impute_rf <- function(
   
   if (hierarchical.levels == "strata") {
     message("        Imputations for strata: ", unique(x$STRATA))
-    x <- dplyr::select(x, -STRATA)
+    x %<>% dplyr::select(-STRATA)
   }
   
   res <- randomForestSRC::impute.rfsrc(
@@ -1607,7 +1598,7 @@ grur_imputer <- function(
 ) {
   # data <- data #test
   
-  data <- data %>%
+  data %<>% 
     dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
     dplyr::group_by(INDIVIDUALS, STRATA) %>%
     dplyr::mutate(GT = replace(GT, which(is.na(GT)), "missing")) %>%
@@ -1615,22 +1606,7 @@ grur_imputer <- function(
     dplyr::ungroup(.)
   
   # data[is.na(data.model)] <- "missing"
-  
-  
-  data.gl <- NULL
-  # if (rlang::has_name(data.pop, "GL")) {
-  #   # not sure useful
-  #   data.gl <- data.pop %>%
-  #     dplyr::select(STRATA, INDIVIDUALS, MARKERS, GL_RF) %>%
-  #     dplyr::group_by(INDIVIDUALS, STRATA) %>%
-  #     tidyr::spread(data = ., key = MARKERS, value = GL_RF) %>%
-  #     dplyr::ungroup(.)
-  # } else {
-  #   data.gl <- NULL
-  # }
-  
-  
-  data.na <- NULL # remove after test
+  data.gl <- data.na <- NULL # remove after test
   
   
   # initiate while loop
@@ -1661,25 +1637,25 @@ grur_imputer <- function(
       hierarchical.levels = hierarchical.levels,
       # markers.linkage = markers.linkage,
       pred.error = pred.error
-    ) #%>%
-    # dplyr::bind_rows(.)
+    ) %>%
+    dplyr::bind_rows(.)
     
-    system.time(test <- purrr::map(
-      .x = markers.list, .f = impute_genotypes,
-      data = data,
-      data.na = data.na,
-      data.gl = data.gl,
-      data.imp = data.imp,
-      num.tree = num.tree,
-      pmm = pmm,
-      random.seed = random.seed,
-      parallel.core = parallel.core,
-      hierarchical.levels = hierarchical.levels,
-      # markers.linkage = markers.linkage,
-      pred.error = pred.error))
-    
-    
-    test <- dplyr::bind_rows(data.imp)
+    # system.time(test <- purrr::map(
+    #   .x = markers.list, .f = impute_genotypes,
+    #   data = data,
+    #   data.na = data.na,
+    #   data.gl = data.gl,
+    #   data.imp = data.imp,
+    #   num.tree = num.tree,
+    #   pmm = pmm,
+    #   random.seed = random.seed,
+    #   parallel.core = parallel.core,
+    #   hierarchical.levels = hierarchical.levels,
+    #   # markers.linkage = markers.linkage,
+    #   pred.error = pred.error))
+    # 
+    # 
+    # test <- dplyr::bind_rows(data.imp)
     
     # update error
     oob.error <- mean(pred.error) < mean(pred.error.last)
@@ -1740,9 +1716,7 @@ impute_genotypes <- function(
   # if (nrow(data.missing) > 0) {
   
   # GL
-  data.gl <- NULL
-  
-  data.complete <- NULL # remove after test
+  data.gl <- data.complete <- NULL # remove after test
   
   if (!is.null(data.gl)) {
     # mean GL per sample
@@ -1926,27 +1900,20 @@ grur_boost_imputer <- function(
     nthread = 1, nrounds = 200, early_stopping_rounds = 20,
     save_name = "imputation.model.temp"
   ) {
-    # m <- markers.list <- "BINDED_M10642_M10643"
-    # m <- markers.list <- "BINDED_M10638_M10639_M10640"
-    # m <- markers.list <- "M29"
     m <- markers.list
     message("Imputation of marker: ", m)
     # preparing data
-    
     all.var <- colnames(data.xgb)
     train.var <- !all.var %in% c(m)
     data.na <- is.na(data.xgb[, all.var, drop = FALSE])
     select.na <- data.na[, m]
     all.var <- data.na <- NULL
-    
     train.data <- data.xgb[!select.na, train.var]
     train.label <- data.xgb[!select.na, m]
-    
     data.xgb <- xgboost::xgb.DMatrix(data = train.data, label = train.label, missing = NA)
     train.data <- NULL
-    
     train.missing <- data.xgb[select.na, train.var, drop = FALSE]
-    if (nrow(train.missing) == 0) stop("code error: email author")
+    if (nrow(train.missing) == 0) rlang::abort("code error: email author")
     train.missing.label <- data.xgb[select.na, m]
     train.var <- select.na <- NULL
     id.string <- train.missing[, "INDIVIDUALS"]
@@ -2395,8 +2362,7 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
         data = data
       ) %>% dplyr::bind_rows(.)
     } else {
-      data.sep <- purrr::map(.x = markers.sep, .f = separate_locus, data = data) %>%
-        dplyr::bind_rows(.)
+      data.sep <- purrr::map_dfr(.x = markers.sep, .f = separate_locus, data = data)
     }
     
     # Include markers 1 snp/read
