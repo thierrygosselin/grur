@@ -5,12 +5,6 @@ output:
 ---
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
-description <- readLines("DESCRIPTION")
-rvers <- stringr::str_match(grep("R \\(", description, value = TRUE), "[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}")[1,1]
-version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, value = TRUE)))
-```
-
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -18,8 +12,14 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
+
 # grur <img src="docs/logo.png" align="right" alt="" />
 <!-- badges: start -->
+```{r, echo = FALSE}
+description <- readLines("DESCRIPTION")
+rvers <- stringr::str_match(grep("R \\(", description, value = TRUE), "[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}")[1,1]
+version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, value = TRUE)))
+```
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://tidyverse.org/lifecycle/#experimental)
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur)
@@ -56,26 +56,32 @@ Use **grur** to **visualize patterns of missingness** and
 
 
 ## Installation
-To try out the dev version of **grur**, copy/paste the code below:
-
 ```r
 if (!require("remotes")) install.packages("remotes")
 remotes::install_github("thierrygosselin/grur")
 library(grur)
 ```
+Note: not all the packages used inside **grur** are installed, why?
 
-* web site and additional info: [https://thierrygosselin.github.io/grur/](https://thierrygosselin.github.io/grur/) 
+* Depending on your analysis, you might not need to install all of them
+* Some modules used for imputations are more complicated to install, and might
+impact your choice of imputations.
+* [this section covers all the required packages installation](https://thierrygosselin.github.io/grur/index.html#options-and-required-packages)
+
+## web site and additional info:
+
+* [https://thierrygosselin.github.io/grur/](https://thierrygosselin.github.io/grur/) 
 * [Computer setup and troubleshooting](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
 * [Function's documentation](http://thierrygosselin.github.io/grur/reference/index.html)
 * [Vignettes](http://thierrygosselin.github.io/grur/articles/index.html)
-* How to cite assigner: inside R type `citation("grur")`
+* How to cite grur: inside R type `citation("grur")`
 
 ## [Life cycle](https://thierrygosselin.github.io/radiator/articles/life_cycle.html)
 
-grur is still experimental, in order to make the package better, changes are 
+**grur** is still experimental, in order to make the package better, changes are 
 inevitable. Experimental functions will change, argument names will change.
-Your codes and workflows might break from time to time until grur is stable. 
-Consequently, depending on your tolerance to change, grur might not be for you.
+Your codes and workflows might break from time to time **until grur is stable**. 
+Consequently, depending on your tolerance to change, **grur** might not be for you.
 
 * Philosophy, major changes and deprecated functions/arguments are documented in
 life cycle section of functions. 
@@ -85,16 +91,14 @@ life cycle section of functions.
 
 ## Options and required packages
 
-Please follow instructions in the [Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0) to install required packages for the
-selected imputation options below:
+Please follow additional instructions in the [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) to install the required packages for the imputation options you want to conduct:
 
 | imputation options | package | install instructions |
 |:-------------------|:-------------------------:|-------------------------------|
-|**imputation.method = "lightgbm"**|`lightgbm`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
-|**imputation.method = "xgboost"**|`xgboost`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
-|**imputation.method = "rf"**|`randomForestSRC`|[Notebook vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)|
+|**imputation.method = "lightgbm"**|`lightgbm`|[vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)|
+|**imputation.method = "xgboost"**|`xgboost`|[vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)|
+|**imputation.method = "rf"**|`randomForestSRC`|[vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)|
 |**imputation.method = "rf_pred"**|`ranger`|`install.packages("ranger")`|
-|**imputation.method = "bpca"**|`pcaMethods`|`source("https://bioconductor.org/biocLite.R")`<br>`biocLite("pcaMethods")`|
 |**if using pmm > 0**|`missRanger`|`install.packages("missRanger")`|
 
 
@@ -102,8 +106,9 @@ selected imputation options below:
 | Caracteristics | Description |
 |:-------------------|:--------------------------------------------------------|
 |**Simulate RADseq data**|`simulate_rad`: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with [fastsimcoal2](http://cmpg.unibe.ch/software/fastsimcoal2/) and then used inside [rmetasim](https://github.com/stranda/rmetasim) simulation engine. *Vignette coming soon*.|
-|**Patterns of missingness**|`missing_visualization`: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures. Vignette: [html](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0) and [Rmd](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)<br><br>`generate_missing`: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. *Vignette coming soon*.|
+|**Patterns of missingness**|`missing_visualization`: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures ([see vignette](https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html)). <br><br>`generate_missing`: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. *Vignette coming soon*.|
 |**Imputations**|`grur_imputations`: **Map-independent** imputations of missing genotypes with several algorithms (including machine leaning):<br> * **Random Forests** (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>* **Extreme Gradient Tree Boosting** (using XGBoost or LightGBM),<br>* **Bayesian PCA** (using bpca in pcaMethods),<br>* **Classic Strawman: ** the most frequently observed, non-missing, genotypes is used for imputation.<br><br>**Hierarchy: ** algorithm's model can account for *strata* groupings, e.g. if patterns of missingness is found in the data.<br><br>**Haplotypes: ** automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. *Vignette coming soon*.|
-| **Input/Output** | The imputations offered in **grur** are seamlesly integrated in **radiator** and **assigner**. Imputations are also integrated with usefull filters, blacklists and whitelists inside those 2 packages. Genetic formats recognized: [VCF, SNPs and haplotypes](https://samtools.github.io/hts-specs/), [PLINK tped/tfam](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr), [genind](https://github.com/thibautjombart/adegenet), [genlight](https://github.com/thibautjombart/adegenet), [strataG gtypes](https://github.com/EricArcher/strataG), [Genepop](http://genepop.curtin.edu.au), [STACKS haplotype file](http://catchenlab.life.illinois.edu/stacks/), [hierfstat](https://github.com/jgx65/hierfstat), [COLONY](https://www.zsl.org/science/software/colony), [betadiv](http://adn.biol.umontreal.ca/~numericalecology/Rcode/), [δaδi](http://gutengroup.mcb.arizona.edu/software/), [structure](http://pritchardlab.stanford.edu/structure.html), [Arlequin](http://cmpg.unibe.ch/software/arlequin35/), [SNPRelate](https://github.com/zhengxwen/SNPRelate), dataframes of genotypes in wide or long/tidy format.|
+| **Input/Output** | **grur** uses [radiator](https://thierrygosselin.github.io/radiator/index.html) input and output modules. Check out the [overview](https://thierrygosselin.github.io/radiator/articles/get_started.html#overview) of
+supported file format|
 |**[ggplot2](http://ggplot2.org)-based plotting**|Visualization: publication-ready figures of important metrics and statistics.|
-|**Parallel**|Codes designed and optimized for fast computations with progress bars. Works with all OS: Linux, Mac and yes PC!|
+|**Parallel**|Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC!|

@@ -1,7 +1,7 @@
 reference:
 - title: Simulate RADseq data
   contents:
-  - simulte_rad
+  - simulate_rad
 
 - title: Identity-by-missigness analysis
   desc: Visualize missing data pattern(s)

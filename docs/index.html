@@ -99,17 +99,25 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>To try out the dev version of <strong>grur</strong>, copy/paste the code below:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"remotes"</span>)) <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
 <a class="sourceLine" id="cb1-2" title="2">remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"thierrygosselin/grur"</span>)</a>
 <a class="sourceLine" id="cb1-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(grur)</a></code></pre></div>
+<p>Note: not all the packages used inside <strong>grur</strong> are installed, why?</p>
 <ul>
-<li>web site and additional info: <a href="https://thierrygosselin.github.io/grur/">https://thierrygosselin.github.io/grur/</a>
-</li>
+<li>Depending on your analysis, you might not need to install all of them</li>
+<li>Some modules used for imputations are more complicated to install, and might impact your choice of imputations.</li>
+<li><a href="https://thierrygosselin.github.io/grur/index.html#options-and-required-packages">this section covers all the required packages installation</a></li>
+</ul>
+</div>
+<div id="web-site-and-additional-info" class="section level2">
+<h2 class="hasAnchor">
+<a href="#web-site-and-additional-info" class="anchor"></a>web site and additional info:</h2>
+<ul>
+<li><a href="https://thierrygosselin.github.io/grur/">https://thierrygosselin.github.io/grur/</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">Computer setup and troubleshooting</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/reference/index.html">Function’s documentation</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/articles/index.html">Vignettes</a></li>
-<li>How to cite assigner: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code>
+<li>How to cite grur: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code>
 </li>
 </ul>
 </div>
@@ -117,7 +125,7 @@
 <h2 class="hasAnchor">
 <a href="#life-cycle" class="anchor"></a><a href="https://thierrygosselin.github.io/radiator/articles/life_cycle.html">Life cycle</a>
 </h2>
-<p>grur is still experimental, in order to make the package better, changes are inevitable. Experimental functions will change, argument names will change. Your codes and workflows might break from time to time until grur is stable. Consequently, depending on your tolerance to change, grur might not be for you.</p>
+<p><strong>grur</strong> is still experimental, in order to make the package better, changes are inevitable. Experimental functions will change, argument names will change. Your codes and workflows might break from time to time <strong>until grur is stable</strong>. Consequently, depending on your tolerance to change, <strong>grur</strong> might not be for you.</p>
 <ul>
 <li>Philosophy, major changes and deprecated functions/arguments are documented in life cycle section of functions.</li>
 <li><a href="https://thierrygosselin.github.io/grur/news/index.html">changelog, versions, new features and bug history</a></li>
@@ -129,13 +137,8 @@
 <div id="options-and-required-packages" class="section level2">
 <h2 class="hasAnchor">
 <a href="#options-and-required-packages" class="anchor"></a>Options and required packages</h2>
-<p>Please follow instructions in the <a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a> to install required packages for the selected imputation options below:</p>
+<p>Please follow additional instructions in the <a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a> to install the required packages for the imputation options you want to conduct:</p>
 <table class="table table">
-<colgroup>
-<col width="25%">
-<col width="34%">
-<col width="39%">
-</colgroup>
 <thead><tr class="header">
 <th align="left">imputation options</th>
 <th align="center">package</th>
@@ -145,17 +148,17 @@
 <tr class="odd">
 <td align="left"><strong>imputation.method = “lightgbm”</strong></td>
 <td align="center"><code>lightgbm</code></td>
-<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
+<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = “xgboost”</strong></td>
 <td align="center"><code>xgboost</code></td>
-<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
+<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>imputation.method = “rf”</strong></td>
 <td align="center"><code>randomForestSRC</code></td>
-<td><a href="https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0">Notebook vignette</a></td>
+<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>imputation.method = “rf_pred”</strong></td>
@@ -163,13 +166,6 @@
 <td><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("ranger")</a></code></td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>imputation.method = “bpca”</strong></td>
-<td align="center"><code>pcaMethods</code></td>
-<td>
-<code><a href="https://www.rdocumentation.org/packages/base/topics/source">source("https://bioconductor.org/biocLite.R")</a></code><br><code>biocLite("pcaMethods")</code>
-</td>
-</tr>
-<tr class="even">
 <td align="left"><strong>if using pmm &gt; 0</strong></td>
 <td align="center"><code>missRanger</code></td>
 <td><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("missRanger")</a></code></td>
@@ -198,7 +194,7 @@
 <tr class="even">
 <td align="left"><strong>Patterns of missingness</strong></td>
 <td align="left">
-<code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures. Vignette: <a href="https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0">html</a> and <a href="https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0">Rmd</a><br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. <em>Vignette coming soon</em>.</td>
+<code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures (<a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">see vignette</a>). <br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. <em>Vignette coming soon</em>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Imputations</strong></td>
@@ -207,15 +203,20 @@
 </tr>
 <tr class="even">
 <td align="left"><strong>Input/Output</strong></td>
-<td align="left">The imputations offered in <strong>grur</strong> are seamlesly integrated in <strong>radiator</strong> and <strong>assigner</strong>. Imputations are also integrated with usefull filters, blacklists and whitelists inside those 2 packages. Genetic formats recognized: <a href="https://samtools.github.io/hts-specs/">VCF, SNPs and haplotypes</a>, <a href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#tr">PLINK tped/tfam</a>, <a href="https://github.com/thibautjombart/adegenet">genind</a>, <a href="https://github.com/thibautjombart/adegenet">genlight</a>, <a href="https://github.com/EricArcher/strataG">strataG gtypes</a>, <a href="http://genepop.curtin.edu.au">Genepop</a>, <a href="http://catchenlab.life.illinois.edu/stacks/">STACKS haplotype file</a>, <a href="https://github.com/jgx65/hierfstat">hierfstat</a>, <a href="https://www.zsl.org/science/software/colony">COLONY</a>, <a href="http://adn.biol.umontreal.ca/~numericalecology/Rcode/">betadiv</a>, <a href="http://gutengroup.mcb.arizona.edu/software/">δaδi</a>, <a href="http://pritchardlab.stanford.edu/structure.html">structure</a>, <a href="http://cmpg.unibe.ch/software/arlequin35/">Arlequin</a>, <a href="https://github.com/zhengxwen/SNPRelate">SNPRelate</a>, dataframes of genotypes in wide or long/tidy format.</td>
+<td align="left">
+<strong>grur</strong> uses <a href="https://thierrygosselin.github.io/radiator/index.html">radiator</a> input and output modules. Check out the <a href="https://thierrygosselin.github.io/radiator/articles/get_started.html#overview">overview</a> of</td>
 </tr>
 <tr class="odd">
+<td align="left">supported file format</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
 <td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
 <td align="left">Visualization: publication-ready figures of important metrics and statistics.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><strong>Parallel</strong></td>
-<td align="left">Codes designed and optimized for fast computations with progress bars. Works with all OS: Linux, Mac and yes PC!</td>
+<td align="left">Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC!</td>
 </tr>
 </tbody>
 </table>

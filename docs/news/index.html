@@ -118,12 +118,142 @@
       <small>Source: <a href='https://github.com/thierrygosselin/grur/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="grur-010-2019-03-15" class="section level1">
+<h1 class="page-header">
+<a href="#grur-010-2019-03-15" class="anchor"></a>grur 0.1.0 2019-03-15</h1>
+<ul>
+<li>several commits will come with this in the next 2 weeks</li>
+<li>
+<code>missing_visualization</code>: is getting an upgrade. Will work with GDS file/object.</li>
+<li>
+<code>grur_imputations</code>: will be fully reviewed and updated to work with GDS.</li>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/radiator/topics/genomic_converter">radiator::genomic_converter</a></code>: is now integrated at the end of the imputation module, instead of the later. This will reduce duplication codes for me, and help pass CRAN…</li>
+<li>New documentations.</li>
+<li>Several arguments are now deprecated or moved to the advance section. Read documentation.</li>
+<li>new life cycle section in <code>grur_imputations</code>
+</li>
+<li>Requirement to pass some test before imputations will be generated so that user with bad data don’t waist time with imputations!</li>
+</ul>
+</div>
+    <div id="grur-0011-2018-07-09" class="section level1">
+<h1 class="page-header">
+<a href="#grur-0011-2018-07-09" class="anchor"></a>grur 0.0.11 2018-07-09</h1>
+<ul>
+<li>grur ready for R 3.5.1 “Feather Spray” released on 2018/07/05</li>
+<li>grur updated to work with ggplot2 v.3.0.0</li>
+</ul>
+</div>
+    <div id="grur-0010-2018-04-26" class="section level1">
+<h1 class="page-header">
+<a href="#grur-0010-2018-04-26" class="anchor"></a>grur 0.0.10 2018-04-26</h1>
+<p><code>grur's</code> dependencies:</p>
+<ul>
+<li>I transferred to <code>Suggests</code> section these packages: lightgbm, missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG, xgboost.</li>
+<li>Functions thate requires specific package will now say so.</li>
+<li>Reason: people only interested in <code>missing_visualization</code> don’t have to install all the required packages required for imputations or simulations.</li>
+</ul>
+<p><code>simulate_rad</code>: with the latest R release (3.5.0), Check now throw a new note: <strong>Note: next used in wrong context: no loop is visible at simulate_rad.R:189</strong> I replaced <code>next</code> inside <code>sapply</code> with <code>while</code>.</p>
+</div>
+    <div id="grur-009-2017-10-27" class="section level1">
+<h1 class="page-header">
+<a href="#grur-009-2017-10-27" class="anchor"></a>grur 0.0.9 2017-10-27</h1>
+<ul>
+<li>
+<code>lightGBM</code> option to conduct the imputations is fully functional</li>
+</ul>
+</div>
+    <div id="grur-008-2017-10-24" class="section level1">
+<h1 class="page-header">
+<a href="#grur-008-2017-10-24" class="anchor"></a>grur 0.0.8 2017-10-24</h1>
+<ul>
+<li>worked on <code>missing_visualization</code> to get better output figures with large number of pop</li>
+<li>worked on imputation algorithm to prep for the use of <code>lightGBM</code> package</li>
+</ul>
+</div>
+    <div id="grur-007-2017-10-02" class="section level1">
+<h1 class="page-header">
+<a href="#grur-007-2017-10-02" class="anchor"></a>grur 0.0.7 2017-10-02</h1>
+<p>worked on <code>missing_visualization</code></p>
+<ul>
+<li>added Eric Archer’s work on detecting patterns</li>
+<li>figures are now combined under themes (e.g. all PCoA for the same strata are together, etc)</li>
+</ul>
+</div>
+    <div id="grur-006-2017-08-18" class="section level1">
+<h1 class="page-header">
+<a href="#grur-006-2017-08-18" class="anchor"></a>grur 0.0.6 2017-08-18</h1>
+<ul>
+<li>several typos fixed</li>
+<li>work on <code>missing_visualization</code>
+</li>
+</ul>
+</div>
+    <div id="grur-005-2017-08-15" class="section level1">
+<h1 class="page-header">
+<a href="#grur-005-2017-08-15" class="anchor"></a>grur 0.0.5 2017-08-15</h1>
+<ul>
+<li>restored progress bar when using parallel computing by installing the new dev version of <code>pbmcapply</code> package.</li>
+</ul>
+</div>
+    <div id="grur-005-2017-08-15-1" class="section level1">
+<h1 class="page-header">
+<a href="#grur-005-2017-08-15-1" class="anchor"></a>grur 0.0.5 2017-08-15</h1>
+<ul>
+<li>restored progress bar when using parallel computing by installing the new dev version of <code>pbmcapply</code> package.</li>
+</ul>
+</div>
+    <div id="grur-004-2017-08-15" class="section level1">
+<h1 class="page-header">
+<a href="#grur-004-2017-08-15" class="anchor"></a>grur 0.0.4 2017-08-15</h1>
+<ul>
+<li>bug fix: removed the progress bar when using parallel computing. This is temporary, while waiting for a fix with <code>pbmcapply</code> package.</li>
+</ul>
+</div>
+    <div id="grur-003-2017-06-17" class="section level1">
+<h1 class="page-header">
+<a href="#grur-003-2017-06-17" class="anchor"></a>grur 0.0.3 2017-06-17</h1>
+<ul>
+<li>
+<code>simulate_rad</code>: a new function developed by Eric Archer to simulate populations of RADseq data following <strong>island</strong> or <strong>stepping</strong> stone models.</li>
+<li>
+<strong>grur</strong> works with <code>dplyr v.0.7.0</code>
+</li>
+</ul>
+</div>
+    <div id="grur-002-2017-04-23" class="section level1">
+<h1 class="page-header">
+<a href="#grur-002-2017-04-23" class="anchor"></a>grur 0.0.2 2017-04-23</h1>
+<ul>
+<li>Work on <code>generate_missing</code> function.</li>
+<li>Still not as I wish. But getting there.</li>
+<li>2 new functions: <code>imputations_accuracy</code> and <code>memorize_missing</code>. Check functions documentations for more info.</li>
+</ul>
+</div>
+    <div id="grur-001-2017-04-07" class="section level1">
+<h1 class="page-header">
+<a href="#grur-001-2017-04-07" class="anchor"></a>grur 0.0.1 2017-04-07</h1>
+<p>New package is out!</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#grur-010-2019-03-15">0.1.0</a></li>
+        <li><a href="#grur-0011-2018-07-09">0.0.11</a></li>
+        <li><a href="#grur-0010-2018-04-26">0.0.10</a></li>
+        <li><a href="#grur-009-2017-10-27">0.0.9</a></li>
+        <li><a href="#grur-008-2017-10-24">0.0.8</a></li>
+        <li><a href="#grur-007-2017-10-02">0.0.7</a></li>
+        <li><a href="#grur-006-2017-08-18">0.0.6</a></li>
+        <li><a href="#grur-005-2017-08-15">0.0.5</a></li>
+        <li><a href="#grur-005-2017-08-15-1">0.0.5</a></li>
+        <li><a href="#grur-004-2017-08-15">0.0.4</a></li>
+        <li><a href="#grur-003-2017-06-17">0.0.3</a></li>
+        <li><a href="#grur-002-2017-04-23">0.0.2</a></li>
+        <li><a href="#grur-001-2017-04-07">0.0.1</a></li>
       </ul>
     </div>
   </div>
