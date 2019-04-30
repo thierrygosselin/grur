@@ -117,14 +117,19 @@
 <li><a href="http://thierrygosselin.github.io/grur/reference/index.html">Function’s documentation</a></li>
 <li><a href="https://thierrygosselin.github.io/grur/index.html#features">grur’s features</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/articles/index.html">Vignettes</a></li>
-<li>How to cite grur: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code> ## Assumptions before imputing your dataset</li>
+<li>How to cite grur: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code>
+</li>
 </ul>
+</div>
+<div id="assumptions-before-imputing-your-dataset" class="section level2">
+<h2 class="hasAnchor">
+<a href="#assumptions-before-imputing-your-dataset" class="anchor"></a>Assumptions before imputing your dataset</h2>
 <ol style="list-style-type: decimal">
-<li><p><strong>Filtered data</strong> Please don’t try <strong>grur</strong> with raw data consisting of &gt; 100K SNPs, you will generate all sorts of bias and you’ll be disapointed. <strong>Filter your data first.</strong> <a href="https://thierrygosselin.github.io/radiator/">radiator</a> was designed for this.</p></li>
-<li><p><strong>Correlations</strong>: machine learning algorithms will work better and faster if correlation are reduced to a minimum. If you used <a href="https://thierrygosselin.github.io/radiator/reference/filter_rad.html">filter_rad</a> to filter your dataset, you should be ok. If not, check your dataset for <a href="https://thierrygosselin.github.io/radiator/reference/filter_ld.html">short and long LD</a>.</p></li>
+<li><p><strong>Filtered data</strong>: Please don’t try <strong>grur</strong> with raw data consisting of &gt; 100K SNPs, you will generate all sorts of bias and you’ll be disapointed. <strong>Filter your data first!</strong> <a href="https://thierrygosselin.github.io/radiator/">radiator</a> was designed for this.</p></li>
+<li><p><strong>Correlations</strong>: Machine learning algorithms will work better and faster if correlation are reduced to a minimum. If you used <a href="https://thierrygosselin.github.io/radiator/reference/filter_rad.html">filter_rad</a> to filter your dataset, you should be ok. If not, check your dataset for <a href="https://thierrygosselin.github.io/radiator/reference/filter_ld.html">short and long LD</a>.</p></li>
 <li><p><strong>Pattern of individual heterozygosity</strong>: If you have individual heterozygosity patterns and/or correlation of individual heterozygosity with missingness, you might want to skip imputation and go back to filter your data. Please check out <a href="https://thierrygosselin.github.io/radiator/reference/detect_mixed_genomes.html">radiator::detect_mixed_genomes</a> and <a href="https://thierrygosselin.github.io/radiator/reference/detect_het_outliers.html">radiator::detect_het_outliers</a>.</p></li>
-<li><p><strong>Patterns of missingness</strong>: look for patterns of missingness <a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">(vignette)</a> to better understand the reasons for their presence and tailor the arguments inside grur’s imputation module.</p></li>
-<li><p><strong>Default arguments</strong>: are there for testing, please, please, please, don’t use grur’s defaults for publications!</p></li>
+<li><p><strong>Patterns of missingness</strong>: Look for patterns of missingness <a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">(vignette)</a> to better understand the reasons for their presence and tailor the arguments inside grur’s imputation module.</p></li>
+<li><p><strong>Default arguments</strong>: Defaults are there for testing, please, please, please, don’t use grur’s defaults for publications!</p></li>
 </ol>
 </div>
 <div id="life-cycle" class="section level2">

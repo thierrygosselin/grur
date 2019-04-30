@@ -24,6 +24,8 @@ navbar:
   left:
   - text: Installation
     href: index.html
+  - text: Assumptions
+    href: 
   - text: Reference
     href: reference/index.html
   #- text: Features

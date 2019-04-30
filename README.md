@@ -67,16 +67,18 @@ web site and additional info <https://thierrygosselin.github.io/grur/> :
 -   [grur’s
     features](https://thierrygosselin.github.io/grur/index.html#features)
 -   [Vignettes](http://thierrygosselin.github.io/grur/articles/index.html)
--   How to cite grur: inside R type `citation("grur")` \#\# Assumptions
-    before imputing your dataset
+-   How to cite grur: inside R type `citation("grur")`
 
-1.  **Filtered data** Please don’t try **grur** with raw data consisting
-    of \> 100K SNPs, you will generate all sorts of bias and you’ll be
-    disapointed. **Filter your data first.**
+Assumptions before imputing your dataset
+----------------------------------------
+
+1.  **Filtered data**: Please don’t try **grur** with raw data
+    consisting of \> 100K SNPs, you will generate all sorts of bias and
+    you’ll be disapointed. **Filter your data first.**
     [radiator](https://thierrygosselin.github.io/radiator/) was designed
     for this.
 
-2.  **Correlations**: machine learning algorithms will work better and
+2.  **Correlations**: Machine learning algorithms will work better and
     faster if correlation are reduced to a minimum. If you used
     [filter\_rad](https://thierrygosselin.github.io/radiator/reference/filter_rad.html)
     to filter your dataset, you should be ok. If not, check your dataset
@@ -91,13 +93,13 @@ web site and additional info <https://thierrygosselin.github.io/grur/> :
     and
     [radiator::detect\_het\_outliers](https://thierrygosselin.github.io/radiator/reference/detect_het_outliers.html).
 
-4.  **Patterns of missingness**: look for patterns of missingness
+4.  **Patterns of missingness**: Look for patterns of missingness
     [(vignette)](https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html)
     to better understand the reasons for their presence and tailor the
     arguments inside grur’s imputation module.
 
-5.  **Default arguments**: are there for testing, please, please,
-    please, don’t use grur’s defaults for publications!
+5.  **Default arguments**: Defaults are there for testing, please,
+    please, please, don’t use grur’s defaults for publications!
 
 [Life cycle](https://thierrygosselin.github.io/radiator/articles/life_cycle.html)
 ---------------------------------------------------------------------------------
