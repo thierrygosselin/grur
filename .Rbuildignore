@@ -10,3 +10,5 @@
 ^README_grur_logo\.png$
 .DS_Store
 ^docs$
+^_pkgdown\.yml$
+^pkgdown$

@@ -28,8 +28,6 @@
 #' @param mc.allow.recursive see \pkg{parallel} \code{\link{mclapply}}
 
 # @return For mclapply, a list of the same length as X and named by X.
-#' @importFrom utils sessionInfo
-#' @importFrom parallel detectCores makeCluster clusterExport mclapply parLapply stopCluster
 #' @rdname grur_parallel
 #' @export
 #' @keywords internal
@@ -97,8 +95,6 @@ grur_mclapply_win <- function(
 #' functions on Windows.
 # @inheritParams parallel::mclapply
 #' @return For mclapply, a list of the same length as X and named by X.
-# @importFrom parallel detectCores makeCluster clusterExport mclapply parLapply stopCluster
-# @importFrom pbmcapply pbmclapply
 #' @rdname grur_parallel
 #' @keywords internal
 #' @export
@@ -121,8 +117,6 @@ grur_mclapply_win <- function(
 #' functions on Windows.
 # @inheritParams parallel::mclapply
 #' @return For mclapply, a list of the same length as X and named by X.
-# @importFrom parallel detectCores makeCluster clusterExport mclapply parLapply stopCluster
-#' @importFrom pbmcapply pbmclapply
 #' @rdname grur_parallel
 #' @keywords internal
 #' @export

@@ -85,10 +85,6 @@
 #' @seealso \href{https://github.com/EricArcher/strataG}{strataG}
 
 #' @author Eric Archer \email{eric.archer@@noaa.gov} and Thierry Gosselin \email{thierrygosselin@@icloud.com}
-#' 
-#' @importFrom readr write_tsv
-# @importFrom strataG fscPopInfo fscLocusParams fscHistEv fastsimcoal alleleFreqs df2gtypes
-# @importFrom rmetasim landscape.simulate landscape.ploidy landscape.democol landscape.locusvec landscape.new.empty landscape.new.intparam landscape.new.floatparam landscape.new.switchparam landscape.new.local.demo landscape.new.epoch landscape.new.locus landscape.mig.matrix
 #' @export
 simulate_rad <- function(
   num.pops = 5,

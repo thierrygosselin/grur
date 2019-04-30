@@ -1,0 +1,256 @@
+---
+title: "grur missing data visualization analysis"
+author: "Thierry Gosselin"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_document:
+   toc: yes
+   toc_float: yes
+vignette: >
+  %\VignetteIndexEntry{RADseq genomics in R}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Objectives
+Learn how to visualize missing genotypes in your genomic dataset with 
+the function `grur::missing_visualization` (time = 15 min).
+
+
+# Workflow
+The function `missing_visualization` in 
+[grur](https://github.com/thierrygosselin/grur) uses various genomic input 
+files and conduct identity-by-missingness analyses (IBM) using 
+Principal Coordinates Analysis (PCoA), also called Multidimensional Scaling (MDS)
+and RDA (Redundancy Analysis) to highlight missing data patterns.
+Figures and summary tables of missing information at the marker, 
+individual and population level are generated. 
+Below, the simplest form of the function to get results. 
+More options are available, please see the function documentation.
+
+
+# Prepare your R workspace
+
+Clean your desk
+```{r Prepare your R workspace, eval = FALSE}
+rm(list = ls())
+```
+
+Follow the [instruction to install grur](https://thierrygosselin.github.io/grur/)
+
+Load the required libraries:
+```{r Load the required libraries, eval = FALSE}
+library("grur")
+```
+
+
+Set your working directory, e.g.:
+```{r working directory, eval = FALSE}
+setwd("~/Documents/test_missing_visualization_vignette")
+```
+
+
+
+# Download the test data
+
+
+Dataset: in this example, we use the data in Ferchaud and Hansen (2015 and 2016) 
+paper. The code below gets the vcf from Dryad directly. 
+But you can skip the step if it's already in the folder.
+```{r download vcf, eval=FALSE, include=TRUE}
+writeBin(httr::content(httr::GET("http://datadryad.org/bitstream/handle/10255/dryad.97237/sticklebacks_Danish.vcf?sequence=1"), "raw"), "stickleback_ferchaud_2015.vcf")
+```
+
+With a vcf you also need a strata file (indicating population groupings)
+
+* it's a tab-delimited file or object, in the global environment.
+* requires a minimum of 2 columns: `INDIVIDUALS` and `STRATA`.
+* the `STRATA` column and the remaining columns can be any hierarchical groupings you like.
+* because in the strickleback vcf the population's ids are contained in the name of the
+individuals, we can easily extract this info with string command.
+* here, creating from scratch the strata file is beyond the point of this tutoria (`??radiator::read_strata`).
+* if you don't have this kind of individual naming scheme, you can also make the strata file by hand, 
+the old fashion way.
+* if you've used \href{http://catchenlab.life.illinois.edu/stacks/}{stacks}
+for your RADseq pipeline, the strata file is similar to a 
+stacks `population map file`. Just make sure you have the required column names:
+`INDIVIDUALS` and `STRATA`. 
+
+to download the strata for this example: [strata link](https://www.dropbox.com/s/ely3wp4j4tulkrc/strata.stickleback.tsv?dl=0)
+
+
+# Run the function
+
+This is the simplest way to run the function:
+
+```{r run the function, eval=FALSE, include=TRUE}
+ibm <- grur::missing_visualization(
+  data = "stickleback_ferchaud_2015.vcf", 
+  strata = "strata.stickleback.tsv")
+```
+
+The function does a few automatic filters:
+* Monomorphic markers are removed
+* Only common markers between strata are kept for the analysis
+* Individuals and markers statistics are generated automatically
+
+
+A new object `ibm` was created in your global environment. 
+It's a list and to view it's content use:
+```{r accessing the object, eval = FALSE}
+names(ibm)
+```
+
+
+Lots of info in there... Lets focus on just a few. 
+A folder is also created automatically. The function generates by default a large object (list):
+
+* IBM-PCoA plot
+* heatmap plot showing genotyped/missing data (in black)
+* several plots showing the distribution of missing genotypes by individuals, 
+pop and markers. 
+* blacklists of individuals are included in the list 
+`ibm` and written to the working directory 
+(defaults from 10% to 70%, that automatically stops if no individuals at the 
+threshold is found, can be changed with `ind.missing.geno.threshold` argument). 
+* tables with summary missing information along the vectors of eigenvalues of the 
+principal coordinates analysis are also part of the list output. 
+* all these objects are accessed with `$`.
+
+# Visualization
+
+**To view the IBM-PCoA plot made with POP_ID grouping:**
+```{r IBM-PCoA plot POP_ID, eval = FALSE}
+ibm$ibm.plots$ibm.strata.POP_ID
+```
+
+The dark green bubble from KIB it's an individual with almost **all of his genotypes missing**.
+This one skip the radar of the authors ;)
+
+The heatmap showing missingness:
+
+* gives a nice global outlook of the missingness
+* the figure is very long to generate (on some computers..), don't try this with more than 100K markers... or take a couple day off:
+```{r heatmap, eval = FALSE}
+heatmap <- ibm$heatmap 
+heatmap 
+```
+
+The vertical black line highlight the problem in the vcf with the individual missing almost all it's genotypes.
+
+View the table with summary of missing genotypes per individuals: 
+```{r table with summary of missing genotypes per individuals, eval = FALSE}
+table.ind <- ibm$missing.genotypes.ind
+table.ind
+```
+
+
+To view the distribution
+```{r view the distribution of missing genotypes per ind.and populations, eval =  FALSE}
+ibm$missing.genotypes.ind.plots
+```
+
+```{r, eval =  FALSE}
+ibm$missing.genotypes.ind.histo
+```
+
+Show the helper figure showing how many individuals could potentially be blacklisted based on % on genotypes.
+```{r, eval =  FALSE}
+ibm$ind.genotyped.helper.plot
+```
+
+All these figures are combined in the folder...
+
+
+To view the distribution of missingness per markers
+```{r missingness markers, eval =  FALSE}
+ibm$missing.genotypes.markers.combined.plots
+```
+
+**Other figures are created, explore the list of objects and folder. Read the doc.**
+
+
+**To view the distribution of FH and missing genotypes per individuals**
+
+* FH : is an identity by descent genomic (IBDg) measure based on the excess in 
+the observed number of homozygous genotypes within an individual relative to
+the mean number of homozygous genotypes expected under random mating).
+
+* To learn more about it see (Keller et al., 2011; Kardos et al., 2015; Hedrick & Garcia-Dorado, 2016)
+
+```{r, eval = FALSE}
+ibm$missing.genotypes.ind.fh.combined.plots 
+```
+
+This is weird figure is caused by the outlier individual. To remove this individual, re-run `missing_visualization` with the argument `blacklist.id` and one of the several blacklists written to the working directory (e.g. `blacklist.id.missing.70.tsv`). 
+
+
+**Explore the rest by yourself!**
+
+
+
+# Interpretation
+
+Do you see patterns in your plots that provides insight about the relationships that missing values might have with other variables (inspired from [r4ds](http://r4ds.had.co.nz/exploratory-data-analysis-eda.html)).
+
+If you see a pattern, ask yourself:
+
+* Is the pattern due to coincidence (i.e. random chance)?
+
+* Could you describe the relationship in the pattern ?
+
+* How strong is the relationship implied by the pattern?
+
+* What other variables might affect the relationship?
+
+* Does the relationship change if you look at individual subgroups of the data?
+
+* Do you think the pattern observed in the data could impact the clustering analysis?
+
+
+##Arguments
+* use `strata.select` to select columns from the strata file to generate PCoA-IBM plots. If you have several columns to test e.g. library, sequencer, sequencing lanes, sampling sites, populations, use inside a string to get all of them!
+* use `distance.method` to explore other distance metric used by the function `dist`
+
+
+##Filtering strategies
+* explore the impact of different filtering parameters on missing genotypes pattern, with `radiator::filter_rad`.
+* test your own whitelist of markers with `whitelist.markers`.
+* use the blacklist of individuals created with the function to **manage** missing data inside filtering pipelines
+* excluding/including individuals, populations and markers to test the impact of filtering on polymorphism discovery
+* ready to test missing data imputations ? Most stackr functions have built-in imputations arguments.
+
+##References
+Ferchaud A, Hansen MM (2016) The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Molecular Ecology 25(1): 238–259. http://dx.doi.org/10.1111/mec.13399
+
+Ferchaud A, Hansen MM (2015) Data from: The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.kp11q
+
+Danecek P, Auton A, Abecasis G et al. (2011)
+The variant call format and VCFtools. Bioinformatics, 27, 2156–2158.
+
+Purcell S, Neale B, Todd-Brown K et al. (2007)
+PLINK: a tool set for whole-genome association and population-based linkage
+analyses. American Journal of Human Genetics, 81, 559–575.
+
+Keller MC, Visscher PM, Goddard ME (2011)
+Quantification of inbreeding due to distant ancestors and its detection
+using dense single nucleotide polymorphism data. Genetics, 189, 237–249.
+
+Kardos M, Luikart G, Allendorf FW (2015)
+Measuring individual inbreeding in the age of genomics: marker-based
+measures are better than pedigrees. Heredity, 115, 63–72.
+
+Hedrick PW, Garcia-Dorado A. (2016)
+Understanding Inbreeding Depression, Purging, and Genetic Rescue.
+Trends in Ecology and Evolution. 2016;31: 940-952.
+doi:10.1016/j.tree.2016.09.005

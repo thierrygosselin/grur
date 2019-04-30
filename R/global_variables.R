@@ -62,7 +62,7 @@ if (getRversion() >= "2.15.1") {
       "std.error", "term", "estimate", "a", "b", "is.missing", "STRATA_SELECT",
       "POLYMORPHIC.x", "POLYMORPHIC.y", "SPLIT_VEC", "SCORE", "IMPUTED_DATA",
       "LABEL", "MODEL", "ROWS", "ANCESTRY", "ASSIGN", "GROUP_POST", "GROUP_PRIOR",
-      "LEVELS", "TERMS", "Variance", "input"
+      "LEVELS", "TERMS", "Variance", "input", "HETEROZYGOSITY"
     )
   )
 }

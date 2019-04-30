@@ -45,11 +45,6 @@
 
 #' @export
 #' @rdname generate_sequencing_strata
-#' @importFrom dplyr n_distinct left_join ntile
-#' @importFrom readr read_tsv write_tsv
-#' @importFrom stringi stri_join
-#' @importFrom tibble data_frame
-
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
 generate_sequencing_strata <- function(

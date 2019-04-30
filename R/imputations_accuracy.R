@@ -24,11 +24,6 @@
 
 #' @export
 #' @rdname imputations_accuracy
-#' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter full_join
-#' @importFrom radiator tidy_genomic_data
-#' @importFrom purrr flatten_chr flatten_dbl
-#' @importFrom tibble has_name
-#' @importFrom tidyr gather
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
 imputations_accuracy <- function(obs, imp) {
@@ -38,7 +33,7 @@ imputations_accuracy <- function(obs, imp) {
   
   # Cleanup---------------------------------------------------------------------
   file.date <- format(Sys.time(), "%Y%m%d@%H%M")
-  if (verbose) message("Execution date/time: ", file.date)
+  message("Execution date/time: ", file.date)
   old.dir <- getwd()
   opt.change <- getOption("width")
   options(width = 70)
@@ -47,8 +42,8 @@ imputations_accuracy <- function(obs, imp) {
   on.exit(setwd(old.dir), add = TRUE)
   on.exit(options(width = opt.change), add = TRUE)
   on.exit(timing <- proc.time() - timing, add = TRUE)
-  on.exit(if (verbose) message("\nComputation time, overall: ", round(timing[[3]]), " sec"), add = TRUE)
-  on.exit(if (verbose) cat("############################ imputations_accuracy ##############################\n"), add = TRUE)
+  on.exit(message("\nComputation time, overall: ", round(timing[[3]]), " sec"), add = TRUE)
+  on.exit(cat("############################ imputations_accuracy ##############################\n"), add = TRUE)
   
   # manage missing arguments -----------------------------------------------------
   if (missing(obs)) rlang::abort("obs data/file missing")

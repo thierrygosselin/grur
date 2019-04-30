@@ -57,9 +57,6 @@
 
 #' @export
 #' @rdname memorize_missing
-#' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
-#' @importFrom radiator tidy_genomic_data
-
 #' @author Thierry Gosselin \email{thierrygosselin@@icloud.com}
 
 memorize_missing <- function(

@@ -9,7 +9,7 @@
 #' @usage lhs \%>\% rhs
 NULL
 
-# Exposition pipe-operator
+# Exposition pipe-operator -----------------------------------------------------
 #' @title Exposition pipe-operator
 #' @description magrittr Exposition pipe-operator
 #' @name %$%
@@ -20,7 +20,7 @@ NULL
 #' @usage lhs \%$\% rhs
 NULL
 
-# compound assignment pipe operator
+# compound assignment pipe operator --------------------------------------------
 #' @title compound assignment pipe operator
 #' @description magrittr compound assignment pipe operator
 #' @name %<>%

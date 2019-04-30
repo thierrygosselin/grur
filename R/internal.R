@@ -57,7 +57,6 @@ landscape.new.ind.genos <- function(rland, PopulationSizes, AlleleFreqs = NULL) 
   rland
 }
 
-
 #' @title loadLandscape
 #' @description loadLandscape
 #' @rdname loadLandscape
@@ -384,7 +383,6 @@ markers_genotyped_helper <- function(x, y) {
 #' @rdname generate_pcoa_plot
 #' @keywords internal
 #' @export
-#' @importFrom ggpubr ggarrange
 generate_pcoa_plot <- function(
   strata.select,
   pc.to.do,
@@ -522,22 +520,13 @@ generate_pcoa_plot <- function(
 #' @title pct_missing_by_total
 #' @description Generates plot missing by total
 #' @rdname pct_missing_by_total
-#' @importFrom rlang .data UQ ":="
-#' @importFrom dplyr group_by left_join summarise mutate filter ungroup select arrange
-#' @importFrom ggplot2 ggplot aes_string geom_segment geom_point geom_abline geom_hline aes scale_x_log10 facet_wrap labs
-#' @importFrom purrr map
-#' @importFrom tidyr nest unnest
-#' @importFrom broom tidy
-#' @importFrom stats lm
 #' @keywords internal
 #' @export
 
 pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
   res <- list() # to store results
   
-  data <- dplyr::rename(
-    .data = data,
-    STRATA_SELECT = .data[[!!(strata.select)]])
+  data %<>% dplyr::rename(STRATA_SELECT = data[[!!(strata.select)]])
   
   n.strata <- dplyr::n_distinct(data$STRATA_SELECT)
   
@@ -578,7 +567,7 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE))
 
   # summarize % missing for each total number missing in each factor level (label)
-  miss.smry <- miss.smry %>%
+  miss.smry %<>% 
     dplyr::group_by(STRATA_SELECT, num.missing.total) %>%
     dplyr::summarize(
       n = length(pct.missing),
@@ -671,19 +660,20 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
 #' Redundancy Analysis to highlight potential patterns of missingness in the data
 #' based on the strata provided
 #' @rdname missing_rda
-#' @importFrom dplyr group_by left_join summarise mutate filter ungroup select arrange
-#' @importFrom tidyr gather spread
-#' @importFrom purrr map flatten_chr keep
-#' @importFrom broom tidy
-#' @importFrom ape pcoa
-#' @importFrom adespatial dist.ldc
-#' @importFrom stats as.formula
-#' @importFrom stringi stri_join
-#' @importFrom broom tidy
-#' @importFrom vegan anova.cca rda
-#' @importFrom radiator read_rad
 #' @keywords internal
 #' @export
+# IMPORT FROM ------------------------------------------------------------------
+#' @importFrom dplyr distinct rename arrange mutate select summarise group_by ungroup filter inner_join left_join
+#' @importFrom ggpubr ggarrange
+#' @importFrom ape pcoa
+#' @importFrom radiator tidy_genomic_data change_pop_names ibdg_fh detect_all_missing write_rad
+#' @importFrom cowplot plot_grid align_plots
+#' @importFrom Matrix Matrix
+#' @importFrom vegan anova.cca rda
+#' @importFrom ape pcoa
+#' @importFrom adespatial dist.ldc
+#' @importFrom pbmcapply pbmclapply
+#' @importFrom data.table as.data.table dcast.data.table melt.data.table
 
 missing_rda <- function(
   data, 

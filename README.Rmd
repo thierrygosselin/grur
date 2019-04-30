@@ -1,7 +1,13 @@
 ---
-output: github_document
+output:
+  md_document:
+    variant: markdown_github
 ---
-
+```{r, echo = FALSE}
+description <- readLines("DESCRIPTION")
+rvers <- stringr::str_match(grep("R \\(", description, value = TRUE), "[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}")[1,1]
+version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, value = TRUE)))
+```
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
@@ -13,34 +19,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-# grur<img src="README_grur_logo.png" align="right"/>
+# grur<img src="logo.png" align="right"/>
+<!-- badges: start -->
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://tidyverse.org/lifecycle/#experimental)
 [![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
-
-```{r, echo = FALSE}
-description <- readLines("DESCRIPTION")
-rvers <- stringr::str_match(grep("R \\(", description, value = TRUE), "[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}")[1,1]
-```
-```{r, echo = FALSE}
-description <- readLines("DESCRIPTION")
-version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, value = TRUE)))
-```
 [![packageversion](https://img.shields.io/badge/Package%20version-`r version`-orange.svg)](commits/master)
 [![Last-changedate](https://img.shields.io/badge/last%20change-`r gsub('-', '--', Sys.Date())`-brightgreen.svg)](/commits/master)
-
+<!-- badges: end -->
 ---
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-```
 
 https://thierrygosselin.github.io/grur/
 
@@ -70,8 +61,8 @@ Use **grur** to **visualize patterns of missingness** and
 To try out the dev version of **grur**, copy/paste the code below:
 
 ```r
-if (!require("devtools")) install.packages("devtools") # to install
-devtools::install_github("thierrygosselin/grur")
+if (!require("remotes")) install.packages("remotes")
+remotes::install_github("thierrygosselin/grur")
 library(grur)
 ```
 
