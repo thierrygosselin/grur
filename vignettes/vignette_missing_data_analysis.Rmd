@@ -7,7 +7,7 @@ output:
    toc: yes
    toc_float: yes
 vignette: >
-  %\VignetteIndexEntry{RADseq genomics in R}
+  %\VignetteIndexEntry{grur missing data visualization analysis}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

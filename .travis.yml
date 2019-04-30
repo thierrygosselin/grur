@@ -20,3 +20,26 @@ apt_packages:
 os:
   - linux
   - osx
+
+# Binary versions of packages to reduce build time.
+r_binary_packages:
+  - data.table
+  - dplyr
+  - markdown
+  - readr
+  - rlang
+  - rmarkdown
+  - stringi
+  - tidyr
+  - tibble
+  - ggplot2
+  - pbmcapply
+  - adespatial
+  - missRanger
+  - ape
+  - adespatial,
+  - cowplot,
+  - ggpubr,
+  - vegan
+  - xgboost
+  - randomForestSRC
