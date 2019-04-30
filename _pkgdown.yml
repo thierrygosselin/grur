@@ -25,11 +25,11 @@ navbar:
   - text: Installation
     href: index.html
   - text: Assumptions
-    href: 
+    href: https://thierrygosselin.github.io/grur/#assumptions-before-imputing-your-dataset
+  - text: Features
+    href: https://thierrygosselin.github.io/grur/#features
   - text: Reference
     href: reference/index.html
-  #- text: Features
-   # href: FEATURES.html
   - text: Articles
     href: articles/index.html
     menu:

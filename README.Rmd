@@ -99,7 +99,7 @@ Please check out [radiator::detect_mixed_genomes](https://thierrygosselin.github
 grur's defaults for publications!
 
 
-## [Life cycle](https://thierrygosselin.github.io/radiator/articles/life_cycle.html)
+## Life cycle
 
 **grur** is still experimental, in order to make the package better, changes are 
 inevitable. Experimental functions will change, argument names will change.

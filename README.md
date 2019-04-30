@@ -74,7 +74,7 @@ Assumptions before imputing your dataset
 
 1.  **Filtered data**: Please don’t try **grur** with raw data
     consisting of \> 100K SNPs, you will generate all sorts of bias and
-    you’ll be disapointed. **Filter your data first.**
+    you’ll be disapointed. **Filter your data first!**
     [radiator](https://thierrygosselin.github.io/radiator/) was designed
     for this.
 
@@ -101,8 +101,8 @@ Assumptions before imputing your dataset
 5.  **Default arguments**: Defaults are there for testing, please,
     please, please, don’t use grur’s defaults for publications!
 
-[Life cycle](https://thierrygosselin.github.io/radiator/articles/life_cycle.html)
----------------------------------------------------------------------------------
+Life cycle
+----------
 
 **grur** is still experimental, in order to make the package better,
 changes are inevitable. Experimental functions will change, argument
