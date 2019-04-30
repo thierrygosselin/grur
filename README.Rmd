@@ -62,7 +62,8 @@ library(grur)
 ```
 Note: not all the packages used inside **grur** are installed, why?
 
-* Depending on your analysis, you might not need to install all of them
+* Depending on your analysis, you might not need to install all of them, by default,
+you'll be able to run `grur::missing_visualization`.
 * Some modules used for imputations are more complicated to install, and might
 impact your choice of imputations.
 * [this section covers all the required packages installation](https://thierrygosselin.github.io/grur/index.html#options-and-required-packages)
@@ -130,7 +131,6 @@ Please follow additional instructions in the [vignette](http://thierrygosselin.g
 |**Simulate RADseq data**|`simulate_rad`: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with [fastsimcoal2](http://cmpg.unibe.ch/software/fastsimcoal2/) and then used inside [rmetasim](https://github.com/stranda/rmetasim) simulation engine. *Vignette coming soon*.|
 |**Patterns of missingness**|`missing_visualization`: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK's identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures ([see vignette](https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html)). <br><br>`generate_missing`: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. *Vignette coming soon*.|
 |**Imputations**|`grur_imputations`: **Map-independent** imputations of missing genotypes with several algorithms (including machine leaning):<br> * **Random Forests** (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>* **Extreme Gradient Tree Boosting** (using XGBoost or LightGBM),<br>* **Bayesian PCA** (using bpca in pcaMethods),<br>* **Classic Strawman: ** the most frequently observed, non-missing, genotypes is used for imputation.<br><br>**Hierarchy: ** algorithm's model can account for *strata* groupings, e.g. if patterns of missingness is found in the data.<br><br>**Haplotypes: ** automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. *Vignette coming soon*.|
-| **Input/Output** | **grur** uses [radiator](https://thierrygosselin.github.io/radiator/index.html) input and output modules. Check out the [overview](https://thierrygosselin.github.io/radiator/articles/get_started.html#overview) of
-supported file format|
+| **Input/Output** | **grur** uses [radiator](https://thierrygosselin.github.io/radiator/index.html) input and output modules. Check out the [overview](https://thierrygosselin.github.io/radiator/articles/get_started.html#overview) of supported file format.|
 |**[ggplot2](http://ggplot2.org)-based plotting**|Visualization: publication-ready figures of important metrics and statistics.|
 |**Parallel**|Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC!|

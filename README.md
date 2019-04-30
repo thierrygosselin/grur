@@ -49,7 +49,8 @@ library(grur)
 Note: not all the packages used inside **grur** are installed, why?
 
 -   Depending on your analysis, you might not need to install all of
-    them
+    them, by default, you’ll be able to run
+    `grur::missing_visualization`.
 -   Some modules used for imputations are more complicated to install,
     and might impact your choice of imputations.
 -   [this section covers all the required packages
@@ -161,17 +162,13 @@ Features
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>Input/Output</strong></td>
-<td style="text-align: left;"><strong>grur</strong> uses <a href="https://thierrygosselin.github.io/radiator/index.html">radiator</a> input and output modules. Check out the <a href="https://thierrygosselin.github.io/radiator/articles/get_started.html#overview">overview</a> of</td>
+<td style="text-align: left;"><strong>grur</strong> uses <a href="https://thierrygosselin.github.io/radiator/index.html">radiator</a> input and output modules. Check out the <a href="https://thierrygosselin.github.io/radiator/articles/get_started.html#overview">overview</a> of supported file format.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">supported file format</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
 <td style="text-align: left;"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
 <td style="text-align: left;">Visualization: publication-ready figures of important metrics and statistics.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;"><strong>Parallel</strong></td>
 <td style="text-align: left;">Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC!</td>
 </tr>
