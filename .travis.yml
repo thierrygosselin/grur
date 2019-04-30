@@ -19,7 +19,6 @@ apt_packages:
   - libgsl0-dev
 os:
   - linux
-  - osx
 
 # Binary versions of packages to reduce build time.
 r_binary_packages:
