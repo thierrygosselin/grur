@@ -8,8 +8,6 @@ grur <img src="docs/logo.png" align="right" alt="" />
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://tidyverse.org/lifecycle/#experimental)
 [![Travis-CI Build
 Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/thierrygosselin/grur?branch=master&svg=true)](https://ci.appveyor.com/project/thierrygosselin/grur)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
