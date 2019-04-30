@@ -57,14 +57,15 @@ Note: not all the packages used inside **grur** are installed, why?
 -   [this section covers all the required packages
     installation](https://thierrygosselin.github.io/grur/index.html#options-and-required-packages)
 
-web site and additional info:
------------------------------
+web site and additional info <https://thierrygosselin.github.io/grur/> :
+------------------------------------------------------------------------
 
--   <https://thierrygosselin.github.io/grur/>
--   [Computer setup and
+-   [Computer setup - installation -
     troubleshooting](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
 -   [Function’s
     documentation](http://thierrygosselin.github.io/grur/reference/index.html)
+-   [grur’s
+    features](https://thierrygosselin.github.io/grur/index.html#features)
 -   [Vignettes](http://thierrygosselin.github.io/grur/articles/index.html)
 -   How to cite grur: inside R type `citation("grur")`
 
