@@ -1,7 +1,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-grur<img src="logo.png" align="right"/>
-=======================================
+grur <img src="docs/logo.png" align="right" alt="" />
+=====================================================
 
 <!-- badges: start -->
 
@@ -49,6 +49,32 @@ if (!require("remotes")) install.packages("remotes")
 remotes::install_github("thierrygosselin/grur")
 library(grur)
 ```
+
+-   web site and additional info:
+    <https://thierrygosselin.github.io/grur/>
+-   [Computer setup and
+    troubleshooting](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
+-   [Function’s
+    documentation](http://thierrygosselin.github.io/grur/reference/index.html)
+-   [Vignettes](http://thierrygosselin.github.io/grur/articles/index.html)
+-   How to cite assigner: inside R type `citation("grur")`
+
+[Life cycle](https://thierrygosselin.github.io/radiator/articles/life_cycle.html)
+---------------------------------------------------------------------------------
+
+grur is still experimental, in order to make the package better, changes
+are inevitable. Experimental functions will change, argument names will
+change. Your codes and workflows might break from time to time until
+grur is stable. Consequently, depending on your tolerance to change,
+grur might not be for you.
+
+-   Philosophy, major changes and deprecated functions/arguments are
+    documented in life cycle section of functions.
+-   [changelog, versions, new features and bug
+    history](https://thierrygosselin.github.io/grur/news/index.html)
+-   [issues](https://github.com/thierrygosselin/grur/issues/new/choose)
+    and
+    [contributions](https://github.com/thierrygosselin/grur/issues/new/choose)
 
 Options and required packages
 -----------------------------
@@ -104,27 +130,6 @@ to install required packages for the selected imputation options below:
 </tbody>
 </table>
 
-#### Troubleshooting
-
--   `rmetasim` needs to be modified in order to simulate more than 2000
-    markers [notebook
-    vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)
--   **Parallel computing**: follow the steps in this [notebook
-    vignette](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)
-    to install the packages with OpenMP-enabled compiler and conduct
-    imputations in parallel.
--   [Installation
-    problems.](https://www.dropbox.com/s/5npumwdo0cxtxi4/rad_genomics_computer_setup.nb.html?dl=0)
--   **Windows users**: Install
-    [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
--   The R GUI is unstable with functions using parallel ([more
-    info](https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mclapply.html)),
-    so I recommend using
-    [RStudio](https://www.rstudio.com/products/rstudio/download/) for a
-    better experience.
--   Running codes in chunks inside R Notebook might cause problem, run
-    it outside in the console.
-
 Features
 --------
 
@@ -166,76 +171,3 @@ Features
 </tr>
 </tbody>
 </table>
-
-Vignettes and examples
-----------------------
-
-Vignettes with real data for example in the form of R Notebooks take too
-much space to be included in package, without CRAN complaining.
-Consequently, vignettes will start to be distributed separately, follow
-the links below.
-
--   Missing data visualization and analysis [(html
-    vignette)](https://www.dropbox.com/s/4zf032g6yjatj0a/vignette_missing_data_analysis.nb.html?dl=0)
-    and
-    [(Rmd)](https://www.dropbox.com/s/5fxw2h9w1l1j391/vignette_missing_data_analysis.Rmd?dl=0)
-
-Citation
---------
-
-To get the citation, inside R:
-
-``` r
-citation("grur")
-```
-
-New features
-------------
-
-Change log, version, new features and bug history lives in the [NEWS.md
-file](https://github.com/thierrygosselin/grur/blob/master/NEWS.md)
-
-**grur v.0.0.10 2018-04-26**
-
-`grur's` dependencies:
-
--   I transferred to `Suggests` section these packages: lightgbm,
-    missRanger, randomForestSRC, ranger, rmarkdown, rmetasim, strataG,
-    xgboost.
--   Functions thate requires specific package will now say so.
--   Reason: people only interested in `missing_visualization` don’t have
-    to install all the required packages required for imputations or
-    simulations.
-
-`simulate_rad`: with the latest R release (3.5.0), Check now throw a new
-note: **Note: next used in wrong context: no loop is visible at
-simulate\_rad.R:189** I replaced `next` inside `sapply` with `while`.
-
-**grur v.0.0.9 2017-10-27**
-
--   `lightGBM` option to conduct the imputations is fully functional
-
-#### Roadmap of future developments
-
--   Integrate more imputation method.
--   Workflow tutorial to further explore some problems.
--   Use Shiny and ggvis (when subplots and/or facets becomes available
-    for ggvis).
--   Until publication **grur** will change rapidly, stay updated with
-    releases and contribute with bug reports.
--   Suggestions ?
-
-#### Contributions
-
-This package has been developed in the open, and it wouldn’t be nearly
-as good without your contributions. There are a number of ways you can
-help me make this package even better:
-
--   If you don’t understand something, please let me know and raise an
-    [issue](https://github.com/thierrygosselin/grur/issues)
--   Your feedback on what is confusing or hard to understand is
-    valuable.
--   If you spot a typo, feel free to edit the underlying page and send a
-    pull request.
--   New to pull request on github ? [The process is very
-    easy](http://r-pkgs.had.co.nz/git.html#git-pullreq).

@@ -1,0 +1,42 @@
+reference:
+- title: Simulate RADseq data
+  contents:
+  - simulte_rad
+
+- title: Identity-by-missigness analysis
+  desc: Visualize missing data pattern(s)
+  contents:
+  - missing_visualization
+
+- title: Imputations
+  contents:
+  - grur_imputations
+
+- title: Utility
+  contents:
+  - generate_sequencing_strata
+  - imputations_accuracy
+  - memorize_missing
+  - tidy_sim
+
+navbar:
+  type: default
+  left:
+  - text: Installation
+    href: index.html
+  - text: Reference
+    href: reference/index.html
+  #- text: Features
+   # href: FEATURES.html
+  - text: Articles
+    href: articles/index.html
+    menu:
+    - text: Computer setup - Installation - Troubleshooting
+      href: articles/rad_genomics_computer_setup.html
+    - text: Missing visualization
+      href: articles/vignette_missing_data_analysis.html
+  - text: News
+    href: news/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/thierrygosselin/grur

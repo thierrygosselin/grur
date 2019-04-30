@@ -59,7 +59,7 @@ Set your working directory, e.g.:
 setwd("~/Documents/test_missing_visualization_vignette")
 ```
 
-
+Note: running codes in chunks inside R Notebook might cause problem, run it outside in the console (the default here).
 
 # Download the test data
 
