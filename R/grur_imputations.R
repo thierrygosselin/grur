@@ -42,7 +42,7 @@
 #'
 #'
 #' Before using this function to populate the original dataset with synthetic
-#' data:
+#' data, grur assumes:
 #' \enumerate{
 #' \item \strong{filter your data: } please check out \code{\link[radiator]{filter_rad}}.
 #' \item \strong{correlations: } machine learning algorithms will work better and 

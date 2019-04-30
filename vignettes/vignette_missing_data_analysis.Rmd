@@ -217,20 +217,24 @@ If you see a pattern, ask yourself:
 
 * Do you think the pattern observed in the data could impact the clustering analysis?
 
+# Strategies
 
-##Arguments
+## Arguments
+
 * use `strata.select` to select columns from the strata file to generate PCoA-IBM plots. If you have several columns to test e.g. library, sequencer, sequencing lanes, sampling sites, populations, use inside a string to get all of them!
 * use `distance.method` to explore other distance metric used by the function `dist`
 
 
-##Filtering strategies
+## Filtering
+
 * explore the impact of different filtering parameters on missing genotypes pattern, with `radiator::filter_rad`.
 * test your own whitelist of markers with `whitelist.markers`.
 * use the blacklist of individuals created with the function to **manage** missing data inside filtering pipelines
 * excluding/including individuals, populations and markers to test the impact of filtering on polymorphism discovery
 * ready to test missing data imputations ? Most stackr functions have built-in imputations arguments.
 
-##References
+# References
+
 Ferchaud A, Hansen MM (2016) The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Molecular Ecology 25(1): 238–259. http://dx.doi.org/10.1111/mec.13399
 
 Ferchaud A, Hansen MM (2015) Data from: The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.kp11q

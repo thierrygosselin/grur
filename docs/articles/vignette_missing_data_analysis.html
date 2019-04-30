@@ -200,9 +200,35 @@
 <li><p>Does the relationship change if you look at individual subgroups of the data?</p></li>
 <li><p>Do you think the pattern observed in the data could impact the clustering analysis?</p></li>
 </ul>
-<p>##Arguments * use <code>strata.select</code> to select columns from the strata file to generate PCoA-IBM plots. If you have several columns to test e.g. library, sequencer, sequencing lanes, sampling sites, populations, use inside a string to get all of them! * use <code>distance.method</code> to explore other distance metric used by the function <code>dist</code></p>
-<p>##Filtering strategies * explore the impact of different filtering parameters on missing genotypes pattern, with <code><a href="https://www.rdocumentation.org/packages/radiator/topics/filter_rad">radiator::filter_rad</a></code>. * test your own whitelist of markers with <code>whitelist.markers</code>. * use the blacklist of individuals created with the function to <strong>manage</strong> missing data inside filtering pipelines * excluding/including individuals, populations and markers to test the impact of filtering on polymorphism discovery * ready to test missing data imputations ? Most stackr functions have built-in imputations arguments.</p>
-<p>##References Ferchaud A, Hansen MM (2016) The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Molecular Ecology 25(1): 238–259. <a href="http://dx.doi.org/10.1111/mec.13399" class="uri">http://dx.doi.org/10.1111/mec.13399</a></p>
+</div>
+<div id="strategies" class="section level1">
+<h1 class="hasAnchor">
+<a href="#strategies" class="anchor"></a>Strategies</h1>
+<div id="arguments" class="section level2">
+<h2 class="hasAnchor">
+<a href="#arguments" class="anchor"></a>Arguments</h2>
+<ul>
+<li>use <code>strata.select</code> to select columns from the strata file to generate PCoA-IBM plots. If you have several columns to test e.g. library, sequencer, sequencing lanes, sampling sites, populations, use inside a string to get all of them!</li>
+<li>use <code>distance.method</code> to explore other distance metric used by the function <code>dist</code>
+</li>
+</ul>
+</div>
+<div id="filtering" class="section level2">
+<h2 class="hasAnchor">
+<a href="#filtering" class="anchor"></a>Filtering</h2>
+<ul>
+<li>explore the impact of different filtering parameters on missing genotypes pattern, with <code><a href="https://www.rdocumentation.org/packages/radiator/topics/filter_rad">radiator::filter_rad</a></code>.</li>
+<li>test your own whitelist of markers with <code>whitelist.markers</code>.</li>
+<li>use the blacklist of individuals created with the function to <strong>manage</strong> missing data inside filtering pipelines</li>
+<li>excluding/including individuals, populations and markers to test the impact of filtering on polymorphism discovery</li>
+<li>ready to test missing data imputations ? Most stackr functions have built-in imputations arguments.</li>
+</ul>
+</div>
+</div>
+<div id="references" class="section level1">
+<h1 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h1>
+<p>Ferchaud A, Hansen MM (2016) The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Molecular Ecology 25(1): 238–259. <a href="http://dx.doi.org/10.1111/mec.13399" class="uri">http://dx.doi.org/10.1111/mec.13399</a></p>
 <p>Ferchaud A, Hansen MM (2015) Data from: The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Dryad Digital Repository. <a href="http://dx.doi.org/10.5061/dryad.kp11q" class="uri">http://dx.doi.org/10.5061/dryad.kp11q</a></p>
 <p>Danecek P, Auton A, Abecasis G et al. (2011) The variant call format and VCFtools. Bioinformatics, 27, 2156–2158.</p>
 <p>Purcell S, Neale B, Todd-Brown K et al. (2007) PLINK: a tool set for whole-genome association and population-based linkage analyses. American Journal of Human Genetics, 81, 559–575.</p>
@@ -224,6 +250,13 @@
       <li><a href="#run-the-function">Run the function</a></li>
       <li><a href="#visualization">Visualization</a></li>
       <li><a href="#interpretation">Interpretation</a></li>
+      <li>
+<a href="#strategies">Strategies</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#arguments">Arguments</a></li>
+      <li><a href="#filtering">Filtering</a></li>
+      </ul>
+</li>
+      <li><a href="#references">References</a></li>
       </ul>
 </div>
       </div>
