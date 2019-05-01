@@ -1,3 +1,13 @@
+# grur 0.1.1 2019-05-01
+
+* pkgdown website
+* better function doc
+* vignettes
+* work on dependencies
+* work on travis CI
+
+
+
 # grur 0.1.0 2019-03-15
 
 * several commits will come with this in the next 2 weeks
