@@ -729,7 +729,7 @@ make_mig_mat <- function(mig.rate, num.pops,
 #' @rdname run_fsc_sim
 #' @keywords internal
 #' @export
-run_fsc_sim <- function(sc, num.rep) {
+run_fsc_sim <- function(sc, num.rep, num.cores, exec) {
   .makeEventSettings <- function(dvgnc.time, num.pops) {
     if(num.pops == 1) return(NULL)
     pop.pairs <- t(utils::combn(num.pops, 2) - 1)
@@ -766,7 +766,9 @@ run_fsc_sim <- function(sc, num.rep) {
     ),
     label = "grur.fsc.sim"
   ) %>% 
-    strataG::fscRun(num.sims = num.rep)
+    strataG::fscRun(
+      num.sims = num.rep, num.cores = num.cores, quiet = TRUE, exec = exec
+    )
 }
 
 

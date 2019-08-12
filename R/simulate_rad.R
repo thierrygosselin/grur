@@ -135,13 +135,13 @@ simulate_rad <- function(
   
   if (is.null(label)) {
     sim.arguments <- paste0(
-      "_pop.", paste0(num.pops, collapse = "."),
-      "_loc.", paste0(num.loci, collapse = "."),
-      "_div.", paste0(div.time, collapse = "."),
-      "_ne.", paste0(ne, collapse = "."),
-      "_nm.", paste0(nm, collapse = "."),
-      "_the.", paste0(theta, collapse = "."),
-      "_mig.", paste0(mig.type, collapse = "."),
+      "_pop.", paste0(num.pops, collapse = ","),
+      "_loc.", paste0(num.loci, collapse = ","),
+      "_div.", paste0(div.time, collapse = ","),
+      "_ne.", paste0(ne, collapse = ","),
+      "_nm.", paste0(nm, collapse = ","),
+      "_the.", paste0(theta, collapse = ","),
+      "_mig.", paste0(mig.type, collapse = ","),
       "_rep.", num.reps,
       "_gen.", num.rms.gens
     )
@@ -165,14 +165,16 @@ simulate_rad <- function(
   save(scenarios, file = file.path(label, paste0(label, "_scenarios.rdata")))
   
   # run scenarios
-  for(sc.i in 1:nrow(scenarios)) {    
+  files <- sapply(1:nrow(scenarios), function(sc.i) {    
     fname <- file.path(label, paste0(label, "_genotypes_", sc.i, ".rdata"))
     if(file.exists(fname)) next
     
     cat(format(Sys.time()), "---- Scenario", sc.i, "----\n")
     sc <- as.list(scenarios[sc.i, ])
     sc$mig.mat <- make_mig_mat(sc$mig.rate, sc$num.pops, sc$mig.type)
-    p <- run_fsc_sim(sc = sc, num.rep = num.reps)
+    p <- run_fsc_sim(
+      sc = sc, num.rep = num.reps, num.cores = parallel.core, exec = fsc.exec
+    )
     sim.list <- lapply(1:num.reps, function(sim.i) {
       fsc <- strataG::fscReadArp(p, sim = c(1, sim.i), drop.mono = TRUE) 
       rms <- fsc %>% 
@@ -188,12 +190,12 @@ simulate_rad <- function(
     message("saving fastsimcoal and rmetasim results")
     save(sim.list, sc, label, file = fname)
     fname
-  }
+  })
   
   timing <- difftime(Sys.time(), start.time)
   message("\nComputation time: ", format(round(timing, 2)))
   cat("#################### grur::simulate_rad completed #####################\n")
   options(width = opt.change)
   
-  invisible(label)
+  invisible(list(scenarios = scenarios, label = label, files = files))
 }
