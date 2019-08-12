@@ -183,7 +183,7 @@ simulate_rad <- function(
         rmetasim::landscape.make.genind() %>% 
         strataG::genind2gtypes() %>% 
         strataG::as.data.frame()
-      list(fsc = fsc, rms = rms)
+      list(rep = sim.i, fsc = fsc, rms = rms)
     })
     strataG::fscCleanup(p$label)
     
