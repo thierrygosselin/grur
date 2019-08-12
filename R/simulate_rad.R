@@ -167,7 +167,7 @@ simulate_rad <- function(
   # run scenarios
   files <- sapply(1:nrow(scenarios), function(sc.i) {    
     fname <- file.path(label, paste0(label, "_genotypes_", sc.i, ".rdata"))
-    if(file.exists(fname)) next
+    if(file.exists(fname)) return(NULL)
     
     cat(format(Sys.time()), "---- Scenario", sc.i, "----\n")
     sc <- as.list(scenarios[sc.i, ])

@@ -4,7 +4,7 @@
 \alias{run_fsc_sim}
 \title{run_fsc_sim}
 \usage{
-run_fsc_sim(sc, num.rep)
+run_fsc_sim(sc, num.rep, num.cores, exec)
 }
 \description{
 Run fastsimcoal
