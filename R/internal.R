@@ -1,130 +1,3 @@
-#' @title landscape.new.ind.genos
-#' @description landscape.new.ind.genos
-#' @rdname landscape.new.ind.genos
-#' @export
-#' @keywords internal
-landscape.new.ind.genos <- function(rland, PopulationSizes, AlleleFreqs = NULL) {
-  if (!is.null(AlleleFreqs))
-    if (length(AlleleFreqs) != length(rland$loci)) {
-      stop("AlleleFreqs must be NULL or a list the same length as rland$loci")
-    }
-  if (length(PopulationSizes) != rland$intparam$stages * rland$intparam$habitats) {
-    stop("PopulationSizes must be a vector of length equal to the product of #stages and #habitats")
-  }
-  
-  loccols <- length(rmetasim::landscape.locusvec(rland))
-  rland$individuals <- matrix(
-    nrow = sum(PopulationSizes),
-    ncol = rmetasim::landscape.democol() + length(rmetasim::landscape.locusvec(rland))
-  )
-  
-  rland$intparam$nextid <- nrow(rland$individuals) + 1
-  
-  rland$individuals[, 1] <- inverse.rle(
-    list(lengths = PopulationSizes, values = 1:length(PopulationSizes))
-  ) #set the demographic stages
-  rland$individuals[, 2] <- 0 #unused
-  rland$individuals[, 3] <- rland$intparam$currentgen #time of birth
-  rland$individuals[, 4] <- 1:nrow(rland$individuals) # ID
-  rland$individuals[, 5] <- 0 #mother's id
-  rland$individuals[, 6] <- 0 #father's id
-  
-  pops <- rland$individuals[, 1] %/% rland$intparam$stages + 1
-  
-  for (i in 1:length(AlleleFreqs)) {
-    ainds <- 1:dim(AlleleFreqs[[i]])[1]
-    frqs <- rowSums(AlleleFreqs[[i]][, "freq", , drop = FALSE])
-    props <- frqs / sum(frqs)
-    
-    #make sure that the loci have the correct allele specification
-    rland$loci[[i]]$alleles <- vector("list", length(props))
-    for (j in ainds) {
-      rland$loci[[i]]$alleles[[j]]$aindex <- j
-      rland$loci[[i]]$alleles[[j]]$birth <- rland$intparam$currentgen
-      rland$loci[[i]]$alleles[[j]]$prop <- props[j]
-      rland$loci[[i]]$alleles[[j]]$state <- dimnames(AlleleFreqs[[i]])[[1]][j]
-    }
-    
-    ###now specify genotypes based on within pop freqs
-    cols <- rmetasim::landscape.democol() + which(rmetasim::landscape.locusvec(rland) == i)
-    for (j in 1:dim(AlleleFreqs[[i]])[3]) {
-      indx <- which(pops == j)
-      num.als <- length(indx) * length(cols)
-      rland$individuals[indx, cols] <- sample(ainds, num.als, T, AlleleFreqs[[i]][, "prop", j])
-    }
-  }
-  
-  rland
-}
-
-#' @title loadLandscape
-#' @description loadLandscape
-#' @rdname loadLandscape
-#' @export
-#' @keywords internal
-loadLandscape <- function(sc, AlleleFreqs, num.gens) {
-  rl <- rmetasim::landscape.new.intparam(
-    rmetasim::landscape.new.empty(), h = sc$num.pops, 
-    s = 2, cg = 0, ce = 0, totgen = num.gens + 1
-  )
-  
-  rl <- rmetasim::landscape.new.floatparam(rmetasim::landscape.new.switchparam(rl))
-  
-  localS <- matrix(c(0, 1, 0, 0), nrow = 2, ncol = 2)
-  localR <- matrix(c(0, 0, 1.2, 0), nrow = 2, ncol = 2)
-  localM <- matrix(c(0, 0, 0, 1.2), nrow = 2, ncol = 2)
-  rl <- rmetasim::landscape.new.local.demo(rl, localS, localR, localM)
-  
-  S <- M <- matrix(0, nrow = sc$num.pops * 2, ncol = sc$num.pops * 2)
-  diag(S) <- diag(M) <- 1
-  R <- rmetasim::landscape.mig.matrix(
-    h = nrow(sc$mig.mat), s = 2, mig.model = "custom", R.custom = sc$mig.mat
-  )$R
-  rl <- rmetasim::landscape.new.epoch(rl, R = R, carry = rep(sc$ne, sc$num.pops))
-  
-  #just make loci that have the correct type and ploidy
-  for (i in 1:length(AlleleFreqs)) {
-    rl <- rmetasim::landscape.new.locus(
-      rl, type = 2, ploidy = 2, mutationrate = 0, #sc$mut.rate,
-      transmission = 0, numalleles = 2, states = NULL
-    )
-  }
-  
-  landscape.new.ind.genos(rl, rep(c(sc$ne, 0), sc$num.pops), AlleleFreqs)
-}
-
-#' @title landscape2gtypes
-#' @description landscape2gtypes
-#' @rdname landscape2gtypes
-#' @export
-#' @keywords internal
-landscape2gtypes <- function(Rland) {
-  pl <- rmetasim::landscape.ploidy(Rland)
-  strata <- Rland$individuals[, 1] %/% Rland$intparam$stages + 1
-  gen.data <- Rland$individuals[, -(1:rmetasim::landscape.democol())]
-  rownames(gen.data) <- Rland$individuals[, 4]
-  loc.names <- paste0("Locus", 1:length(pl))
-  colnames(gen.data) <- paste(rep(loc.names, each = pl[1]), 1:pl[1], sep = ".")
-  gen.data <- cbind(strata = strata, gen.data)
-  strataG::df2gtypes(gen.data, ploidy = pl[1], id.col = NULL, strata.col = 1, loc.col = 2)
-}
-
-#' @title killExcess
-#' @description killExcess
-#' @export
-#' @rdname killExcess
-#' @keywords internal
-killExcess <- function(rl, n) {
-  to.kill <- tapply(1:nrow(rl$individuals), rl$individuals[, 1], function(i) {
-    if (length(i) > n) {
-      sample(i, length(i) - n)
-    } else NULL
-  })
-  to.kill <- unlist(unname(to.kill))
-  if (length(to.kill) > 0) rl$individuals <- rl$individuals[-to.kill, ]
-  rl
-}
-
 #' @title ind_genotyped_helper
 #' @description Help individual's genotyped threshold
 #' @rdname ind_genotyped_helper
@@ -523,22 +396,20 @@ generate_pcoa_plot <- function(
 #' @keywords internal
 #' @export
 
-pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
-  res <- list() # to store results
+pct_missing_by_total <- function(
+  strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
   
-  data %<>% dplyr::rename(STRATA_SELECT = data[[!!(strata.select)]])
+  # rename strata column and convert GT_BIN to missing or not
+  data <- data %>% 
+    dplyr::rename(STRATA_SELECT = data[[!!(strata.select)]]) %>% 
+    dplyr::mutate(is.missing = GT_MISSING_BINARY == 0)
   
+  # count number of strata
   n.strata <- dplyr::n_distinct(data$STRATA_SELECT)
   
-  # the expected % missing by random (1 / number of factor levels)
-  ran.pct.miss <- 1 / length(unique(data$STRATA_SELECT))
-  
-  # convert GT_BIN to missing or not
-  data$is.missing <- data$GT_MISSING_BINARY == 0
-  
-  
   # summarize missingness by locus and factor column
-  miss.smry <- dplyr::group_by(.data = data, MARKERS, STRATA_SELECT) %>% 
+  miss.smry <- data %>% 
+    dplyr::group_by(MARKERS, STRATA_SELECT) %>% 
     dplyr::summarise(num.missing.col = sum(is.missing)) %>%
     dplyr::left_join(
       data %>%
@@ -555,16 +426,19 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
   # summarize overall percent missing by factor column
   pct.miss.col <- miss.smry %>%
     dplyr::group_by(STRATA_SELECT) %>%
-    dplyr::summarise(pct.missing = sum(num.missing.col) / sum(num.missing.total)) %>%
+    dplyr::summarise(
+      pct.missing = sum(num.missing.col) / sum(num.missing.total)
+    ) %>%
     dplyr::ungroup(.) %>% 
     dplyr::arrange(dplyr::desc(pct.missing)) %>% 
     dplyr::mutate(STRATA_SELECT = as.character(STRATA_SELECT))
   
   # Keep string to reorder factor based on marginal % missingness
   level.miss <- pct.miss.col$STRATA_SELECT
-  pct.miss.col <- dplyr::mutate(
-    .data = pct.miss.col,
-    STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE))
+  pct.miss.col <- pct.miss.col %>% 
+    dplyr::mutate(
+      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)
+    )
 
   # summarize % missing for each total number missing in each factor level (label)
   miss.smry %<>% 
@@ -577,50 +451,69 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::mutate(
-      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE))
+      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)
+    )
+  
+  # to store results
+  res <- list() 
   
   # Tidy result of lm
-  lm.res <- miss.smry %>% 
+  lm.res.name <- stringi::stri_join("pct.missing.lm.", "strata.", strata.select)
+  res[[lm.res.name]] <- miss.smry %>% 
     split(x = ., f = .$STRATA_SELECT) %>% 
-    purrr::map_df(~ broom::tidy(stats::lm(
-      mean.miss ~ log10(num.missing.total), weights = n, data = .)), .id = "STRATA_SELECT")
+    purrr::map_df(
+      ~ broom::tidy(
+        stats::lm(
+          mean.miss ~ log10(num.missing.total), 
+          weights = n, 
+          data = .
+        )
+      ), 
+      .id = "STRATA_SELECT"
+    )
   
-  lm.res.name <- stringi::stri_join(
-    "pct.missing.lm.", "strata.", strata.select)
-  res[[lm.res.name]] <- lm.res
-  
-  
-  miss.lm.coefs <- lm.res %>%
+  miss.lm.coefs <- res[[lm.res.name]] %>%
     dplyr::select(-c(std.error, statistic, p.value)) %>% 
     tidyr::spread(data = ., key = term, value = estimate) %>% 
     dplyr::rename(a = `(Intercept)`, b = `log10(num.missing.total)`) %>% 
     dplyr::mutate(
-      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)) %>% 
+      STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)
+    ) %>% 
     dplyr::arrange(STRATA_SELECT)
   
   axis.title.element <- ggplot2::element_text(
-    size = 12, family = "Helvetica", face = "bold")
-  axis.text.element <- ggplot2::element_text(
-    size = 10, family = "Helvetica")
+    size = 12, family = "Helvetica", face = "bold"
+  )
+  axis.text.element <- ggplot2::element_text(size = 10, family = "Helvetica")
   
-  fig <- ggplot2::ggplot(
+  # generate figure
+  fig.name <- stringi::stri_join("pct.missing.plot", ".strata.", strata.select)
+  res[[fig.name]] <- ggplot2::ggplot(
     miss.smry, ggplot2::aes_string(x = "num.missing.total")) +
     ggplot2::geom_segment(
       ggplot2::aes_string(xend = "num.missing.total", y = "lci", yend = "uci"),
-      color = "gray50") +
+      color = "gray50"
+    ) +
     ggplot2::geom_point(ggplot2::aes_string(y = "mean.miss", size = "n")) +
     ggplot2::scale_size(breaks = c(0, 10, 100, 1000, 10000)) +
-    ggplot2::geom_abline(data = miss.lm.coefs,
-                         ggplot2::aes(intercept = a, slope = b),
-                         color = "yellow") +
-    ggplot2::geom_hline(ggplot2::aes_string(yintercept = "ran.pct.miss")) +
-    ggplot2::geom_hline(data = pct.miss.col,
-                        ggplot2::aes_string(yintercept = "pct.missing"),
-                        color = "red") +
+    ggplot2::geom_abline(
+      data = miss.lm.coefs,
+      ggplot2::aes(intercept = a, slope = b),
+      color = "yellow"
+    ) +
+    # the expected % missing by random (1 / number of factor levels)
+    ggplot2::geom_hline(yintercept = 1 / dplyr::n_distinct(data$STRATA_SELECT)) +
+    ggplot2::geom_hline(
+      data = pct.miss.col,
+      ggplot2::aes_string(yintercept = "pct.missing"),
+      color = "red"
+    ) +
     ggplot2::scale_x_log10() +
     ggplot2::labs(
       title = stringi::stri_join("Strata: ", strata.select),
-      x = expression(paste("Total number of missing genotypes (", log[10], ")")),
+      x = expression(
+        paste("Total number of missing genotypes (", log[10], ")")
+      ),
       y = "Missing genotypes (mean percentage)",
       size = "Markers missing (number)"
     ) +
@@ -636,19 +529,18 @@ pct_missing_by_total <- function(strata.select, data, ci = 0.95, path.folder, wr
     ggplot2::facet_wrap(~ STRATA_SELECT)
   # fig
   
-  fig.name <- stringi::stri_join(
-    "pct.missing.plot", ".strata.", strata.select)
-  
   if (write.plot) {
     ggplot2::ggsave(
       filename = stringi::stri_join(path.folder, "/", fig.name, ".pdf"),
-      plot = fig,
-      width = n.strata * 3, height = n.strata * 3,
-      dpi = 600, units = "cm",
-      useDingbats = FALSE, limitsize = FALSE)
+      plot = res[[fig.name]],
+      width = n.strata * 3, 
+      height = n.strata * 3,
+      dpi = 600, 
+      units = "cm",
+      useDingbats = FALSE, 
+      limitsize = FALSE
+    )
   }
-  
-  res[[fig.name]] <- fig
   
   return(res)
 }#End pct_missing_by_total
@@ -801,3 +693,166 @@ missing_rda <- function(
   
   return(res)
 }#End missing_rda
+
+
+#' @title make_mig_mat
+#' @description Make migration matrix for simulation
+#' @rdname make_mig_mat
+#' @keywords internal
+#' @export
+make_mig_mat <- function(mig.rate, num.pops, 
+                         type = c("island", "stepping.stone")) {
+  type <- match.arg(type)
+  mig.mat <- switch(
+    type,      
+    island = {
+      m <- mig.rate / (num.pops - 1)
+      matrix(rep(m, num.pops ^ 2), nrow = num.pops)
+    },
+    stepping.stone = {
+      mat <- matrix(0, nrow = num.pops, ncol = num.pops)
+      m <- mig.rate / 2
+      for (k in 1:(num.pops - 1)) {
+        mat[k, k + 1] <- mat[k + 1, k] <- m
+      }
+      mat[1, num.pops] <- mat[num.pops, 1] <- m
+      mat
+    }
+  )
+  diag(mig.mat) <- 1 - mig.rate
+  mig.mat
+}
+
+
+#' @title run_fsc_sim
+#' @description Run fastsimcoal
+#' @rdname run_fsc_sim
+#' @keywords internal
+#' @export
+run_fsc_sim <- function(sc, num.rep) {
+  .makeEventSettings <- function(dvgnc.time, num.pops) {
+    if(num.pops == 1) return(NULL)
+    pop.pairs <- t(utils::combn(num.pops, 2) - 1)
+    pop.pairs <- pop.pairs[pop.pairs[, 1] == 0, , drop = FALSE]
+    do.call(
+      strataG::fscSettingsEvents, 
+      lapply(
+        1:nrow(pop.pairs),
+        function(i) {
+          strataG::fscEvent(dvgnc.time, pop.pairs[i, 2], pop.pairs[i, 1])
+        }
+      )
+    )
+  }
+  
+  demes <- do.call(
+    strataG::fscSettingsDemes,
+    c(
+      lapply(1:sc$num.pops, function(i) {
+        strataG::fscDeme(deme.size = sc$ne, sample.size = sc$ne)
+      }),
+      ploidy = 2
+    )
+  )
+  
+  strataG::fscWrite(
+    demes = demes,
+    migration = if(sc$num.pops > 1) {
+      strataG::fscSettingsMigration(sc$mig.mat)
+    } else NULL,
+    events = .makeEventSettings(sc$div.time, sc$num.pops),
+    genetics = strataG::fscSettingsGenetics(
+      strataG::fscBlock_snp(1, 1e-4), num.chrom = 1000
+    ),
+    label = "grur.fsc.sim"
+  ) %>% 
+    strataG::fscRun(num.sims = num.rep)
+}
+
+
+#' @title calc_freqs
+#' @description Calculate by-population and by-locus allele frequencies
+#' @rdname calc_freqs
+#' @keywords internal
+#' @export
+calc_freqs <- function(snps) {
+  .alleleProp <- function(mac) {
+    maf <- mean(mac == 0) + (mean(mac == 1) / 2)
+    c('1' = maf, '2' = 1 - maf)
+  }
+  
+  mac.df <- snps %>% 
+    strataG::df2gtypes(ploidy = 2) %>% 
+    strataG::as.data.frame(coded = T) %>% 
+    dplyr::select(-id) %>% 
+    tidyr::gather("locus", "mac", -stratum) %>% 
+    dplyr::mutate(
+      stratum = as.numeric(factor(stratum)),
+      locus = as.numeric(factor(locus))
+    )
+  
+  list(
+    global = lapply(split(mac.df, mac.df$locus), function(loc.df) {
+      .alleleProp(loc.df$mac)
+    }),
+    pop = lapply(split(mac.df, mac.df$stratum), function(st.df) {
+      lapply(split(st.df, st.df$locus), function(loc.df) .alleleProp(loc.df$mac))
+    })
+  )
+}
+
+
+#' @title run_rmetasim
+#' @description Run Rmetasim
+#' @rdname run_rmetasim
+#' @keywords internal
+#' @export
+run_rmetasim <- function(freqs, sc, num.gens) {
+  cat(format(Sys.time()), "running rmetasim\n")
+  
+  localS <- matrix(c(0, 1, 0, 0), nrow = 2, ncol = 2)
+  localR <- matrix(c(0, 0, 1.2, 0), nrow = 2, ncol = 2)
+  localM <- matrix(c(0, 0, 0, 1.2), nrow = 2, ncol = 2)
+  S <- M <- matrix(0, nrow = sc$num.pops * 2, ncol = sc$num.pops * 2)
+  diag(S) <- diag(M) <- 1
+  R <- rmetasim::landscape.mig.matrix(
+    h = nrow(sc$mig.mat), 
+    s = 2, 
+    mig.model = "custom", 
+    R.custom = sc$mig.mat
+  )$R
+  
+  Rland <- rmetasim::landscape.new.empty() %>% 
+    rmetasim::landscape.new.intparam(
+      h = sc$num.pops, s = 2, cg = 0, ce = 0, totgen = num.gens + 1
+    ) %>% 
+    rmetasim::landscape.new.switchparam() %>% 
+    rmetasim::landscape.new.floatparam() %>% 
+    rmetasim::landscape.new.local.demo(localS, localR, localM) %>% 
+    rmetasim::landscape.new.epoch(R = R, carry = rep(sc$ne, sc$num.pops)) 
+  
+  for(i in 1:length(freqs$global)) {
+    Rland <- rmetasim::landscape.new.locus(
+      Rland, type = 2, ploidy = 2, mutationrate = 0,
+      transmission = 0, numalleles = 2, allelesize = 1,
+      frequencies = freqs$global[[i]], states = names(freqs$global[[i]])
+    )
+  }
+  
+  Rland <- Rland %>% 
+    rmetasim::landscape.new.individuals(rep(c(sc$ne, 0), sc$num.pops)) %>% 
+    rmetasim::landscape.setpopfreq(freqs$pop) 
+  
+  for(gen.i in 1:num.gens) {
+    Rland <- rmetasim::landscape.simulate(Rland, numit = 1)
+    to.kill <- tapply(
+      1:nrow(Rland$individuals), 
+      Rland$individuals[, 1], 
+      function(i) if (length(i) > sc$ne) sample(i, length(i) - sc$ne) else NULL
+    )
+    to.kill <- unlist(unname(to.kill))
+    if (length(to.kill) > 0) Rland$individuals <- Rland$individuals[-to.kill, ]
+  }
+  
+  Rland
+}

@@ -5,10 +5,9 @@
 \title{Simulate RADseq data}
 \usage{
 simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000,
-  ne = c(50, 500), nm = c(0, 0.1, 0.5, 1, 5), theta = 0.2,
-  mig.type = c("island", "stepping.stone"), num.reps = 3,
-  num.rms.gens = 10, label = NULL, fsc.exec = "fsc26",
-  parallel.core = parallel::detectCores() - 1)
+  ne = 50, nm = c(0, 5), theta = 0.2, mig.type = c("island",
+  "stepping.stone"), num.reps = 3, num.rms.gens = 10, label = NULL,
+  fsc.exec = "fsc26", parallel.core = parallel::detectCores() - 1)
 }
 \arguments{
 \item{num.pops}{(integer) Number of populations.
@@ -83,7 +82,7 @@ The following arguments can be specified as single values or vectors:
  The function will create a folder in the current working directory with the 
  name provided by \code{label}. Within this folder there will be an R 
  workspace file ("\code{scenarios.rdata}") containing a data frame with the 
- parameters for each scenario (\code{sc.df}), and one R  
+ parameters for each scenario (\code{scenarios}), and one R  
  workspace file for each scenario, named \code{"gtypes.#.rdata"} where "#" 
  is the scenario number. Each scenario file contains a list named 
  \code{sim.data}, which contains a \code{strataG::gtypes} representation 
@@ -108,5 +107,6 @@ parallel.core = 4)
 \href{https://github.com/EricArcher/strataG}{strataG}
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov} and Thierry Gosselin \email{thierrygosselin@icloud.com}
+Eric Archer \email{eric.archer@noaa.gov} and 
+  Thierry Gosselin \email{thierrygosselin@icloud.com}
 }

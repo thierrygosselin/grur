@@ -71,7 +71,7 @@
 #'  The function will create a folder in the current working directory with the 
 #'  name provided by \code{label}. Within this folder there will be an R 
 #'  workspace file ("\code{scenarios.rdata}") containing a data frame with the 
-#'  parameters for each scenario (\code{sc.df}), and one R  
+#'  parameters for each scenario (\code{scenarios}), and one R  
 #'  workspace file for each scenario, named \code{"gtypes.#.rdata"} where "#" 
 #'  is the scenario number. Each scenario file contains a list named 
 #'  \code{sim.data}, which contains a \code{strataG::gtypes} representation 
@@ -84,14 +84,15 @@
 
 #' @seealso \href{https://github.com/EricArcher/strataG}{strataG}
 
-#' @author Eric Archer \email{eric.archer@@noaa.gov} and Thierry Gosselin \email{thierrygosselin@@icloud.com}
+#' @author Eric Archer \email{eric.archer@@noaa.gov} and 
+#'   Thierry Gosselin \email{thierrygosselin@@icloud.com}
 #' @export
 simulate_rad <- function(
   num.pops = 5,
   num.loci = 1000,
   div.time = 25000,
-  ne = c(50, 500),
-  nm = c(0, 0.1, 0.5, 1, 5),
+  ne = 50, #c(50, 500),
+  nm = c(0, 5), #c(0, 0.1, 0.5, 1, 5),
   theta = 0.2,
   mig.type = c("island", "stepping.stone"),
   num.reps = 3,
@@ -107,16 +108,22 @@ simulate_rad <- function(
   cat("#######################################################################\n")
   
   # Check if rmetasim installed ------------------------------------------------
-    if (!requireNamespace("rmetasim", quietly = TRUE)) {
-      stop("rmetasim needed for this function to work.
-Please follow the vignette for install instructions", call. = FALSE)
-    }
+  if (!requireNamespace("rmetasim", quietly = TRUE)) {
+    stop(
+      "rmetasim needed for this function to work. ", 
+      "Please follow the vignette for install instructions", 
+      call. = FALSE
+    )
+  }
   if (!requireNamespace("strataG", quietly = TRUE)) {
-    stop("strataG needed for this function to work
-         Install with install.packages('strataG')", call. = FALSE)
+    stop(
+      "strataG needed for this function to work. ",
+      "Install with install.packages('strataG')", 
+      call. = FALSE
+    )
   }
   
-  timing <- proc.time()
+  start.time <- Sys.time()
   
   num.pops <- sort(unique(num.pops))
   num.loci <- sort(unique(num.loci))
@@ -128,108 +135,65 @@ Please follow the vignette for install instructions", call. = FALSE)
   
   if (is.null(label)) {
     sim.arguments <- paste0(
-      "pop_", paste0(num.pops, collapse = ":"),
-      ".loc_", paste0(num.loci, collapse = ":"),
-      ".div_", paste0(div.time, collapse = ":"),
-      ".ne_", paste0(ne, collapse = ":"),
-      ".nm_", paste0(nm, collapse = ":"),
-      ".the_", paste0(theta, collapse = ":"),
-      ".mig_", paste0(mig.type, collapse = ":"),
-      ".rep_", num.reps,
-      ".gen_", num.rms.gens, collapse = "_")
-    label <- paste0("sims_", sim.arguments, "__", format(Sys.time(), "%Y%m%d@%H%M"))
+      "_pop.", paste0(num.pops, collapse = "."),
+      "_loc.", paste0(num.loci, collapse = "."),
+      "_div.", paste0(div.time, collapse = "."),
+      "_ne.", paste0(ne, collapse = "."),
+      "_nm.", paste0(nm, collapse = "."),
+      "_the.", paste0(theta, collapse = "."),
+      "_mig.", paste0(mig.type, collapse = "."),
+      "_rep.", num.reps,
+      "_gen.", num.rms.gens
+    )
+    label <- paste0(
+      "sims", sim.arguments, "_", format(Sys.time(), "%Y%m%d@%H%M")
+    )
   }
-  if (!dir.exists(label)) dir.create(label)
-  
+  if(dir.exists(label)) unlink(label, recursive = TRUE, force = TRUE)
+  dir.create(label)
   
   # create scenario data.frame
-  sc.df <- expand.grid(
+  scenarios <- expand.grid(
     num.pops = num.pops, num.loci = num.loci, div.time = div.time, ne = ne,
     nm = nm, theta = theta, mig.type = mig.type,
     stringsAsFactors = FALSE
   )
-  sc.df <- cbind(scenario = 1:nrow(sc.df), sc.df)
-  sc.df$mut.rate <- sc.df$theta / (4 * sc.df$ne)
-  sc.df$mig.rate <- sc.df$nm / sc.df$ne
-  readr::write_tsv(x = sc.df, path = file.path(label, "scenarios.summary.tsv"))
-  sc.df$mig.mat <- lapply(1:nrow(sc.df), function(i) {
-    num.pops <- sc.df$num.pops[i]
-    mig.rate <- sc.df$mig.rate[i]
-    switch(
-      sc.df$mig.type[i],
-      island = {
-        m <- mig.rate / (num.pops - 1)
-        mat <- matrix(rep(m, num.pops ^ 2), nrow = num.pops)
-        diag(mat) <- 1 - mig.rate
-        mat
-      },
-      stepping.stone = {
-        mat <- matrix(0, nrow = num.pops, ncol = num.pops)
-        m <- mig.rate / 2
-        for (k in 1:(num.pops - 1)) {
-          mat[k, k + 1] <- mat[k + 1, k] <- m
-        }
-        mat[1, num.pops] <- mat[num.pops, 1] <- m
-        diag(mat) <- 1 - mig.rate
-        mat
-      }
-    )
-  })
-  attr(sc.df, "label") <- label
-  save(sc.df, file = file.path(label, "scenarios.rdata"))
+  scenarios <- cbind(scenario = 1:nrow(scenarios), scenarios)
+  scenarios$mut.rate <- scenarios$theta / (4 * scenarios$ne)
+  scenarios$mig.rate <- scenarios$nm / scenarios$ne
+  attr(scenarios, "label") <- label
+  save(scenarios, file = file.path(label, paste0(label, "_scenarios.rdata")))
   
   # run scenarios
-  sapply(1:nrow(sc.df), function(i) {
-    # i <- 1#test
-    fname <- file.path(label, paste("gtypes", i, "rdata", sep = "."))
-    while (!file.exists(fname)) {
-    # remove next because with latest R and Checks it's throwing this note:
-      # Note: next used in wrong context: no loop is visible at simulate_rad.R:189 
-    sc <- as.list(sc.df[i, ])
-    sc$mig.mat <- sc$mig.mat[[1]]
+  for(sc.i in 1:nrow(scenarios)) {    
+    fname <- file.path(label, paste0(label, "_genotypes_", sc.i, ".rdata"))
+    if(file.exists(fname)) next
     
-    # run fastsimcoal
-    message("fastsimcoal runs")
-    fsc.list <- with(sc, {
-      n <- num.pops
-      pi <- strataG::fscPopInfo(pop.size = rep(ne, n), sample.size = rep(ne, n))
-      lp <- strataG::fscLocusParams(locus.type = "snp", num.loci = num.loci, mut.rate = mut.rate)
-      he <- strataG::fscHistEv(num.gen = rep(div.time, n - 1), source.deme = 1:(n - 1))
-      lapply(1:num.reps, function(rep) {
-        lbl <- paste0("scenario_", i, ".replicate_", rep)
-        strataG::fastsimcoal(
-          pi, lp, mig.rates = mig.mat, hist.ev = he, label = lbl, 
-          quiet = FALSE, exec = fsc.exec, num.cores = parallel.core
-        )
-      })
+    cat(format(Sys.time()), "---- Scenario", sc.i, "----\n")
+    sc <- as.list(scenarios[sc.i, ])
+    sc$mig.mat <- make_mig_mat(sc$mig.rate, sc$num.pops, sc$mig.type)
+    p <- run_fsc_sim(sc = sc, num.rep = num.reps)
+    sim.list <- lapply(1:num.reps, function(sim.i) {
+      fsc <- strataG::fscReadArp(p, sim = c(1, sim.i), drop.mono = TRUE) 
+      rms <- fsc %>% 
+        calc_freqs() %>% 
+        run_rmetasim(sc = sc, num.gens = num.rms.gens) %>% 
+        rmetasim::landscape.make.genind() %>% 
+        strataG::genind2gtypes() %>% 
+        strataG::as.data.frame()
+      list(fsc = fsc, rms = rms)
     })
+    strataG::fscCleanup(p$label)
     
-    # run rmetasim for 'num.gens' generations using fastsimcoal runs as initialization
-    message("rmetasim runs")
-    rms.list <- lapply(1:length(fsc.list), function(i) {
-      # i <- 1
-      af <- strataG::alleleFreqs(fsc.list[[i]], by.strata = T)
-      rl <- loadLandscape(sc, af, num.rms.gens)
-      for (g in 1:num.rms.gens) {
-        #g <- 1
-        rl <- rmetasim::landscape.simulate(rl, 1)
-          rl <- killExcess(rl, sc$ne)
-      }
-      landscape2gtypes(rl)
-    })
-    
-    attr(rms.list, "scenario") <- attr(fsc.list, "scenario") <- sc.df[i, ]
-    attr(rms.list, "label") <- attr(fsc.list, "label") <- label
-    
-    sim.data <- rms.list
-    # save both fastsimcoal and rmetasim results to same workspace file
     message("saving fastsimcoal and rmetasim results")
-    save(fsc.list, sim.data, file = fname)
+    save(sim.list, sc, label, file = fname)
     fname
-  }})
-  timing <- proc.time() - timing
-  message("\nComputation time: ", round(timing[[3]]), " sec")
+  }
+  
+  timing <- difftime(Sys.time(), start.time)
+  message("\nComputation time: ", format(round(timing, 2)))
   cat("#################### grur::simulate_rad completed #####################\n")
   options(width = opt.change)
+  
   invisible(label)
 }

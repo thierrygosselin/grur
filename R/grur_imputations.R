@@ -710,7 +710,7 @@ Please follow the vignette for install instructions")
       data.type <- "SeqVarGDSClass"
     }
     
-    data <- radiator:::gds2tidy(gds = data, parallel.core = parallel.core)
+    data <- radiator::gds2tidy(gds = data, parallel.core = parallel.core)
     data.type <- "tbl_df"
   }
   # strata--------------------------------------------------------------------

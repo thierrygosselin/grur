@@ -251,7 +251,7 @@ missing_visualization <- function(
         data.type <- "SeqVarGDSClass"
       }
       
-      individuals <- radiator:::generate_id_stats(
+      individuals <- radiator::generate_id_stats(
         gds = data, 
         coverage = FALSE,
         path.folder = path.folder, 
@@ -264,7 +264,7 @@ missing_visualization <- function(
         dplyr::rename(POP_ID = STRATA)
       
       tidy.data <- suppressWarnings(
-        radiator:::gds2tidy(
+        radiator::gds2tidy(
           gds = data,
           calibrate.alleles = FALSE,
           parallel.core = parallel.core
