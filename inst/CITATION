@@ -3,9 +3,9 @@ citHeader("To cite stackr in publications use:")
 citEntry(
 entry="Manual",
 title = "grur: an R package tailored for RADseq data imputations",
-year = "2018",
+year = "2019",
 author = personList(as.person("Thierry Gosselin"), as.person("Eric Archer")),
 url = "https://github.com/thierrygosselin/grur",
-doi = "http://dx.doi.org/10.5281/zenodo.496176",
-textVersion = paste("Thierry Gosselin (2018). grur: an R package tailored for RADseq data imputations. R package version 0.0.10 https://github.com/thierrygosselin/grur. doi : 10.5281/zenodo.496176")
+doi = "10.5281/zenodo.598156",
+textVersion = paste("Thierry Gosselin and Eric Archer (2019). grur: an R package tailored for RADseq data imputations. R package version 0.1.1 https://github.com/thierrygosselin/grur. doi : 10.5281/zenodo.598156")
 )
