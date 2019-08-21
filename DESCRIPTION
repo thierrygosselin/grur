@@ -38,6 +38,7 @@ Suggests:
     rlang,
     rmarkdown,
     rmetasim,
+    shiny,
     stats,
     stringi,
     strataG,
