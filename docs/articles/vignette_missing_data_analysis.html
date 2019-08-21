@@ -90,7 +90,7 @@
       <h1>grur missing data visualization analysis</h1>
                         <h4 class="author">Thierry Gosselin</h4>
             
-            <h4 class="date">2019-05-01</h4>
+            <h4 class="date">2019-08-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_missing_data_analysis.Rmd"><code>vignettes/vignette_missing_data_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>vignette_missing_data_analysis.Rmd</code></div>
@@ -113,19 +113,19 @@
 <h1 class="hasAnchor">
 <a href="#prepare-your-r-workspace" class="anchor"></a>Prepare your R workspace</h1>
 <p>Clean your desk</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rm">rm</a></span>(<span class="dt">list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ls">ls</a></span>())</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rm">rm</a></span>(<span class="dt">list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ls">ls</a></span>())</a></code></pre></div>
 <p>Follow the <a href="https://thierrygosselin.github.io/grur/">instruction to install grur</a></p>
 <p>Load the required libraries:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"grur"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"grur"</span>)</a></code></pre></div>
 <p>Set your working directory, e.g.:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(<span class="st">"~/Documents/test_missing_visualization_vignette"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(<span class="st">"~/Documents/test_missing_visualization_vignette"</span>)</a></code></pre></div>
 <p>Note: running codes in chunks inside R Notebook might cause problem, run it outside in the console (the default here).</p>
 </div>
 <div id="download-the-test-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#download-the-test-data" class="anchor"></a>Download the test data</h1>
 <p>Dataset: in this example, we use the data in Ferchaud and Hansen (2015 and 2016) paper. The code below gets the vcf from Dryad directly. But you can skip the step if it’s already in the folder.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readBin">writeBin</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/httr/topics/content">content</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/httr/topics/GET">GET</a></span>(<span class="st">"http://datadryad.org/bitstream/handle/10255/dryad.97237/sticklebacks_Danish.vcf?sequence=1"</span>), <span class="st">"raw"</span>), <span class="st">"stickleback_ferchaud_2015.vcf"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readBin">writeBin</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/content.html">content</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/GET.html">GET</a></span>(<span class="st">"http://datadryad.org/bitstream/handle/10255/dryad.97237/sticklebacks_Danish.vcf?sequence=1"</span>), <span class="st">"raw"</span>), <span class="st">"stickleback_ferchaud_2015.vcf"</span>)</a></code></pre></div>
 <p>With a vcf you also need a strata file (indicating population groupings)</p>
 <ul>
 <li>it’s a tab-delimited file or object, in the global environment.</li>
@@ -142,12 +142,12 @@
 <h1 class="hasAnchor">
 <a href="#run-the-function" class="anchor"></a>Run the function</h1>
 <p>This is the simplest way to run the function:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">ibm &lt;-<span class="st"> </span>grur<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/grur/topics/missing_visualization">missing_visualization</a></span>(</a>
-<a class="sourceLine" id="cb5-2" title="2">  <span class="dt">data =</span> <span class="st">"stickleback_ferchaud_2015.vcf"</span>, </a>
-<a class="sourceLine" id="cb5-3" title="3">  <span class="dt">strata =</span> <span class="st">"strata.stickleback.tsv"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">ibm &lt;-<span class="st"> </span>grur<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/grur/topics/missing_visualization">missing_visualization</a></span>(</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">  <span class="dt">data =</span> <span class="st">"stickleback_ferchaud_2015.vcf"</span>, </a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">  <span class="dt">strata =</span> <span class="st">"strata.stickleback.tsv"</span>)</a></code></pre></div>
 <p>The function does a few automatic filters: * Monomorphic markers are removed * Only common markers between strata are kept for the analysis * Individuals and markers statistics are generated automatically</p>
 <p>A new object <code>ibm</code> was created in your global environment. It’s a list and to view it’s content use:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(ibm)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(ibm)</a></code></pre></div>
 <p>Lots of info in there… Lets focus on just a few. A folder is also created automatically. The function generates by default a large object (list):</p>
 <ul>
 <li>IBM-PCoA plot</li>
@@ -162,35 +162,35 @@
 <h1 class="hasAnchor">
 <a href="#visualization" class="anchor"></a>Visualization</h1>
 <p><strong>To view the IBM-PCoA plot made with POP_ID grouping:</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">ibm<span class="op">$</span>ibm.plots<span class="op">$</span>ibm.strata.POP_ID</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">ibm<span class="op">$</span>ibm.plots<span class="op">$</span>ibm.strata.POP_ID</a></code></pre></div>
 <p>The dark green bubble from KIB it’s an individual with almost <strong>all of his genotypes missing</strong>. This one skip the radar of the authors ;)</p>
 <p>The heatmap showing missingness:</p>
 <ul>
 <li>gives a nice global outlook of the missingness</li>
 <li>the figure is very long to generate (on some computers..), don’t try this with more than 100K markers… or take a couple day off:</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">heatmap &lt;-<span class="st"> </span>ibm<span class="op">$</span>heatmap </a>
-<a class="sourceLine" id="cb8-2" title="2">heatmap </a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">heatmap &lt;-<span class="st"> </span>ibm<span class="op">$</span>heatmap </a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">heatmap </a></code></pre></div>
 <p>The vertical black line highlight the problem in the vcf with the individual missing almost all it’s genotypes.</p>
 <p>View the table with summary of missing genotypes per individuals:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">table.ind &lt;-<span class="st"> </span>ibm<span class="op">$</span>missing.genotypes.ind</a>
-<a class="sourceLine" id="cb9-2" title="2">table.ind</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">table.ind &lt;-<span class="st"> </span>ibm<span class="op">$</span>missing.genotypes.ind</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">table.ind</a></code></pre></div>
 <p>To view the distribution</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">ibm<span class="op">$</span>missing.genotypes.ind.plots</a></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">ibm<span class="op">$</span>missing.genotypes.ind.histo</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">ibm<span class="op">$</span>missing.genotypes.ind.plots</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">ibm<span class="op">$</span>missing.genotypes.ind.histo</a></code></pre></div>
 <p>Show the helper figure showing how many individuals could potentially be blacklisted based on % on genotypes.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">ibm<span class="op">$</span>ind.genotyped.helper.plot</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">ibm<span class="op">$</span>ind.genotyped.helper.plot</a></code></pre></div>
 <p>All these figures are combined in the folder…</p>
 <p>To view the distribution of missingness per markers</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">ibm<span class="op">$</span>missing.genotypes.markers.combined.plots</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">ibm<span class="op">$</span>missing.genotypes.markers.combined.plots</a></code></pre></div>
 <p><strong>Other figures are created, explore the list of objects and folder. Read the doc.</strong></p>
 <p><strong>To view the distribution of FH and missing genotypes per individuals</strong></p>
 <ul>
 <li><p>FH : is an identity by descent genomic (IBDg) measure based on the excess in the observed number of homozygous genotypes within an individual relative to the mean number of homozygous genotypes expected under random mating).</p></li>
 <li><p>To learn more about it see (Keller et al., 2011; Kardos et al., 2015; Hedrick &amp; Garcia-Dorado, 2016)</p></li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">ibm<span class="op">$</span>missing.genotypes.ind.fh.combined.plots </a></code></pre></div>
-<p>This is weird figure is caused by the outlier individual. To remove this individual, re-run <code>missing_visualization</code> with the argument <code>blacklist.id</code> and one of the several blacklists written to the working directory (e.g. <code>blacklist.id.missing.70.tsv</code>).</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">ibm<span class="op">$</span>missing.genotypes.ind.fh.combined.plots </a></code></pre></div>
+<p>This is weird figure is caused by the outlier individual. To remove this individual, re-run <code>missing_visualization</code> with the argument <code>blacklist.id</code> and one of the several blacklists written to the working directory (e.g. <code>blacklist.id.missing.70.tsv</code>).</p>
 <p><strong>Explore the rest by yourself!</strong></p>
 </div>
 <div id="interpretation" class="section level1">
@@ -236,8 +236,8 @@
 <a href="#references" class="anchor"></a>References</h1>
 <p>Ferchaud A, Hansen MM (2016) The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Molecular Ecology 25(1): 238–259. <a href="http://dx.doi.org/10.1111/mec.13399" class="uri">http://dx.doi.org/10.1111/mec.13399</a></p>
 <p>Ferchaud A, Hansen MM (2015) Data from: The impact of selection, gene flow and demographic history on heterogeneous genomic divergence: threespine sticklebacks in divergent environments. Dryad Digital Repository. <a href="http://dx.doi.org/10.5061/dryad.kp11q" class="uri">http://dx.doi.org/10.5061/dryad.kp11q</a></p>
-<p>Danecek P, Auton A, Abecasis G et al. (2011) The variant call format and VCFtools. Bioinformatics, 27, 2156–2158.</p>
-<p>Purcell S, Neale B, Todd-Brown K et al. (2007) PLINK: a tool set for whole-genome association and population-based linkage analyses. American Journal of Human Genetics, 81, 559–575.</p>
+<p>Danecek P, Auton A, Abecasis G et al. (2011) The variant call format and VCFtools. Bioinformatics, 27, 2156–2158.</p>
+<p>Purcell S, Neale B, Todd-Brown K et al. (2007) PLINK: a tool set for whole-genome association and population-based linkage analyses. American Journal of Human Genetics, 81, 559–575.</p>
 <p>Keller MC, Visscher PM, Goddard ME (2011) Quantification of inbreeding due to distant ancestors and its detection using dense single nucleotide polymorphism data. Genetics, 189, 237–249.</p>
 <p>Kardos M, Luikart G, Allendorf FW (2015) Measuring individual inbreeding in the age of genomics: marker-based measures are better than pedigrees. Heredity, 115, 63–72.</p>
 <p>Hedrick PW, Garcia-Dorado A. (2016) Understanding Inbreeding Depression, Purging, and Genetic Rescue. Trends in Ecology and Evolution. 2016;31: 940-952. <a href="doi:10.1016/j.tree.2016.09.005" class="uri">doi:10.1016/j.tree.2016.09.005</a></p>

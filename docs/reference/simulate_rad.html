@@ -146,10 +146,9 @@ to be installed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>simulate_rad</span>(<span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>25000</span>,
-  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>50</span>, <span class='fl'>500</span>), <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>), <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
-  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></span>() - <span class='fl'>1</span>)</pre>
+  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>5</span>), <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"island"</span>,
+  <span class='st'>"stepping.stone"</span>), <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>, <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></span>() - <span class='fl'>1</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -242,10 +241,10 @@ Default: <code>parallel.core = parallel::detectCores() - 1</code>.</p></td>
     <p>The function will create a folder in the current working directory with the 
  name provided by <code>label</code>. Within this folder there will be an R 
  workspace file ("<code>scenarios.rdata</code>") containing a data frame with the 
- parameters for each scenario (<code>sc.df</code>), and one R  
+ parameters for each scenario (<code>scenarios</code>), and one R  
  workspace file for each scenario, named <code>"gtypes.#.rdata"</code> where "#" 
  is the scenario number. Each scenario file contains a list named 
- <code>sim.data</code>, which contains a <code>strataG::gtypes</code> representation 
+ <code>sim.data</code>, which contains a <code><a href='https://www.rdocumentation.org/packages/strataG/topics/gtypes-class'>strataG::gtypes</a></code> representation 
  of the simulated SNP data for every replicate in that scenario. The list 
  has a "<code>scenario</code>" attribute which is a one row data.frame providing 
  the parameters that generated the data and a "<code>label</code>" attribute which 
@@ -285,7 +284,8 @@ Default: <code>parallel.core = parallel::detectCores() - 1</code>.</p></td>
     </ul>
 
     <h2>Author</h2>
-    <p>Eric Archer <a href='mailto:eric.archer@noaa.gov'>eric.archer@noaa.gov</a> and Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
+    <p>Eric Archer <a href='mailto:eric.archer@noaa.gov'>eric.archer@noaa.gov</a> and 
+  Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
   </div>
 </div>
 

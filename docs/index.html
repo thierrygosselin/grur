@@ -104,19 +104,61 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"remotes"</span>)) <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
-<a class="sourceLine" id="cb1-2" title="2">remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"thierrygosselin/grur"</span>)</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(grur)</a></code></pre></div>
-<p>Note: not all the packages used inside <strong>grur</strong> are installed, why?</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"remotes"</span>)) <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"thierrygosselin/grur"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(grur)</a></code></pre></div>
+<p>Note: not all the packages used for imputations inside <strong>grur</strong> are installed automatically, why?</p>
 <ul>
-<li>Depending on your analysis, you might not need to install all of them, by default, you’ll be able to run <code><a href="reference/missing_visualization.html">grur::missing_visualization</a></code>.</li>
-<li>Some modules used for imputations are more complicated to install, and might impact your choice of imputations.</li>
-<li><a href="https://thierrygosselin.github.io/grur/index.html#options-and-required-packages">this section covers all the required packages installation</a></li>
+<li>Not all methods will be of interest.</li>
+<li>Some modules used for imputations are more complicated to install, and depending on OS, it will definitely test your R skills and patience.</li>
+<li>By default, you’ll be able to run <code><a href="reference/missing_visualization.html">grur::missing_visualization</a></code> to check for pattern of missingness (the first step…)</li>
 </ul>
 </div>
-<div id="web-site-and-additional-info-httpsthierrygosselin-github-iogrur" class="section level2">
+<div id="installation-details-for-additonal-imputation-options" class="section level2">
 <h2 class="hasAnchor">
-<a href="#web-site-and-additional-info-httpsthierrygosselin-github-iogrur" class="anchor"></a>web site and additional info <a href="https://thierrygosselin.github.io/grur/">https://thierrygosselin.github.io/grur/</a> :</h2>
+<a href="#installation-details-for-additonal-imputation-options" class="anchor"></a>Installation details for additonal imputation options</h2>
+<p>Please follow additional instructions in the <a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a> to install the required packages for the imputation options you want to conduct:</p>
+<table class="table table">
+<thead><tr class="header">
+<th align="left">imputation options</th>
+<th align="center">package</th>
+<th align="center">installation difficulty</th>
+<th align="left">install instructions</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>imputation.method = “lightgbm”</strong></td>
+<td align="center"><code>lightgbm</code></td>
+<td align="center">difficult</td>
+<td align="left"><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>imputation.method = “xgboost”</strong></td>
+<td align="center"><code>xgboost</code></td>
+<td align="center">moderate</td>
+<td align="left"><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>imputation.method = “rf”</strong></td>
+<td align="center"><code>randomForestSRC</code></td>
+<td align="center">moderate</td>
+<td align="left"><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>imputation.method = “rf_pred”</strong></td>
+<td align="center"><code>ranger</code></td>
+<td align="center">easy</td>
+<td align="left"><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("ranger")</a></code></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>if using pmm &gt; 0</strong></td>
+<td align="center"><code>missRanger</code></td>
+<td align="center">easy</td>
+<td align="left"><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("missRanger")</a></code></td>
+</tr>
+</tbody>
+</table>
+<p>web site and additional info: <a href="https://thierrygosselin.github.io/grur/">https://thierrygosselin.github.io/grur/</a></p>
 <ul>
 <li><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">Computer setup - installation - troubleshooting</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/reference/index.html">Function’s documentation</a></li>
@@ -125,17 +167,6 @@
 <li>How to cite grur: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code>
 </li>
 </ul>
-</div>
-<div id="assumptions-before-imputing-your-dataset" class="section level2">
-<h2 class="hasAnchor">
-<a href="#assumptions-before-imputing-your-dataset" class="anchor"></a>Assumptions before imputing your dataset</h2>
-<ol style="list-style-type: decimal">
-<li><p><strong>Filtered data</strong>: Please don’t try <strong>grur</strong> with raw data consisting of &gt; 100K SNPs, you will generate all sorts of bias and you’ll be disapointed. <strong>Filter your data first!</strong> <a href="https://thierrygosselin.github.io/radiator/">radiator</a> was designed for this.</p></li>
-<li><p><strong>Correlations</strong>: Machine learning algorithms will work better and faster if correlation are reduced to a minimum. If you used <a href="https://thierrygosselin.github.io/radiator/reference/filter_rad.html">filter_rad</a> to filter your dataset, you should be ok. If not, check your dataset for <a href="https://thierrygosselin.github.io/radiator/reference/filter_ld.html">short and long LD</a>.</p></li>
-<li><p><strong>Pattern of individual heterozygosity</strong>: If you have individual heterozygosity patterns and/or correlation of individual heterozygosity with missingness, you might want to skip imputation and go back to filter your data. Please check out <a href="https://thierrygosselin.github.io/radiator/reference/detect_mixed_genomes.html">radiator::detect_mixed_genomes</a> and <a href="https://thierrygosselin.github.io/radiator/reference/detect_het_outliers.html">radiator::detect_het_outliers</a>.</p></li>
-<li><p><strong>Patterns of missingness</strong>: Look for patterns of missingness <a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">(vignette)</a> to better understand the reasons for their presence and tailor the arguments inside grur’s imputation module.</p></li>
-<li><p><strong>Default arguments</strong>: Defaults are there for testing, please, please, please, don’t use grur’s defaults for publications!</p></li>
-</ol>
 </div>
 <div id="life-cycle" class="section level2">
 <h2 class="hasAnchor">
@@ -149,44 +180,16 @@
 </li>
 </ul>
 </div>
-<div id="options-and-required-packages" class="section level2">
+<div id="assumptions-before-imputing-your-dataset" class="section level2">
 <h2 class="hasAnchor">
-<a href="#options-and-required-packages" class="anchor"></a>Options and required packages</h2>
-<p>Please follow additional instructions in the <a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a> to install the required packages for the imputation options you want to conduct:</p>
-<table class="table table">
-<thead><tr class="header">
-<th align="left">imputation options</th>
-<th align="center">package</th>
-<th>install instructions</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><strong>imputation.method = “lightgbm”</strong></td>
-<td align="center"><code>lightgbm</code></td>
-<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
-</tr>
-<tr class="even">
-<td align="left"><strong>imputation.method = “xgboost”</strong></td>
-<td align="center"><code>xgboost</code></td>
-<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>imputation.method = “rf”</strong></td>
-<td align="center"><code>randomForestSRC</code></td>
-<td><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a></td>
-</tr>
-<tr class="even">
-<td align="left"><strong>imputation.method = “rf_pred”</strong></td>
-<td align="center"><code>ranger</code></td>
-<td><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("ranger")</a></code></td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>if using pmm &gt; 0</strong></td>
-<td align="center"><code>missRanger</code></td>
-<td><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("missRanger")</a></code></td>
-</tr>
-</tbody>
-</table>
+<a href="#assumptions-before-imputing-your-dataset" class="anchor"></a>Assumptions before imputing your dataset</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Filtered data</strong>: Please don’t try <strong>grur</strong> with raw data consisting of &gt; 100K SNPs, you will generate all sorts of bias and you’ll be disapointed. <strong>Filter your data first!</strong> <a href="https://thierrygosselin.github.io/radiator/">radiator</a> was designed for this.</p></li>
+<li><p><strong>Correlations</strong>: Machine learning algorithms will work better and faster if correlations are reduced to a minimum. If you used <a href="https://thierrygosselin.github.io/radiator/reference/filter_rad.html">filter_rad</a> to filter your dataset, you should be ok. If not, check your dataset for <a href="https://thierrygosselin.github.io/radiator/reference/filter_ld.html">short and long LD</a>.</p></li>
+<li><p><strong>Pattern of individual heterozygosity</strong>: If you have individual heterozygosity patterns and/or correlation of individual heterozygosity with missingness, you might want to skip imputation and go back to filter your data. Please check out <a href="https://thierrygosselin.github.io/radiator/reference/detect_mixed_genomes.html">radiator::detect_mixed_genomes</a> and <a href="https://thierrygosselin.github.io/radiator/reference/detect_het_outliers.html">radiator::detect_het_outliers</a>.</p></li>
+<li><p><strong>Patterns of missingness</strong>: Look for patterns of missingness <a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">(vignette)</a> to better understand the reasons for their presence and tailor the arguments inside grur’s imputation module.</p></li>
+<li><p><strong>Default arguments</strong>: Defaults are there for testing, please, please, please, don’t use grur’s defaults for publications!</p></li>
+</ol>
 </div>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
@@ -209,12 +212,14 @@
 <tr class="even">
 <td align="left"><strong>Patterns of missingness</strong></td>
 <td align="left">
-<code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures (<a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">see vignette</a>). <br><br><code>generate_missing</code>: allows to generate missing genotypes in dateset [simulated] based on a compound Dirichlet-multinomial distribution. <em>Vignette coming soon</em>.</td>
+<code>missing_visualization</code>: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), <strong>grur</strong> is more powerful because it generates more analysis and automatically creates tables and figures (<a href="https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html">see vignette</a>). <br><br><code>generate_missing</code>: allows to generate missing genotypes in dataset [simulated] based on a compound Dirichlet-multinomial distribution. <em>Vignette coming soon</em>.</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Imputations</strong></td>
 <td align="left">
-<code>grur_imputations</code>: <strong>Map-independent</strong> imputations of missing genotypes with several algorithms (including machine leaning):<br> * <strong>Random Forests</strong> (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>* <strong>Extreme Gradient Tree Boosting</strong> (using XGBoost or LightGBM),<br>* <strong>Bayesian PCA</strong> (using bpca in pcaMethods),<br>* <strong>Classic Strawman: </strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy: </strong> algorithm’s model can account for <em>strata</em> groupings, e.g. if patterns of missingness is found in the data.<br><br><strong>Haplotypes: </strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. <em>Vignette coming soon</em>.</td>
+<strong>Imputations</strong> <code>grur_imputations</code>
+</td>
+<td align="left">
+<strong>Map-independent</strong> imputations of missing genotypes with several algorithms (including machine leaning):<br>* <strong>Random Forests</strong> (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>* <strong>Extreme Gradient Tree Boosting</strong> (using XGBoost or LightGBM),<br>* <strong>Bayesian PCA</strong> (using bpca in pcaMethods),<br>* <strong>Classic Strawman:</strong> the most frequently observed, non-missing, genotypes is used for imputation.<br><br><strong>Hierarchy:</strong> algorithm’s model can account for <em>strata</em> groupings, e.g. if patterns of missingness is found in the data.<br><br><strong>Haplotypes:</strong> automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. <em>Vignette coming soon</em>.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Input/Output</strong></td>
@@ -222,7 +227,7 @@
 <strong>grur</strong> uses <a href="https://thierrygosselin.github.io/radiator/index.html">radiator</a> input and output modules. Check out the <a href="https://thierrygosselin.github.io/radiator/articles/get_started.html#overview">overview</a> of supported file format.</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong><a href="http://ggplot2.org">ggplot2</a>-based plotting</strong></td>
+<td align="left"><strong><a href="https://ggplot2.tidyverse.org">ggplot2</a>-based plotting</strong></td>
 <td align="left">Visualization: publication-ready figures of important metrics and statistics.</td>
 </tr>
 <tr class="even">
@@ -274,7 +279,7 @@
 <li><a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed."></a></li>
 <li><a href="https://zenodo.org/badge/latestdoi/87596763"><img src="https://zenodo.org/badge/87596763.svg" alt="DOI"></a></li>
 <li><a href="commits/master"><img src="https://img.shields.io/badge/Package%20version-0.1.1-orange.svg" alt="packageversion"></a></li>
-<li><a href="/commits/master"><img src="https://img.shields.io/badge/last%20change-2019--05--01-brightgreen.svg" alt="Last-changedate"></a></li>
+<li><a href="/commits/master"><img src="https://img.shields.io/badge/last%20change-2019--08--21-brightgreen.svg" alt="Last-changedate"></a></li>
 </ul>
 </div>
 </div>
