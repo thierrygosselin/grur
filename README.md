@@ -11,8 +11,8 @@ Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://t
 state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.1.0-orange.svg)](commits/master)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2019--05--01-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.1-orange.svg)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2019--08--21-brightgreen.svg)](/commits/master)
 <!-- badges: end -->
 
 <https://thierrygosselin.github.io/grur/>
@@ -43,17 +43,32 @@ remotes::install_github("thierrygosselin/grur")
 library(grur)
 ```
 
-Note: not all the packages used inside **grur** are installed, why?
+Note: not all the packages used for imputations inside **grur** are
+installed automatically, why?
 
-  - Depending on your analysis, you might not need to install all of
-    them, by default, you’ll be able to run
-    `grur::missing_visualization`.
+  - Not all methods will be of interest.
   - Some modules used for imputations are more complicated to install,
-    and might impact your choice of imputations.
-  - [this section covers all the required packages
-    installation](https://thierrygosselin.github.io/grur/index.html#options-and-required-packages)
+    and depending on OS, it will definitely test your R skills and
+    patience.
+  - By default, you’ll be able to run `grur::missing_visualization` to
+    check for pattern of missingness (the first step…)
 
-## web site and additional info <https://thierrygosselin.github.io/grur/> :
+## Installation details for additonal imputation options
+
+Please follow additional instructions in the
+[vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
+to install the required packages for the imputation options you want to
+conduct:
+
+| imputation options                 |      package      | installation difficulty | install instructions                                                                        |
+| :--------------------------------- | :---------------: | :---------------------: | :------------------------------------------------------------------------------------------ |
+| **imputation.method = “lightgbm”** |    `lightgbm`     |        difficult        | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
+| **imputation.method = “xgboost”**  |     `xgboost`     |        moderate         | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
+| **imputation.method = “rf”**       | `randomForestSRC` |        moderate         | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
+| **imputation.method = “rf\_pred”** |     `ranger`      |          easy           | `install.packages("ranger")`                                                                |
+| **if using pmm \> 0**              |   `missRanger`    |          easy           | `install.packages("missRanger")`                                                            |
+
+web site and additional info: <https://thierrygosselin.github.io/grur/>
 
   - [Computer setup - installation -
     troubleshooting](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
@@ -64,6 +79,22 @@ Note: not all the packages used inside **grur** are installed, why?
   - [Vignettes](http://thierrygosselin.github.io/grur/articles/index.html)
   - How to cite grur: inside R type `citation("grur")`
 
+## Life cycle
+
+**grur** is still experimental, in order to make the package better,
+changes are inevitable. Experimental functions will change, argument
+names will change. Your codes and workflows might break from time to
+time **until grur is stable**. Consequently, depending on your tolerance
+to change, **grur** might not be for you.
+
+  - Philosophy, major changes and deprecated functions/arguments are
+    documented in life cycle section of functions.
+  - [changelog, versions, new features and bug
+    history](https://thierrygosselin.github.io/grur/news/index.html)
+  - [issues](https://github.com/thierrygosselin/grur/issues/new/choose)
+    and
+    [contributions](https://github.com/thierrygosselin/grur/issues/new/choose)
+
 ## Assumptions before imputing your dataset
 
 1.  **Filtered data**: Please don’t try **grur** with raw data
@@ -73,7 +104,7 @@ Note: not all the packages used inside **grur** are installed, why?
     for this.
 
 2.  **Correlations**: Machine learning algorithms will work better and
-    faster if correlation are reduced to a minimum. If you used
+    faster if correlations are reduced to a minimum. If you used
     [filter\_rad](https://thierrygosselin.github.io/radiator/reference/filter_rad.html)
     to filter your dataset, you should be ok. If not, check your dataset
     for [short and long
@@ -93,46 +124,16 @@ Note: not all the packages used inside **grur** are installed, why?
     arguments inside grur’s imputation module.
 
 5.  **Default arguments**: Defaults are there for testing, please,
-    please, please, don’t use grur’s defaults for publications\!
-
-## Life cycle
-
-**grur** is still experimental, in order to make the package better,
-changes are inevitable. Experimental functions will change, argument
-names will change. Your codes and workflows might break from time to
-time **until grur is stable**. Consequently, depending on your tolerance
-to change, **grur** might not be for you.
-
-  - Philosophy, major changes and deprecated functions/arguments are
-    documented in life cycle section of functions.
-  - [changelog, versions, new features and bug
-    history](https://thierrygosselin.github.io/grur/news/index.html)
-  - [issues](https://github.com/thierrygosselin/grur/issues/new/choose)
-    and
-    [contributions](https://github.com/thierrygosselin/grur/issues/new/choose)
-
-## Options and required packages
-
-Please follow additional instructions in the
-[vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html)
-to install the required packages for the imputation options you want to
-conduct:
-
-| imputation options                 |      package      | install instructions                                                                        |
-| :--------------------------------- | :---------------: | ------------------------------------------------------------------------------------------- |
-| **imputation.method = “lightgbm”** |    `lightgbm`     | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
-| **imputation.method = “xgboost”**  |     `xgboost`     | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
-| **imputation.method = “rf”**       | `randomForestSRC` | [vignette](http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html) |
-| **imputation.method = “rf\_pred”** |     `ranger`      | `install.packages("ranger")`                                                                |
-| **if using pmm \> 0**              |   `missRanger`    | `install.packages("missRanger")`                                                            |
+    please, please, don’t use grur’s defaults for
+publications\!
 
 ## Features
 
-| Caracteristics                                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| :----------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Simulate RADseq data**                         | `simulate_rad`: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with [fastsimcoal2](http://cmpg.unibe.ch/software/fastsimcoal2/) and then used inside [rmetasim](https://github.com/stranda/rmetasim) simulation engine. *Vignette coming soon*.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| **Patterns of missingness**                      | `missing_visualization`: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures ([see vignette](https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html)). <br><br>`generate_missing`: allows to generate missing genotypes in dateset \[simulated\] based on a compound Dirichlet-multinomial distribution. *Vignette coming soon*.                                                                                                                                                   |
-| **Imputations**                                  | `grur_imputations`: **Map-independent** imputations of missing genotypes with several algorithms (including machine leaning):<br> \* **Random Forests** (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>\* **Extreme Gradient Tree Boosting** (using XGBoost or LightGBM),<br>\* **Bayesian PCA** (using bpca in pcaMethods),<br>\* **Classic Strawman: ** the most frequently observed, non-missing, genotypes is used for imputation.<br><br>**Hierarchy: ** algorithm’s model can account for *strata* groupings, e.g. if patterns of missingness is found in the data.<br><br>**Haplotypes: ** automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. *Vignette coming soon*. |
-| **Input/Output**                                 | **grur** uses [radiator](https://thierrygosselin.github.io/radiator/index.html) input and output modules. Check out the [overview](https://thierrygosselin.github.io/radiator/articles/get_started.html#overview) of supported file format.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **[ggplot2](http://ggplot2.org)-based plotting** | Visualization: publication-ready figures of important metrics and statistics.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| **Parallel**                                     | Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC\!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Caracteristics                                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Simulate RADseq data**                                    | `simulate_rad`: simulate populations of RADseq data following island or stepping stone models. Inside the function, allele frequency can be created with [fastsimcoal2](http://cmpg.unibe.ch/software/fastsimcoal2/) and then used inside [rmetasim](https://github.com/stranda/rmetasim) simulation engine. *Vignette coming soon*.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Patterns of missingness**                                 | `missing_visualization`: visualize patterns of missing data associated with different variables of your study (lanes, chips, sequencers, populations, sample sites, reads/samples, homozygosity, etc). Similar to PLINK’s identify-by-missingness analysis (IBM), **grur** is more powerful because it generates more analysis and automatically creates tables and figures ([see vignette](https://thierrygosselin.github.io/grur/articles/vignette_missing_data_analysis.html)). <br><br>`generate_missing`: allows to generate missing genotypes in dataset \[simulated\] based on a compound Dirichlet-multinomial distribution. *Vignette coming soon*.                                                                                                                           |
+| **Imputations** `grur_imputations`                          | **Map-independent** imputations of missing genotypes with several algorithms (including machine leaning):<br>\* **Random Forests** (on-the-fly-imputations with randomForestSRC or using predictive modelling using ranger and missRanger),<br>\* **Extreme Gradient Tree Boosting** (using XGBoost or LightGBM),<br>\* **Bayesian PCA** (using bpca in pcaMethods),<br>\* **Classic Strawman:** the most frequently observed, non-missing, genotypes is used for imputation.<br><br>**Hierarchy:** algorithm’s model can account for *strata* groupings, e.g. if patterns of missingness is found in the data.<br><br>**Haplotypes:** automatically detect SNPs on the same LOCUS (read/haplotype) to impute the SNPs jointly, reducing imputation artifacts. *Vignette coming soon*. |
+| **Input/Output**                                            | **grur** uses [radiator](https://thierrygosselin.github.io/radiator/index.html) input and output modules. Check out the [overview](https://thierrygosselin.github.io/radiator/articles/get_started.html#overview) of supported file format.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **[ggplot2](https://ggplot2.tidyverse.org)-based plotting** | Visualization: publication-ready figures of important metrics and statistics.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Parallel**                                                | Codes designed and optimized for fast computations with, sometimes, progress bars. Works with all OS: Linux, Mac and yes PC\!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
