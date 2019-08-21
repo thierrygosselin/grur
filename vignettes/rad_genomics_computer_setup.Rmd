@@ -137,21 +137,12 @@ and download the installer for your OS.
 
 You need to tell R how to use the compilers. This might change from one package
 to another. Nothing is simple, you know this by now...
-All this is done through R's `~/.R/Makevars` file.
+All this is done through R's **Makevars** file located in `~/.R/Makevars`.
 
-If you don't have the file, the fastest way is to use the built-in nano editor in the Terminal to create one:
-```{bash eval=FALSE}
-cd ~
-mkdir ~/.R
+To modify or create the file, the fastest way is to use the package [usethis](https://usethis.r-lib.org) (it's installed automatically with `devtools`):
+```{r eval=FALSE}
+usethis::edit_r_makevars()
 ```
-
-```{bash eval=FALSE}
-nano ~/.R/Makevars
-```
-Copy/paste the section below (Makevars content). Save and Exit with: `crt-o`, `enter`, `crt-x`.
-
-If you already have the *Makevars* file macOS [BBEdit](http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html#install-textwrangler) can be use to open the file with `Show hidden items` turned `ON`. 
-
 
 **Makevars content required:**
 ```{bash eval=FALSE}
