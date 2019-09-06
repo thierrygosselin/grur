@@ -202,9 +202,7 @@ markers_genotyped_helper <- function(x, y) {
   
   mean.pop <- threshold.helper.pop %>%
     dplyr::group_by(GENOTYPED_THRESHOLD) %>%
-    dplyr::summarise(
-      NUMBER_MARKERS = round(mean(NUMBER_MARKERS), 0)
-    ) %>%
+    dplyr::summarise(NUMBER_MARKERS = round(mean(NUMBER_MARKERS), 0)) %>%
     dplyr::mutate(POP_ID = rep("MEAN_POP", n()))
   
   threshold.helper <- suppressWarnings(
@@ -400,8 +398,9 @@ pct_missing_by_total <- function(
   strata.select, data, ci = 0.95, path.folder, write.plot = TRUE) {
   
   # rename strata column and convert GT_BIN to missing or not
-  data <- data %>% 
-    dplyr::rename(STRATA_SELECT = data[[!!(strata.select)]]) %>% 
+  data %<>%  
+    # dplyr::rename(STRATA_SELECT = data[[!!(strata.select)]]) %>% 
+    dplyr::rename(STRATA_SELECT = !! strata.select) %>% 
     dplyr::mutate(is.missing = GT_MISSING_BINARY == 0)
   
   # count number of strata

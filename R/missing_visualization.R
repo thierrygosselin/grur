@@ -623,7 +623,7 @@ missing_visualization <- function(
       , by = c("INDIVIDUALS", "POP_ID")
     )
   )
-  res$fh.manhattan.box.plot <- fh$fh.manhattan.box.plot
+  # res$fh.manhattan.box.plot <- fh$fh.manhattan.box.plot
   
   res$missing.genotypes.ind.fh.plots <- ggplot2::ggplot(
     res$missing.genotypes.ind.fh, ggplot2::aes(y = FH, x = MISSING_GENOTYPE_PROP)) +
@@ -643,7 +643,7 @@ missing_visualization <- function(
   
   # merge plots
   plots <- cowplot::align_plots(
-    res$missing.genotypes.ind.fh.plots, fh$fh.manhattan.box.plot, align = "v", axis = "l")
+    res$missing.genotypes.ind.fh.plots, fh$fh.box.plot, align = "v", axis = "l")
   bottom.row.plot <- suppressMessages(cowplot::plot_grid(
     plots[[2]], fh$fh.distribution.plot, labels = c("B", "C"), align = "h"))
   
