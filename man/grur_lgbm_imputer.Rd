@@ -4,13 +4,25 @@
 \alias{grur_lgbm_imputer}
 \title{grur_lgbm_imputer}
 \usage{
-grur_lgbm_imputer(boost.split = NULL, markers.df = NULL,
-  data.gbm = NULL, boosting = "dart", objective = "multiclass",
-  learning_rate = 0.1, feature_fraction = 0.9,
-  bagging_fraction = 0.9, bagging_freq = 1, max_depth = -1,
-  min_data_in_leaf = 20, num_leaves = 31,
-  cpu.boost = parallel::detectCores()/2, early_stopping_rounds = 10,
-  nrounds = 200, iteration.subsample = 2, pmm = 2)
+grur_lgbm_imputer(
+  boost.split = NULL,
+  markers.df = NULL,
+  data.gbm = NULL,
+  boosting = "dart",
+  objective = "multiclass",
+  learning_rate = 0.1,
+  feature_fraction = 0.9,
+  bagging_fraction = 0.9,
+  bagging_freq = 1,
+  max_depth = -1,
+  min_data_in_leaf = 20,
+  num_leaves = 31,
+  cpu.boost = parallel::detectCores()/2,
+  early_stopping_rounds = 10,
+  nrounds = 200,
+  iteration.subsample = 2,
+  pmm = 2
+)
 }
 \description{
 imputations using Ligh Gradient Boosting Machine

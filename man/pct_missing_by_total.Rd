@@ -4,8 +4,13 @@
 \alias{pct_missing_by_total}
 \title{pct_missing_by_total}
 \usage{
-pct_missing_by_total(strata.select, data, ci = 0.95, path.folder,
-  write.plot = TRUE)
+pct_missing_by_total(
+  strata.select,
+  data,
+  ci = 0.95,
+  path.folder,
+  write.plot = TRUE
+)
 }
 \description{
 Generates plot missing by total

@@ -4,10 +4,16 @@
 \alias{grur_imputer}
 \title{grur_imputer}
 \usage{
-grur_imputer(data, num.tree = 100, pmm = 0, random.seed = NULL,
+grur_imputer(
+  data,
+  num.tree = 100,
+  pmm = 0,
+  random.seed = NULL,
   parallel.core = parallel::detectCores() - 1,
-  hierarchical.levels = "strata", markers.list = markers.list,
-  verbose = verbose)
+  hierarchical.levels = "strata",
+  markers.list = markers.list,
+  verbose = verbose
+)
 }
 \description{
 imputations using Ranger package and predictive mean matching

@@ -4,8 +4,11 @@
 \alias{tidy_sim}
 \title{Tidy simulations}
 \usage{
-tidy_sim(sim.directory, write.tidy = TRUE,
-  parallel.core = parallel::detectCores() - 1)
+tidy_sim(
+  sim.directory,
+  write.tidy = TRUE,
+  parallel.core = parallel::detectCores() - 1
+)
 }
 \arguments{
 \item{sim.directory}{(character, path) Full path to the directory containing simulation objects.}

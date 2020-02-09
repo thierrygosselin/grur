@@ -4,19 +4,33 @@
 \alias{missing_visualization}
 \title{Visualize missing genotypes in genomic data set}
 \usage{
-missing_visualization(data, strata = NULL, strata.select = "POP_ID",
-  distance.method = "euclidean", ind.missing.geno.threshold = c(2, 5,
-  10, 20, 30, 40, 50, 60, 70, 80, 90), filename = NULL,
-  parallel.core = parallel::detectCores() - 1, write.plot = TRUE, ...)
+missing_visualization(
+  data,
+  strata = NULL,
+  strata.select = "POP_ID",
+  distance.method = "euclidean",
+  ind.missing.geno.threshold = c(2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90),
+  filename = NULL,
+  parallel.core = parallel::detectCores() - 1,
+  write.plot = TRUE,
+  ...
+)
 }
 \arguments{
-\item{data}{12 options for input: VCFs (SNPs or Haplotypes,
+\item{data}{14 options for input: VCFs (SNPs or Haplotypes,
 to make the vcf population ready),
-plink, stacks haplotype file, genind (library(adegenet)),
+plink (tped, bed), stacks haplotype file, genind (library(adegenet)),
 genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
 and a data frame in long/tidy or wide format. To verify that radiator detect
-your file format use \code{\link{detect_genomic_format}} (see example below).
-Documented in \strong{Input genomic datasets} of \code{\link{tidy_genomic_data}}.}
+your file format use \code{\link[radiator]{detect_genomic_format}} (see example below).
+Documented in \strong{Input genomic datasets} of \code{\link[radiator]{tidy_genomic_data}}.
+
+\strong{DArT and VCF data}: \pkg{radiator} was not meant to generate alleles
+and genotypes if you are using a VCF file with no genotype
+(only genotype likelihood: GL or PL).
+Neither is \pkg{radiator} able to magically generate a genind object
+from a SilicoDArT dataset. Please look at the first few lines of your dataset
+to understand it's limit before asking raditor to convert or filter your dataset.}
 
 \item{strata}{(optional)
 The strata file is a tab delimited file with a minimum of 2 columns headers:

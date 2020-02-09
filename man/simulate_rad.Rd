@@ -4,10 +4,21 @@
 \alias{simulate_rad}
 \title{Simulate RADseq data}
 \usage{
-simulate_rad(num.pops = 5, num.loci = 1000, div.time = 25000,
-  ne = 50, nm = c(0, 5), theta = 0.2, mig.type = c("island",
-  "stepping.stone"), num.reps = 3, num.rms.gens = 10, label = NULL,
-  fsc.exec = "fsc26", parallel.core = parallel::detectCores() - 1)
+simulate_rad(
+  num.pops = 5,
+  num.loci = 1000,
+  div.time = 25000,
+  ne = 50,
+  nm = c(0, 5),
+  theta = 0.2,
+  mig.type = c("island", "stepping.stone"),
+  num.reps = 3,
+  num.rms.gens = 10,
+  label = NULL,
+  fsc.exec = "fsc26",
+  parallel.core = parallel::detectCores() - 1,
+  use.wd = FALSE
+)
 }
 \arguments{
 \item{num.pops}{(integer) Number of populations.
@@ -49,6 +60,9 @@ Default: \code{fsc.exec = "fsc26"} (for latest version: v.2.6.0.3 - 14.10.17)}
 \item{parallel.core}{(optional, integer) The number of core used for parallel
 execution.
 Default: \code{parallel.core = parallel::detectCores() - 1}.}
+
+\item{use.wd}{(optional, logical) Use the working directory for output files? 
+Default: \code{use.wd = FALSE} means that files are written to temporary folder.}
 }
 \value{
 invisibly, the label used to name output files
