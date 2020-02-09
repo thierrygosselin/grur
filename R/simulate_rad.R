@@ -191,7 +191,7 @@ simulate_rad <- function(
   
   # preload rmetasim landscapes
   params$Rland <- lapply(1:nrow(params$scenarios), .setupScRland, params = params)
-  
+
   # run replicates
   sc.rep.vec <- 1:nrow(params$rep.df)
   params$replicate.runs <- if(params$num.cores == 1) {  
@@ -253,6 +253,7 @@ simulate_rad <- function(
   tryCatch(
     {
       p <- .runFscSim(rep.i, params)
+      print(p)
       gen.data <- strataG::fscReadArp(p)
       sc <- params$scenarios[sc.num, ]
       if(sc$num.rms.gen > 0) {
@@ -286,15 +287,12 @@ simulate_rad <- function(
 .runFscSim <- function(rep.i, params) {
   sc.i <- params$rep.df$sc[rep.i]
   sc <- params$scenarios[sc.i, ]
-  
+
   deme.list <- lapply(1:sc$num.pops, function(i) {
     strataG::fscDeme(deme.size = sc$Ne, sample.size = sc$Ne)
   })
   deme.list$ploidy <- 2
   
-  label <- paste0(
-    params$label, ".sc_", sc$scenario, ".rep_", params$rep.df$rep[rep.i]
-  )
   strataG::fscWrite(
     demes = do.call(strataG::fscSettingsDemes, deme.list),
     migration = if(sc$num.pops > 1) {
@@ -306,7 +304,9 @@ simulate_rad <- function(
       strataG::fscBlock_snp(1, sc$mut.rate), 
       num.chrom = sc$num.loci
     ),
-    label = label,
+    label = paste0(
+      params$label, ".sc_", sc$scenario, ".rep_", params$rep.df$rep[rep.i]
+    ),
     use.wd = params$use.wd
   ) %>% 
     strataG::fscRun(num.cores = 1, exec = params$fsc.exec)

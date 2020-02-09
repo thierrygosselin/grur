@@ -23,7 +23,6 @@ Imports:
     Matrix,
     pbmcapply,
     radiator,
-    strataG,
     rlang,
     tidyverse,
     vegan
@@ -38,7 +37,6 @@ Suggests:
     ranger,
     readr,
     rmarkdown,
-    rmetasim,
     shiny,
     stats,
     stringi,
@@ -48,6 +46,8 @@ Suggests:
     xgboost
 Remotes:
     github::thierrygosselin/radiator
+    github::ericarcher/strataG
+    github::stranda/rmetasim
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr

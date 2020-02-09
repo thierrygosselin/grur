@@ -12,7 +12,7 @@ simulate_rad(
   nm = c(0, 5),
   theta = 0.2,
   mig.type = c("island", "stepping.stone"),
-  num.reps = 3,
+  num.reps = 10,
   num.rms.gens = 10,
   label = NULL,
   fsc.exec = "fsc26",
@@ -107,14 +107,21 @@ The following arguments can be specified as single values or vectors:
 }
 \examples{
 \dontrun{
-require(strataG)
-require(rmetasim)
 library(grur)
 sim <- grur::simulate_rad(
-num.pops = 3, num.loci = 200, div.time = 1000, ne = c(50,200),
-nm = c(0, 0.1), theta = 0.2, mig.type = c("island", "stepping.stone"), 
-num.reps = 3, num.rms.gens = 5, label = NULL, fsc.exec = "fsc26", 
-parallel.core = 4)
+  num.pops = 3, 
+  num.loci = 200, 
+  div.time = 1000, 
+  ne = c(50,200),
+  nm = c(0, 0.1), 
+  theta = 0.2, 
+  mig.type = c("island", "stepping.stone"), 
+  num.reps = 3,
+  num.rms.gens = 5,
+  label = NULL, 
+  fsc.exec = "fsc26", 
+  parallel.core = 4
+ )
 }
 }
 \seealso{

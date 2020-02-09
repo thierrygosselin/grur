@@ -1,7 +1,7 @@
 rm(list = ls())
 library(grur)
 
-sim <- grur::simulate_rad(
+sim <- simulate_rad(
   num.pops = 3,
   num.loci = 200,
   div.time = 1000,
@@ -11,5 +11,5 @@ sim <- grur::simulate_rad(
   mig.type = c("island", "stepping.stone"),
   num.reps = 5,
   label = "sim.rad.test",
-  parallel.core = 3
+  parallel.core = 1
  )
