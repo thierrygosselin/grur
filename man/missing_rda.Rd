@@ -4,8 +4,12 @@
 \alias{missing_rda}
 \title{missing_rda}
 \usage{
-missing_rda(data, strata, permutations = 1000,
-  parallel.core = parallel::detectCores() - 1)
+missing_rda(
+  data,
+  strata,
+  permutations = 1000,
+  parallel.core = parallel::detectCores() - 1
+)
 }
 \description{
 The function uses Permutation test Anova and

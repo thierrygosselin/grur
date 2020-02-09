@@ -4,8 +4,13 @@
 \alias{generate_sequencing_strata}
 \title{Generate sequencing and lanes strata for testing}
 \usage{
-generate_sequencing_strata(strata, number.ind.per.lanes = 36,
-  number.sequencer = NULL, randomize = FALSE, filename = NULL)
+generate_sequencing_strata(
+  strata,
+  number.ind.per.lanes = 36,
+  number.sequencer = NULL,
+  randomize = FALSE,
+  filename = NULL
+)
 }
 \arguments{
 \item{strata}{The strata file used in \code{grur}, \code{radiator} and

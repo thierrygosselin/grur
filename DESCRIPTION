@@ -23,6 +23,7 @@ Imports:
     Matrix,
     pbmcapply,
     radiator,
+    rlang,
     tidyverse,
     vegan
 Suggests:
@@ -35,23 +36,22 @@ Suggests:
     randomForestSRC,
     ranger,
     readr,
-    rlang,
     rmarkdown,
-    rmetasim,
     shiny,
     stats,
     stringi,
-    strataG,
     tibble,
     tidyr,
     utils,
     xgboost
 Remotes:
     github::thierrygosselin/radiator
+    github::ericarcher/strataG
+    github::stranda/rmetasim
 License: GPL (>=2)
 LazyLoad: yes
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 ByteCompile: TRUE
 URL: https://github.com/thierrygosselin/grur
 BugReports: https://github.com/thierrygosselin/grur/issues
