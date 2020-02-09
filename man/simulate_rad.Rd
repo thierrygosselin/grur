@@ -65,7 +65,9 @@ Default: \code{parallel.core = parallel::detectCores() - 1}.}
 Default: \code{use.wd = FALSE} means that files are written to temporary folder.}
 }
 \value{
-invisibly, the label used to name output files
+invisibly, a list containing the parameters used to run the 
+  simulation and the filenames of the genotypes for each scenario
+  and replicate
 }
 \description{
 Simulate populations of RADseq data following island or stepping 

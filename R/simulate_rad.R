@@ -89,7 +89,9 @@
 #'  the parameters that generated the data and a "\code{label}" attribute which 
 #'  is the label of the set of scenarios that were run. 
 
-#' @return invisibly, the label used to name output files
+#' @return invisibly, a list containing the parameters used to run the 
+#'   simulation and the filenames of the genotypes for each scenario
+#'   and replicate
 
 #' @seealso \href{https://github.com/EricArcher/strataG}{strataG}
 
@@ -117,21 +119,21 @@ simulate_rad <- function(
   cat("######################### grur::simulate_rad ##########################\n")
   cat("#######################################################################\n")
   
-  # Check if rmetasim installed ------------------------------------------------
-  if (!requireNamespace("rmetasim", quietly = TRUE)) {
-    stop(
-      "rmetasim needed for this function to work. ", 
-      "Please follow the vignette for install instructions", 
-      call. = FALSE
-    )
-  }
-  if (!requireNamespace("strataG", quietly = TRUE)) {
-    stop(
-      "strataG needed for this function to work. ",
-      "Install with devtools::install_github('ericarcher/strataG')", 
-      call. = FALSE
-    )
-  }
+  # # Check if rmetasim installed ------------------------------------------------
+  # if (!requireNamespace("rmetasim", quietly = TRUE)) {
+  #   stop(
+  #     "rmetasim needed for this function to work. ", 
+  #     "Please follow the vignette for install instructions", 
+  #     call. = FALSE
+  #   )
+  # }
+  # if (!requireNamespace("strataG", quietly = TRUE)) {
+  #   stop(
+  #     "strataG needed for this function to work. ",
+  #     "Install with devtools::install_github('ericarcher/strataG')", 
+  #     call. = FALSE
+  #   )
+  # }
   
   start.time <- Sys.time()
   
@@ -171,8 +173,6 @@ simulate_rad <- function(
   scenarios <- cbind(scenario = 1:nrow(scenarios), scenarios)
   scenarios$mut.rate <- scenarios$theta / (4 * scenarios$ne)
   scenarios$mig.rate <- scenarios$nm / scenarios$ne
-  attr(scenarios, "label") <- label
-  save(scenarios, file = file.path(label, paste0(label, "_scenarios.rdata")))
   
   # create parameter list
   params <- list(
@@ -187,27 +187,17 @@ simulate_rad <- function(
     rep = 1:num.reps, 
     sc = 1:nrow(scenarios),
     stringsAsFactors = FALSE
-  )
+  )[, c("sc", "rep")]
   
   # preload rmetasim landscapes
   params$Rland <- lapply(1:nrow(params$scenarios), .setupScRland, params = params)
 
   # run replicates
   sc.rep.vec <- 1:nrow(params$rep.df)
-  params$replicate.runs <- if(params$num.cores == 1) {  
-    tryCatch({
-      lapply(sc.rep.vec, function(rep.i) {  
-        .labelRep(rep.i, params)
-        .runScRep(rep.i, params, FALSE)
-      })
-    }, error = .repError)
+  fnames <- if(params$num.cores == 1) {  
+    tryCatch(lapply(sc.rep.vec, .runWithLabel, params = params))
   } else {
-    cl <- strataG:::.setupClusters(params$num.cores)
-    tryCatch({
-      parallel::clusterEvalQ(cl, require(ebvSim))
-      parallel::clusterExport(cl, "params", environment())
-      parallel::parLapply(cl, sc.rep.vec, .runScRep, params = params)
-    }, error = .repError, finally = parallel::stopCluster(cl))
+    .grur_parallel_mc(sc.rep.vec, .runScRep, params = params, mc.cores = params$num.cores)
   }
   
   timing <- difftime(Sys.time(), start.time)
@@ -215,6 +205,15 @@ simulate_rad <- function(
   cat("#################### grur::simulate_rad completed #####################\n")
   options(width = opt.change)
   
+  params <- list(
+    label = params$label,
+    scenarios = params$scenarios,
+    num.rep = params$num.rep,
+    replicate.fnames = stats::setNames(
+      cbind(params$rep.df, unlist(fnames), stringsAsFactors = FALSE),
+      c("scenario", "replicate", "fname")
+    )
+  )
   save(
     params, 
     file = file.path(params$label, paste0(params$label, "_params.rdata"))
@@ -225,13 +224,7 @@ simulate_rad <- function(
 
 #' @noRd
 #' 
-.repError <- function(e) {
-  stop(format(Sys.time()), " ", conditionMessage(e), call. = FALSE)
-}
-
-#' @noRd
-#' 
-.labelRep <- function(rep.i, params) {
+.runWithLabel <- function(rep.i, params) {
   cat(paste0(
     format(Sys.time()), 
     " ---- Scenario ", 
@@ -242,41 +235,43 @@ simulate_rad <- function(
     round(100 * rep.i / nrow(params$rep.df)), 
     "%) ----\n"
   ))
+  .runScRep(rep.i, params)
 }
+
 
 #' @noRd
 #' 
-.runScRep <- function(rep.i, params, quiet = TRUE) {
+.runScRep <- function(rep.i, params) {
   sc.num <- params$rep.df$sc[rep.i]
   rep.num <- params$rep.df$rep[rep.i]
   
   tryCatch(
     {
       p <- .runFscSim(rep.i, params)
-      print(p)
       gen.data <- strataG::fscReadArp(p)
+      strataG::fscCleanup(p$label, p$folder)
       sc <- params$scenarios[sc.num, ]
       if(sc$num.rms.gen > 0) {
-        if(!quiet) cat(format(Sys.time()), "running rmetasim...\n")
-        gen.data <- gen.data %>% 
-          .calcFreqs() %>% 
-          .runRmetasim(Rland = params$Rland[[sc.num]], sc = sc) %>% 
-          strataG::landscape2gtypes() %>% 
-          strataG::as.data.frame()
+        cat(format(Sys.time()), "running rmetasim...\n")
+        gen.data <- gen.data %>%
+          .calcFreqs() %>%
+          .runRmetasim(Rland = params$Rland[[sc.num]], sc = sc) %>%
+          strataG::landscape2df()
       }
       
-      fname <- paste0(params$label, "_scenario.", sc$scenario, "_replicate.", rep.num, ".csv")
-      out.name <- file.path(params$folders$out, fname)
-      utils::write.csv(gen.data, file = out.name, row.names = FALSE)
-      
-      if(params$delete.fsc.files) strataG::fscCleanup(p$label, p$folder)
-      list(fsc.p = p, file = out.name)
+      fname <- file.path(
+        params$label,
+        paste0(params$label, "_scenario.", sc$scenario, "_replicate.", rep.num, ".csv")
+      )
+      utils::write.csv(gen.data, file = fname, row.names = FALSE)
+      fname
     },
     error = function(e) {
-      paste0(
-        "Scenario ", params$scenarios$scenario[sc.num], 
+      stop(
+        format(Sys.time()),
+        " Scenario ", params$scenarios$scenario[sc.num],
         ", Replicate ", rep.num, 
-        " : ", conditionMessage(e)
+        ": ", e
       )
     }
   )
@@ -287,9 +282,9 @@ simulate_rad <- function(
 .runFscSim <- function(rep.i, params) {
   sc.i <- params$rep.df$sc[rep.i]
   sc <- params$scenarios[sc.i, ]
-
+  
   deme.list <- lapply(1:sc$num.pops, function(i) {
-    strataG::fscDeme(deme.size = sc$Ne, sample.size = sc$Ne)
+    strataG::fscDeme(deme.size = sc$ne, sample.size = sc$ne)
   })
   deme.list$ploidy <- 2
   
@@ -331,12 +326,12 @@ simulate_rad <- function(
   
   rmetasim::landscape.new.empty() %>% 
     rmetasim::landscape.new.intparam(
-      h = sc$num.pops, s = 2, cg = 0, ce = 0, totgen = sc$num.rms.gen + 1
+      h = sc$num.pops, s = 2, cg = 0, ce = 0, totgen = sc$num.rms.gens + 1
     ) %>% 
     rmetasim::landscape.new.switchparam() %>% 
     rmetasim::landscape.new.floatparam() %>% 
     rmetasim::landscape.new.local.demo(localS, localR, localM) %>% 
-    rmetasim::landscape.new.epoch(R = R, carry = rep(sc$Ne, sc$num.pops)) 
+    rmetasim::landscape.new.epoch(R = R, carry = rep(sc$ne, sc$num.pops)) 
 }
 
 #' @noRd
@@ -344,16 +339,16 @@ simulate_rad <- function(
 .runRmetasim <- function(freqs, Rland, sc) {
   for(i in 1:length(freqs$global)) {
     Rland <- rmetasim::landscape.new.locus(
-      Rland, type = 2, ploidy = sc$ploidy, mutationrate = 0,
+      Rland, type = 2, ploidy = 2, mutationrate = 0,
       transmission = 0, numalleles = 2, allelesize = 1,
       frequencies = freqs$global[[i]], states = names(freqs$global[[i]])
     )
   }
   
   Rland %>% 
-    rmetasim::landscape.new.individuals(rep(c(sc$Ne, 0), sc$num.pops)) %>% 
+    rmetasim::landscape.new.individuals(rep(c(sc$ne, 0), sc$num.pops)) %>% 
     rmetasim::landscape.setpopfreq(freqs$pop) %>% 
-    rmetasim::landscape.simulate(numit = sc$num.rms.gen)
+    rmetasim::landscape.simulate(numit = sc$num.rms.gens)
 }
 
 #' @noRd
