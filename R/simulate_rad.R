@@ -38,17 +38,26 @@
 #' @param parallel.core (optional, integer) The number of core used for parallel
 #' execution.
 #' Default: \code{parallel.core = parallel::detectCores() - 1}.
+#' @param use.wd (optional, logical) Use the working directory for output files? 
+#' Default: \code{use.wd = FALSE} means that files are written to temporary folder.
 
 #' @examples 
 #' \dontrun{
-#' require(strataG)
-#' require(rmetasim)
 #' library(grur)
 #' sim <- grur::simulate_rad(
-#' num.pops = 3, num.loci = 200, div.time = 1000, ne = c(50,200),
-#' nm = c(0, 0.1), theta = 0.2, mig.type = c("island", "stepping.stone"), 
-#' num.reps = 3, num.rms.gens = 5, label = NULL, fsc.exec = "fsc26", 
-#' parallel.core = 4)
+#'   num.pops = 3, 
+#'   num.loci = 200, 
+#'   div.time = 1000, 
+#'   ne = c(50,200),
+#'   nm = c(0, 0.1), 
+#'   theta = 0.2, 
+#'   mig.type = c("island", "stepping.stone"), 
+#'   num.reps = 3,
+#'   num.rms.gens = 5,
+#'   label = NULL, 
+#'   fsc.exec = "fsc26", 
+#'   parallel.core = 4
+#'  )
 #' }
 
 #' @details 
@@ -91,15 +100,16 @@ simulate_rad <- function(
   num.pops = 5,
   num.loci = 1000,
   div.time = 25000,
-  ne = 50, #c(50, 500),
-  nm = c(0, 5), #c(0, 0.1, 0.5, 1, 5),
+  ne = 50,
+  nm = c(0, 5), 
   theta = 0.2,
   mig.type = c("island", "stepping.stone"),
-  num.reps = 3,
+  num.reps = 10,
   num.rms.gens = 10,
   label = NULL,
   fsc.exec = "fsc26",
-  parallel.core = parallel::detectCores() - 1
+  parallel.core = parallel::detectCores() - 1,
+  use.wd = FALSE
 ) {
   opt.change <- getOption("width")
   options(width = 70)
@@ -118,7 +128,7 @@ simulate_rad <- function(
   if (!requireNamespace("strataG", quietly = TRUE)) {
     stop(
       "strataG needed for this function to work. ",
-      "Install with install.packages('strataG')", 
+      "Install with devtools::install_github('ericarcher/strataG')", 
       call. = FALSE
     )
   }
@@ -155,7 +165,7 @@ simulate_rad <- function(
   # create scenario data.frame
   scenarios <- expand.grid(
     num.pops = num.pops, num.loci = num.loci, div.time = div.time, ne = ne,
-    nm = nm, theta = theta, mig.type = mig.type,
+    nm = nm, theta = theta, mig.type = mig.type, num.rms.gens = num.rms.gens,
     stringsAsFactors = FALSE
   )
   scenarios <- cbind(scenario = 1:nrow(scenarios), scenarios)
@@ -164,38 +174,260 @@ simulate_rad <- function(
   attr(scenarios, "label") <- label
   save(scenarios, file = file.path(label, paste0(label, "_scenarios.rdata")))
   
-  # run scenarios
-  files <- sapply(1:nrow(scenarios), function(sc.i) {    
-    fname <- file.path(label, paste0(label, "_genotypes_", sc.i, ".rdata"))
-    if(file.exists(fname)) return(NULL)
-    
-    cat(format(Sys.time()), "---- Scenario", sc.i, "----\n")
-    sc <- as.list(scenarios[sc.i, ])
-    sc$mig.mat <- make_mig_mat(sc$mig.rate, sc$num.pops, sc$mig.type)
-    p <- run_fsc_sim(
-      sc = sc, num.rep = num.reps, num.cores = parallel.core, exec = fsc.exec
-    )
-    sim.list <- lapply(1:num.reps, function(sim.i) {
-      fsc <- strataG::fscReadArp(p, sim = c(1, sim.i), drop.mono = TRUE) 
-      rms <- fsc %>% 
-        calc_freqs() %>% 
-        run_rmetasim(sc = sc, num.gens = num.rms.gens) %>% 
-        rmetasim::landscape.make.genind() %>% 
-        strataG::genind2gtypes() %>% 
-        strataG::as.data.frame()
-      list(rep = sim.i, fsc = fsc, rms = rms)
-    })
-    strataG::fscCleanup(p$label)
-    
-    message("saving fastsimcoal and rmetasim results")
-    save(sim.list, sc, label, file = fname)
-    fname
-  })
+  # create parameter list
+  params <- list(
+    label = label,
+    scenarios = scenarios,
+    num.rep = num.reps,
+    fsc.exec = fsc.exec,
+    num.cores = parallel.core,
+    use.wd = use.wd
+  )
+  params$rep.df <- expand.grid( 
+    rep = 1:num.reps, 
+    sc = 1:nrow(scenarios),
+    stringsAsFactors = FALSE
+  )
+  
+  # preload rmetasim landscapes
+  params$Rland <- lapply(1:nrow(params$scenarios), .setupScRland, params = params)
+
+  # run replicates
+  sc.rep.vec <- 1:nrow(params$rep.df)
+  params$replicate.runs <- if(params$num.cores == 1) {  
+    tryCatch({
+      lapply(sc.rep.vec, function(rep.i) {  
+        .labelRep(rep.i, params)
+        .runScRep(rep.i, params, FALSE)
+      })
+    }, error = .repError)
+  } else {
+    cl <- strataG:::.setupClusters(params$num.cores)
+    tryCatch({
+      parallel::clusterEvalQ(cl, require(ebvSim))
+      parallel::clusterExport(cl, "params", environment())
+      parallel::parLapply(cl, sc.rep.vec, .runScRep, params = params)
+    }, error = .repError, finally = parallel::stopCluster(cl))
+  }
   
   timing <- difftime(Sys.time(), start.time)
   message("\nComputation time: ", format(round(timing, 2)))
   cat("#################### grur::simulate_rad completed #####################\n")
   options(width = opt.change)
   
-  invisible(list(scenarios = scenarios, label = label, files = files))
+  save(
+    params, 
+    file = file.path(params$label, paste0(params$label, "_params.rdata"))
+  )
+  invisible(params)
+}
+
+
+#' @noRd
+#' 
+.repError <- function(e) {
+  stop(format(Sys.time()), " ", conditionMessage(e), call. = FALSE)
+}
+
+#' @noRd
+#' 
+.labelRep <- function(rep.i, params) {
+  cat(paste0(
+    format(Sys.time()), 
+    " ---- Scenario ", 
+    params$scenarios$scenario[params$rep.df$sc[rep.i]], 
+    ", Replicate ", 
+    params$rep.df$rep[rep.i],
+    " (", 
+    round(100 * rep.i / nrow(params$rep.df)), 
+    "%) ----\n"
+  ))
+}
+
+#' @noRd
+#' 
+.runScRep <- function(rep.i, params, quiet = TRUE) {
+  sc.num <- params$rep.df$sc[rep.i]
+  rep.num <- params$rep.df$rep[rep.i]
+  
+  tryCatch(
+    {
+      p <- .runFscSim(rep.i, params)
+      print(p)
+      gen.data <- strataG::fscReadArp(p)
+      sc <- params$scenarios[sc.num, ]
+      if(sc$num.rms.gen > 0) {
+        if(!quiet) cat(format(Sys.time()), "running rmetasim...\n")
+        gen.data <- gen.data %>% 
+          .calcFreqs() %>% 
+          .runRmetasim(Rland = params$Rland[[sc.num]], sc = sc) %>% 
+          strataG::landscape2gtypes() %>% 
+          strataG::as.data.frame()
+      }
+      
+      fname <- paste0(params$label, "_scenario.", sc$scenario, "_replicate.", rep.num, ".csv")
+      out.name <- file.path(params$folders$out, fname)
+      utils::write.csv(gen.data, file = out.name, row.names = FALSE)
+      
+      if(params$delete.fsc.files) strataG::fscCleanup(p$label, p$folder)
+      list(fsc.p = p, file = out.name)
+    },
+    error = function(e) {
+      paste0(
+        "Scenario ", params$scenarios$scenario[sc.num], 
+        ", Replicate ", rep.num, 
+        " : ", conditionMessage(e)
+      )
+    }
+  )
+}
+
+#' @noRd
+#' 
+.runFscSim <- function(rep.i, params) {
+  sc.i <- params$rep.df$sc[rep.i]
+  sc <- params$scenarios[sc.i, ]
+
+  deme.list <- lapply(1:sc$num.pops, function(i) {
+    strataG::fscDeme(deme.size = sc$Ne, sample.size = sc$Ne)
+  })
+  deme.list$ploidy <- 2
+  
+  strataG::fscWrite(
+    demes = do.call(strataG::fscSettingsDemes, deme.list),
+    migration = if(sc$num.pops > 1) {
+      mig.mat <- .makeMigMat(sc$mig.rate, sc$num.pops, sc$mig.type) 
+      strataG::fscSettingsMigration(mig.mat)
+    } else NULL,
+    events = .makeEventSettings(sc$div.time, sc$num.pops),
+    genetics = strataG::fscSettingsGenetics(
+      strataG::fscBlock_snp(1, sc$mut.rate), 
+      num.chrom = sc$num.loci
+    ),
+    label = paste0(
+      params$label, ".sc_", sc$scenario, ".rep_", params$rep.df$rep[rep.i]
+    ),
+    use.wd = params$use.wd
+  ) %>% 
+    strataG::fscRun(num.cores = 1, exec = params$fsc.exec)
+}
+
+#' @noRd
+#' 
+.setupScRland <- function(sc.num, params) {  
+  if(params$scenarios$num.rms.gen[sc.num] == 0) return(NA)
+  sc <- params$scenarios[sc.num, ]
+  localS <- matrix(c(0, 1, 0, 0), nrow = 2, ncol = 2)
+  localR <- matrix(c(0, 0, 1, 0), nrow = 2, ncol = 2)
+  localM <- matrix(c(0, 0, 0, 1), nrow = 2, ncol = 2)
+  S <- M <- matrix(0, nrow = sc$num.pops * 2, ncol = sc$num.pops * 2)
+  diag(S) <- diag(M) <- 1
+  R <- if(sc$num.pops == 1) NULL else {
+    rmetasim::landscape.mig.matrix(
+      h = sc$num.pops, s = 2, mig.model = "custom", 
+      R.custom = .makeMigMat(sc$mig.rate, sc$num.pops, sc$mig.type)
+    )$R
+  }
+  
+  rmetasim::landscape.new.empty() %>% 
+    rmetasim::landscape.new.intparam(
+      h = sc$num.pops, s = 2, cg = 0, ce = 0, totgen = sc$num.rms.gen + 1
+    ) %>% 
+    rmetasim::landscape.new.switchparam() %>% 
+    rmetasim::landscape.new.floatparam() %>% 
+    rmetasim::landscape.new.local.demo(localS, localR, localM) %>% 
+    rmetasim::landscape.new.epoch(R = R, carry = rep(sc$Ne, sc$num.pops)) 
+}
+
+#' @noRd
+#' 
+.runRmetasim <- function(freqs, Rland, sc) {
+  for(i in 1:length(freqs$global)) {
+    Rland <- rmetasim::landscape.new.locus(
+      Rland, type = 2, ploidy = sc$ploidy, mutationrate = 0,
+      transmission = 0, numalleles = 2, allelesize = 1,
+      frequencies = freqs$global[[i]], states = names(freqs$global[[i]])
+    )
+  }
+  
+  Rland %>% 
+    rmetasim::landscape.new.individuals(rep(c(sc$Ne, 0), sc$num.pops)) %>% 
+    rmetasim::landscape.setpopfreq(freqs$pop) %>% 
+    rmetasim::landscape.simulate(numit = sc$num.rms.gen)
+}
+
+#' @noRd
+#' @importFrom rlang .data
+#' @importFrom magrittr %>%
+#' 
+.calcFreqs <- function(snps) {
+  if(ncol(snps) < 3) stop("no loci present")
+  mac.df <- snps %>% 
+    strataG::df2gtypes(ploidy = 2) %>% 
+    strataG::as.data.frame(coded = T) %>% 
+    dplyr::select(-.data$id) %>% 
+    tidyr::gather("locus", "mac", -.data$stratum) %>% 
+    dplyr::mutate(
+      stratum = as.numeric(factor(.data$stratum)),
+      locus = as.numeric(factor(.data$locus))
+    )
+  
+  list(
+    global = lapply(split(mac.df, mac.df$locus), function(loc.df) {
+      .alleleProp(loc.df$mac)
+    }),
+    pop = lapply(split(mac.df, mac.df$stratum), function(st.df) {
+      lapply(split(st.df, st.df$locus), function(loc.df) .alleleProp(loc.df$mac))
+    })
+  )
+}
+
+#' @noRd
+#' 
+.makeMigMat <- function(mig.rate, num.pops, 
+                       type = c("island", "stepping.stone")) {
+  if(is.na(mig.rate)) return(NULL)
+  type <- match.arg(type)
+  mig.mat <- switch(
+    type,      
+    island = {
+      m <- mig.rate / (num.pops - 1)
+      matrix(rep(m, num.pops ^ 2), nrow = num.pops)
+    },
+    stepping.stone = {
+      mat <- matrix(0, nrow = num.pops, ncol = num.pops)
+      m <- mig.rate / 2
+      for (k in 1:(num.pops - 1)) {
+        mat[k, k + 1] <- mat[k + 1, k] <- m
+      }
+      mat[1, num.pops] <- mat[num.pops, 1] <- m
+      mat
+    }
+  )
+  diag(mig.mat) <- 1 - mig.rate
+  mig.mat
+}
+
+#' @noRd
+#' 
+.alleleProp <- function(mac) {
+  maf <- mean(mac == 0) + (mean(mac == 1) / 2)
+  c('1' = maf, '2' = 1 - maf)
+}
+
+#' @noRd
+#' 
+.makeEventSettings <- function(dvgnc.time, num.pops) {
+  if(num.pops == 1) return(NULL)
+  pop.pairs <- t(utils::combn(num.pops, 2) - 1)
+  pop.pairs <- pop.pairs[pop.pairs[, 1] == 0, , drop = FALSE]
+  do.call(
+    strataG::fscSettingsEvents, 
+    lapply(
+      1:nrow(pop.pairs),
+      function(i) {
+        strataG::fscEvent(dvgnc.time, pop.pairs[i, 2], pop.pairs[i, 1])
+      }
+    )
+  )
 }
