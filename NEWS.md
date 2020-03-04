@@ -1,3 +1,8 @@
+# grur 0.1.2 2020-02-13
+
+* lots of works on `simulate_rad` and `missing_distributions` from Eric Archer.
+
+
 # grur 0.1.1 2019-05-01
 
 * pkgdown website

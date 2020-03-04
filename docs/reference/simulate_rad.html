@@ -8,21 +8,32 @@
 
 <title>Simulate RADseq data — simulate_rad • grur</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,8 +41,8 @@
 
 
 
-<meta property="og:title" content="Simulate RADseq data — simulate_rad" />
 
+<meta property="og:title" content="Simulate RADseq data — simulate_rad" />
 <meta property="og:description" content="Simulate populations of RADseq data following island or stepping 
 stone models.
 Inside the function, allele frequency can be created with
@@ -39,9 +50,9 @@ fastsimcoal2 and then used
 inside rmetasim simulation engine.
 The function requires strataG
 to be installed." />
-
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -53,6 +64,7 @@ to be installed." />
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -71,7 +83,7 @@ to be installed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -108,7 +120,6 @@ to be installed." />
   <a href="../news/index.html">News</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/thierrygosselin/grur">
@@ -123,6 +134,7 @@ to be installed." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -134,7 +146,6 @@ to be installed." />
     </div>
 
     <div class="ref-description">
-    
     <p>Simulate populations of RADseq data following island or stepping 
 stone models.
 Inside the function, allele frequency can be created with
@@ -142,14 +153,24 @@ Inside the function, allele frequency can be created with
 inside <a href='https://github.com/stranda/rmetasim'>rmetasim</a> simulation engine.
 The function requires <a href='https://github.com/EricArcher/strataG'>strataG</a>
 to be installed.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_rad</span>(<span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>25000</span>,
-  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>5</span>), <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"island"</span>,
-  <span class='st'>"stepping.stone"</span>), <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>, <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></span>() - <span class='fl'>1</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>simulate_rad</span>(
+  <span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>25000</span>,
+  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>5</span>),
+  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
+  <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
+  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() - <span class='fl'>1</span>,
+  <span class='kw'>use.wd</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -217,12 +238,18 @@ Default: <code>fsc.exec = "fsc26"</code> (for latest version: v.2.6.0.3 - 14.10.
 execution.
 Default: <code>parallel.core = parallel::detectCores() - 1</code>.</p></td>
     </tr>
+    <tr>
+      <th>use.wd</th>
+      <td><p>(optional, logical) Use the working directory for output files? 
+Default: <code>use.wd = FALSE</code> means that files are written to temporary folder.</p></td>
+    </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>invisibly, the label used to name output files</p>
-    
+    <p>invisibly, a list containing the parameters used to run the 
+  simulation and the filenames of the genotypes for each scenario
+  and replicate</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><strong>fastsimcoal2: </strong>
@@ -231,55 +258,55 @@ Default: <code>parallel.core = parallel::detectCores() - 1</code>.</p></td>
  in a location where it can be executed from the current working directory.</p> 
 <p><a href='http://gbs-cloud-tutorial.readthedocs.io/en/latest/03_computer_setup.html?highlight=PATH#save-time'>How to set up your PATH</a>.</p> 
 <p><a href='http://gbs-cloud-tutorial.readthedocs.io/en/latest/07_start_from_new_image.html#install-gbs-radseq-software-time-required-30min'>How to install fastsimcoal2 v.2.6.0.3</a></p>
-    
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The following arguments can be specified as single values or vectors:
  <code>num.pops, num.loci, div.time, ne, nm, theta, mig.type</code>. One simulation 
  scenario will be generated for each combination of unique values of these 
- arguments.</p>
-    <p>The function will create a folder in the current working directory with the 
+ arguments.</p> 
+ 
+<p>The function will create a folder in the current working directory with the 
  name provided by <code>label</code>. Within this folder there will be an R 
  workspace file ("<code>scenarios.rdata</code>") containing a data frame with the 
  parameters for each scenario (<code>scenarios</code>), and one R  
  workspace file for each scenario, named <code>"gtypes.#.rdata"</code> where "#" 
  is the scenario number. Each scenario file contains a list named 
- <code>sim.data</code>, which contains a <code><a href='https://www.rdocumentation.org/packages/strataG/topics/gtypes-class'>strataG::gtypes</a></code> representation 
+ <code>sim.data</code>, which contains a <code><a href='https://rdrr.io/pkg/strataG/man/gtypes-class.html'>strataG::gtypes</a></code> representation 
  of the simulated SNP data for every replicate in that scenario. The list 
  has a "<code>scenario</code>" attribute which is a one row data.frame providing 
  the parameters that generated the data and a "<code>label</code>" attribute which 
  is the label of the set of scenarios that were run.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='https://github.com/EricArcher/strataG'>strataG</a></p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>require</a></span>(<span class='no'>strataG</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>require</a></span>(<span class='no'>rmetasim</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>grur</span>)
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>grur</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/grur/topics/simulate_rad'>simulate_rad</a></span>(
-<span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>50</span>,<span class='fl'>200</span>),
-<span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.1</span>), <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
-<span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
-<span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='fl'>4</span>)
-<span class='co'># }</span></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>grur</span>)
+<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>grur</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/grur/man/simulate_rad.html'>simulate_rad</a></span>(
+  <span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>200</span>,
+  <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>50</span>,<span class='fl'>200</span>),
+  <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.1</span>),
+  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
+  <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
+  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='fl'>4</span>
+ )
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#note">Note</a></li>
-
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
@@ -289,19 +316,23 @@ Default: <code>parallel.core = parallel::detectCores() - 1</code>.</p></td>
   </div>
 </div>
 
+
       <footer>
       <div class="copyright">
   <p>Developed by Thierry Gosselin, Eric Archer.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

@@ -445,7 +445,7 @@ grur_imputations <- function(
   #back to the original directory and options
   on.exit(setwd(old.dir), add = TRUE)
   on.exit(options(width = opt.change), add = TRUE)
-  on.exit(timing <- proc.time() - timing, add = TRUE)
+  on.exit((timing <- proc.time() - timing), add = TRUE)
   on.exit(if (verbose) message("\nComputation time, overall: ", round(timing[[3]]), " sec"), add = TRUE)
   on.exit(if (verbose) cat("############################## grur_imputations ################################\n"), add = TRUE)
   
@@ -454,10 +454,10 @@ grur_imputations <- function(
   if (missing(data)) rlang::abort("data file missing")
   
   if (imputation.method == "lightgbm") {
-    if (!requireNamespace("lightgbm", quietly = TRUE)) {
+    # if (!requireNamespace("lightgbm", quietly = TRUE)) {
       rlang::abort("lightgbm needed for this imputation option to work.
 Please follow the vignette for install instructions")
-    }
+    # }
   }
   
   if (imputation.method == "xgboost") {

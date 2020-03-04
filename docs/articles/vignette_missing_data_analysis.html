@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>grur missing data visualization analysis • grur</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="grur missing data visualization analysis">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
@@ -31,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -84,13 +91,14 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>grur missing data visualization analysis</h1>
                         <h4 class="author">Thierry Gosselin</h4>
             
-            <h4 class="date">2019-08-21</h4>
+            <h4 class="date">2020-03-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/thierrygosselin/grur/blob/master/vignettes/vignette_missing_data_analysis.Rmd"><code>vignettes/vignette_missing_data_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>vignette_missing_data_analysis.Rmd</code></div>
@@ -113,19 +121,19 @@
 <h1 class="hasAnchor">
 <a href="#prepare-your-r-workspace" class="anchor"></a>Prepare your R workspace</h1>
 <p>Clean your desk</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rm">rm</a></span>(<span class="dt">list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ls">ls</a></span>())</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="dt">list =</span> <span class="kw"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>())</a></code></pre></div>
 <p>Follow the <a href="https://thierrygosselin.github.io/grur/">instruction to install grur</a></p>
 <p>Load the required libraries:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"grur"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"grur"</span>)</a></code></pre></div>
 <p>Set your working directory, e.g.:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(<span class="st">"~/Documents/test_missing_visualization_vignette"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(<span class="st">"~/Documents/test_missing_visualization_vignette"</span>)</a></code></pre></div>
 <p>Note: running codes in chunks inside R Notebook might cause problem, run it outside in the console (the default here).</p>
 </div>
 <div id="download-the-test-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#download-the-test-data" class="anchor"></a>Download the test data</h1>
 <p>Dataset: in this example, we use the data in Ferchaud and Hansen (2015 and 2016) paper. The code below gets the vcf from Dryad directly. But you can skip the step if it’s already in the folder.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readBin">writeBin</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/content.html">content</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/GET.html">GET</a></span>(<span class="st">"http://datadryad.org/bitstream/handle/10255/dryad.97237/sticklebacks_Danish.vcf?sequence=1"</span>), <span class="st">"raw"</span>), <span class="st">"stickleback_ferchaud_2015.vcf"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/readBin.html">writeBin</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/content.html">content</a></span>(httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/GET.html">GET</a></span>(<span class="st">"http://datadryad.org/bitstream/handle/10255/dryad.97237/sticklebacks_Danish.vcf?sequence=1"</span>), <span class="st">"raw"</span>), <span class="st">"stickleback_ferchaud_2015.vcf"</span>)</a></code></pre></div>
 <p>With a vcf you also need a strata file (indicating population groupings)</p>
 <ul>
 <li>it’s a tab-delimited file or object, in the global environment.</li>
@@ -142,12 +150,12 @@
 <h1 class="hasAnchor">
 <a href="#run-the-function" class="anchor"></a>Run the function</h1>
 <p>This is the simplest way to run the function:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">ibm &lt;-<span class="st"> </span>grur<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/grur/topics/missing_visualization">missing_visualization</a></span>(</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">ibm &lt;-<span class="st"> </span>grur<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/grur/man/missing_visualization.html">missing_visualization</a></span>(</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">  <span class="dt">data =</span> <span class="st">"stickleback_ferchaud_2015.vcf"</span>, </a>
 <a class="sourceLine" id="cb5-3" data-line-number="3">  <span class="dt">strata =</span> <span class="st">"strata.stickleback.tsv"</span>)</a></code></pre></div>
 <p>The function does a few automatic filters: * Monomorphic markers are removed * Only common markers between strata are kept for the analysis * Individuals and markers statistics are generated automatically</p>
 <p>A new object <code>ibm</code> was created in your global environment. It’s a list and to view it’s content use:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(ibm)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(ibm)</a></code></pre></div>
 <p>Lots of info in there… Lets focus on just a few. A folder is also created automatically. The function generates by default a large object (list):</p>
 <ul>
 <li>IBM-PCoA plot</li>
@@ -155,7 +163,7 @@
 <li>several plots showing the distribution of missing genotypes by individuals, pop and markers.</li>
 <li>blacklists of individuals are included in the list <code>ibm</code> and written to the working directory (defaults from 10% to 70%, that automatically stops if no individuals at the threshold is found, can be changed with <code>ind.missing.geno.threshold</code> argument).</li>
 <li>tables with summary missing information along the vectors of eigenvalues of the principal coordinates analysis are also part of the list output.</li>
-<li>all these objects are accessed with <code>$</code>.</li>
+<li>all these objects are accessed with <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>.</li>
 </ul>
 </div>
 <div id="visualization" class="section level1">
@@ -223,7 +231,7 @@
 <h2 class="hasAnchor">
 <a href="#filtering" class="anchor"></a>Filtering</h2>
 <ul>
-<li>explore the impact of different filtering parameters on missing genotypes pattern, with <code><a href="https://www.rdocumentation.org/packages/radiator/topics/filter_rad">radiator::filter_rad</a></code>.</li>
+<li>explore the impact of different filtering parameters on missing genotypes pattern, with <code><a href="https://rdrr.io/pkg/radiator/man/filter_rad.html">radiator::filter_rad</a></code>.</li>
 <li>test your own whitelist of markers with <code>whitelist.markers</code>.</li>
 <li>use the blacklist of individuals created with the function to <strong>manage</strong> missing data inside filtering pipelines</li>
 <li>excluding/including individuals, populations and markers to test the impact of filtering on polymorphism discovery</li>
@@ -245,6 +253,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -270,17 +279,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Thierry Gosselin, Eric Archer.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Imputations of RADseq data • grur</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Imputations of RADseq data">
 <meta property="og:description" content="RADseq data imputations.">
 <meta property="og:image" content="/logo.png">
@@ -19,7 +26,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-article">
+    <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -31,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -84,15 +91,12 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
-  <div class="col-md-9 contents">
-    
 
-    
-    
+      </header><div class="row">
+  <div class="contents col-md-9">
 <div id="grur" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#grur" class="anchor"></a>grur <img src="logo.png" align="right" alt="">
+<a href="#grur" class="anchor"></a>grur <img src="docs/logo.png" align="right" alt="">
 </h1></div>
 <!-- badges: start -->
 
@@ -104,9 +108,9 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"remotes"</span>)) <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"thierrygosselin/grur"</span>)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(grur)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="st">"remotes"</span>)) <span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"thierrygosselin/grur"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(grur)</a></code></pre></div>
 <p>Note: not all the packages used for imputations inside <strong>grur</strong> are installed automatically, why?</p>
 <ul>
 <li>Not all methods will be of interest.</li>
@@ -118,7 +122,7 @@
 <h2 class="hasAnchor">
 <a href="#installation-details-for-additonal-imputation-options" class="anchor"></a>Installation details for additonal imputation options</h2>
 <p>Please follow additional instructions in the <a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">vignette</a> to install the required packages for the imputation options you want to conduct:</p>
-<table class="table table">
+<table class="table">
 <thead><tr class="header">
 <th align="left">imputation options</th>
 <th align="center">package</th>
@@ -148,23 +152,23 @@
 <td align="left"><strong>imputation.method = “rf_pred”</strong></td>
 <td align="center"><code>ranger</code></td>
 <td align="center">easy</td>
-<td align="left"><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("ranger")</a></code></td>
+<td align="left"><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("ranger")</a></code></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>if using pmm &gt; 0</strong></td>
 <td align="center"><code>missRanger</code></td>
 <td align="center">easy</td>
-<td align="left"><code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("missRanger")</a></code></td>
+<td align="left"><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("missRanger")</a></code></td>
 </tr>
 </tbody>
 </table>
-<p>web site and additional info: <a href="https://thierrygosselin.github.io/grur/">https://thierrygosselin.github.io/grur/</a></p>
+<p>web site and additional info: <a href="https://thierrygosselin.github.io/grur/" class="uri">https://thierrygosselin.github.io/grur/</a></p>
 <ul>
 <li><a href="http://thierrygosselin.github.io/grur/articles/rad_genomics_computer_setup.html">Computer setup - installation - troubleshooting</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/reference/index.html">Function’s documentation</a></li>
 <li><a href="https://thierrygosselin.github.io/grur/index.html#features">grur’s features</a></li>
 <li><a href="http://thierrygosselin.github.io/grur/articles/index.html">Vignettes</a></li>
-<li>How to cite grur: inside R type <code><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation("grur")</a></code>
+<li>How to cite grur: inside R type <code><a href="https://rdrr.io/r/utils/citation.html">citation("grur")</a></code>
 </li>
 </ul>
 </div>
@@ -183,7 +187,7 @@
 <div id="assumptions-before-imputing-your-dataset" class="section level2">
 <h2 class="hasAnchor">
 <a href="#assumptions-before-imputing-your-dataset" class="anchor"></a>Assumptions before imputing your dataset</h2>
-<ol style="list-style-type: decimal">
+<ol>
 <li><p><strong>Filtered data</strong>: Please don’t try <strong>grur</strong> with raw data consisting of &gt; 100K SNPs, you will generate all sorts of bias and you’ll be disapointed. <strong>Filter your data first!</strong> <a href="https://thierrygosselin.github.io/radiator/">radiator</a> was designed for this.</p></li>
 <li><p><strong>Correlations</strong>: Machine learning algorithms will work better and faster if correlations are reduced to a minimum. If you used <a href="https://thierrygosselin.github.io/radiator/reference/filter_rad.html">filter_rad</a> to filter your dataset, you should be ok. If not, check your dataset for <a href="https://thierrygosselin.github.io/radiator/reference/filter_ld.html">short and long LD</a>.</p></li>
 <li><p><strong>Pattern of individual heterozygosity</strong>: If you have individual heterozygosity patterns and/or correlation of individual heterozygosity with missingness, you might want to skip imputation and go back to filter your data. Please check out <a href="https://thierrygosselin.github.io/radiator/reference/detect_mixed_genomes.html">radiator::detect_mixed_genomes</a> and <a href="https://thierrygosselin.github.io/radiator/reference/detect_het_outliers.html">radiator::detect_het_outliers</a>.</p></li>
@@ -194,10 +198,10 @@
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features" class="anchor"></a>Features</h2>
-<table class="table table">
+<table class="table">
 <colgroup>
-<col width="25%">
-<col width="74%">
+<col width="7%">
+<col width="92%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Caracteristics</th>
@@ -270,7 +274,7 @@
 </ul>
 </div>
 
-      <div class="dev-status">
+  <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></li>
@@ -278,12 +282,11 @@
 <li><a href="http://cran.r-project.org/package=grur"><img src="http://www.r-pkg.org/badges/version/grur" alt="CRAN_Status_Badge"></a></li>
 <li><a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed."></a></li>
 <li><a href="https://zenodo.org/badge/latestdoi/87596763"><img src="https://zenodo.org/badge/87596763.svg" alt="DOI"></a></li>
-<li><a href="commits/master"><img src="https://img.shields.io/badge/Package%20version-0.1.1-orange.svg" alt="packageversion"></a></li>
-<li><a href="/commits/master"><img src="https://img.shields.io/badge/last%20change-2019--08--21-brightgreen.svg" alt="Last-changedate"></a></li>
+<li><a href="commits/master"><img src="https://img.shields.io/badge/Package%20version-0.1.2-orange.svg" alt="packageversion"></a></li>
+<li><a href="/commits/master"><img src="https://img.shields.io/badge/last%20change-2020--03--04-brightgreen.svg" alt="Last-changedate"></a></li>
 </ul>
 </div>
 </div>
-
 </div>
 
 
@@ -292,12 +295,14 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
