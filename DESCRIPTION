@@ -47,8 +47,8 @@ Suggests:
     utils,
     xgboost
 Remotes:
-    github::thierrygosselin/radiator
-    github::ericarcher/strataG
+    github::thierrygosselin/radiator,
+    github::ericarcher/strataG,
     github::stranda/rmetasim
 License: GPL (>=2)
 LazyLoad: yes
