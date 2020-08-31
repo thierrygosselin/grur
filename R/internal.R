@@ -23,7 +23,12 @@ ind_genotyped_helper <- function(x) {
       `90` = length(PERCENT[PERCENT >= 90]),
       `100` = length(PERCENT[PERCENT == 100])
     ) %>%
-    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_INDIVIDUALS) %>%
+    tidyr::pivot_longer(
+      data = .,
+      cols = tidyselect::everything(),
+      names_to = "GENOTYPED_THRESHOLD",
+      values_to = "NUMBER_INDIVIDUALS"
+    ) %>%
     dplyr::mutate(POP_ID = rep("OVERALL", n()))
   
   threshold.helper.pop <- x %>%
@@ -41,7 +46,12 @@ ind_genotyped_helper <- function(x) {
       `90` = length(PERCENT[PERCENT >= 90]),
       `100` = length(PERCENT[PERCENT == 100])
     ) %>%
-    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_INDIVIDUALS, -POP_ID)
+    tidyr::pivot_longer(
+      data = .,
+      cols = -POP_ID,
+      names_to = "GENOTYPED_THRESHOLD",
+      values_to = "NUMBER_INDIVIDUALS"
+    )
   
   mean.pop <- threshold.helper.pop %>%
     dplyr::group_by(GENOTYPED_THRESHOLD) %>%
@@ -180,7 +190,12 @@ markers_genotyped_helper <- function(x, y) {
       `90` = length(PERCENT[PERCENT <= 90]),
       `100` = length(PERCENT[PERCENT <= 100])
     ) %>%
-    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS) %>%
+    tidyr::pivot_longer(
+      data = .,
+      cols = tidyselect::everything(),
+      names_to = "GENOTYPED_THRESHOLD",
+      values_to = "NUMBER_MARKERS"
+    ) %>% 
     dplyr::mutate(POP_ID = rep("OVERALL", n()))
   
   threshold.helper.pop <- x %>%
@@ -198,7 +213,12 @@ markers_genotyped_helper <- function(x, y) {
       `90` = length(PERCENT[PERCENT <= 90]),
       `100` = length(PERCENT[PERCENT <= 100])
     ) %>%
-    tidyr::gather(data = ., key = GENOTYPED_THRESHOLD, value = NUMBER_MARKERS, -POP_ID)
+    tidyr::pivot_longer(
+      data = .,
+      cols = -POP_ID,
+      names_to = "GENOTYPED_THRESHOLD",
+      values_to = "NUMBER_MARKERS"
+    )
   
   mean.pop <- threshold.helper.pop %>%
     dplyr::group_by(GENOTYPED_THRESHOLD) %>%
@@ -608,7 +628,12 @@ missing_rda <- function(
     grur_count <- function(x) length(unique(x))
     strata.formula <- dplyr::select(strata, dplyr::one_of(strata.select)) %>%
       dplyr::summarise_all(.tbl = ., .funs = grur_count) %>% 
-      tidyr::gather(data = ., key = TERMS, value = LEVELS) %>%
+      tidyr::pivot_longer(
+        data = .,
+        cols = tidyselect::everything(),
+        names_to = "TERMS",
+        values_to = "LEVELS"
+      ) %>%
       dplyr::arrange(LEVELS) %>% 
       dplyr::select(TERMS) %>%
       purrr::flatten_chr(.)

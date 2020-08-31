@@ -403,8 +403,6 @@ missing_visualization <- function(
       value.var = "GT_MISSING_BINARY"
     ) %>%
     tibble::as_tibble(.) %>% 
-    # dplyr::group_by(INDIVIDUALS, POP_ID) %>%
-    # tidyr::spread(data = ., key = MARKERS, value = GT_MISSING_BINARY) %>% 
     dplyr::ungroup(.)
   
   # we need rownames for this
@@ -607,7 +605,12 @@ missing_visualization <- function(
   
   message("Blacklist(s) of individuals generated: ", length(blacklists))
   blacklists.stats <- purrr::map_df(.x = blacklists, .f = nrow) %>% 
-    tidyr::gather(data = ., key = "BLACKLIST", value = "n") %>%
+    tidyr::pivot_longer(
+      data = .,
+      cols = tidyselect::everything(),
+      names_to = "BLACKLIST",
+      values_to = "n"
+    ) %>%
     dplyr::transmute(BLACKLIST = stringi::stri_join(BLACKLIST, n, sep = " = "))
   message("    Number of individual(s) blacklisted per blacklist generated:\n", stringi::stri_join("    ", blacklists.stats$BLACKLIST, collapse = "\n"))
   res <- c(res, blacklists)
@@ -720,7 +723,12 @@ missing_visualization <- function(
   message("Whitelist(s) of markers generated: ", length(whitelists))
   if (length(whitelists) > 0) {
     whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 
-      tidyr::gather(data = ., key = "WHITELIST", value = "n") %>%
+      tidyr::pivot_longer(
+        data = .,
+        cols = tidyselect::everything(),
+        names_to = "WHITELIST",
+        values_to = "n"
+      ) %>%
       dplyr::transmute(WHITELIST = stringi::stri_join(WHITELIST, n, sep = " = "))
     message("    Number of markers whitelisted per whitelist generated:\n", stringi::stri_join("    ", whitelists.stats$WHITELIST, collapse = "\n"))
   }

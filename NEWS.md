@@ -1,3 +1,10 @@
+# grur 0.1.3 2020-08-31
+
+* `grur_imputations`: `tidyr::spread` and `tidyr::gather` are now
+deprecated in favor of (pivot_) functions. These are actually a lot slower
+than gather and spread (https://github.com/tidyverse/tidyr/issues/613).
+No thank you. They are not replaced in grur by the data.table equivalent verbs.
+
 # grur 0.1.2 2020-02-13
 
 * lots of works on `simulate_rad` and `missing_distributions` from Eric Archer.

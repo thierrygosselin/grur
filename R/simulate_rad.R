@@ -361,7 +361,12 @@ simulate_rad <- function(
     strataG::df2gtypes(ploidy = 2) %>% 
     strataG::as.data.frame(coded = T) %>% 
     dplyr::select(-.data$id) %>% 
-    tidyr::gather("locus", "mac", -.data$stratum) %>% 
+    tidyr::pivot_longer(
+      data = .,
+      cols = -.data$stratum,
+      names_to = "locus",
+      values_to = "mac"
+    ) %>% 
     dplyr::mutate(
       stratum = as.numeric(factor(.data$stratum)),
       locus = as.numeric(factor(.data$locus))

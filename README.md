@@ -11,8 +11,8 @@ Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://t
 state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.1.2-orange.svg)](commits/master)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2020--03--04-brightgreen.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.3-orange.svg)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2020--08--31-brightgreen.svg)](/commits/master)
 <!-- badges: end -->
 
 <https://thierrygosselin.github.io/grur/>
@@ -124,8 +124,7 @@ to change, **grur** might not be for you.
     arguments inside grur’s imputation module.
 
 5.  **Default arguments**: Defaults are there for testing, please,
-    please, please, don’t use grur’s defaults for
-publications\!
+    please, please, don’t use grur’s defaults for publications\!
 
 ## Features
 

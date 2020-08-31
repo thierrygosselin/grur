@@ -515,7 +515,7 @@ Please follow the vignette for install instructions")
   )
   if (is.null(pmm)) pmm <- 0
   if (is.null(cpu.boost)) cpu.boost <- parallel::detectCores() / 2
-  if (is.null(subsample.markers)) subsample.markers <- 1
+  # if (is.null(subsample.markers)) subsample.markers <- 1
   if (pmm > 0) {
     if (!requireNamespace("missRanger", quietly = TRUE)) {
       rlang::abort("missRanger needed for this imputation option to work.
@@ -763,6 +763,21 @@ Please follow the vignette for install instructions")
     message("    1. Have you installed, ", package.used," package with OpenMP enabled ?")
     message("    2. Have you followed grur's vignette ?")
   }
+  
+  # GT FORMAT and ALLELES CALIBRATIONS -----------------------------------------
+  # Note to myself: is working with GT format required or another one could be used ?
+  
+  if (!rlang::has_name(data, "GT")) {
+    message("\nGT format not found, generating the format...")
+    data <- radiator::calibrate_alleles(
+      data = data,
+      parallel.core = parallel.core,
+      verbose = TRUE
+      ) %$%
+      input %>% 
+      dplyr::rename(STRATA = POP_ID)
+  }
+  
   
   # output the proportion of missing genotypes BEFORE imputations
   na.before <- dplyr::summarise(.data = data, MISSING = round(length(GT[GT == "000000"])/length(GT), 6)) %>%
@@ -1120,9 +1135,13 @@ Please follow the vignette for install instructions")
       
       # prepare data
       data.imp <- dplyr::select(data, MARKERS, STRATA, INDIVIDUALS, GT) %>%
-        dplyr::group_by(STRATA, INDIVIDUALS) %>%
-        tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-        dplyr::ungroup(.) %>%
+        data.table::as.data.table(.) %>%
+        data.table::dcast.data.table(
+          data = .,
+          formula = INDIVIDUALS + STRATA ~ MARKERS,
+          value.var = "GT"
+        ) %>%
+        tibble::as_tibble(.) %>% 
         dplyr::mutate_all(.tbl = ., .funs = factor)
       
       # Random Forest by pop
@@ -1136,7 +1155,15 @@ Please follow the vignette for install instructions")
             verbose = FALSE,
             hierarchical.levels = "strata") %>%
           dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-          tidyr::gather(data = ., key = MARKERS, value = GT, -INDIVIDUALS) %>%
+          data.table::as.data.table(.) %>%
+          data.table::melt.data.table(
+            data = ., 
+            id.vars = "INDIVIDUALS", 
+            variable.name = "MARKERS", 
+            value.name = "GT",
+            variable.factor = FALSE
+          ) %>%
+          tibble::as_tibble(.) %>% 
           dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS)
       }#End RF by pop
@@ -1150,7 +1177,15 @@ Please follow the vignette for install instructions")
           nimpute = nimpute, verbose = FALSE,
           hierarchical.levels = "global") %>%
           dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-          tidyr::gather(data = ., key = MARKERS, value = GT, -c(STRATA, INDIVIDUALS)) %>%
+          data.table::as.data.table(.) %>%
+          data.table::melt.data.table(
+            data = ., 
+            id.vars = c("STRATA", "INDIVIDUALS"), 
+            variable.name = "MARKERS", 
+            value.name = "GT",
+            variable.factor = FALSE
+          ) %>%
+          tibble::as_tibble(.) %>% 
           dplyr::mutate(STRATA = factor(STRATA)) %>% 
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS)
       } #End RF global
@@ -1221,10 +1256,15 @@ Please follow the vignette for install instructions")
         data.boost <- data %>%
           dplyr::select(MARKERS, STRATA = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS) %>%
-          dplyr::group_by(STRATA, INDIVIDUALS) %>%
-          tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-          dplyr::ungroup(.) %>% 
-          as.matrix(.) %>% Matrix::Matrix(., sparse = TRUE)
+          data.table::as.data.table(.) %>%
+          data.table::dcast.data.table(
+            data = .,
+            formula = INDIVIDUALS + STRATA ~ MARKERS,
+            value.var = "GT"
+          ) %>%
+          tibble::as_tibble(.) %>% 
+          as.matrix(.) %>% 
+          Matrix::Matrix(., sparse = TRUE)
       }
       
       if (hierarchical.levels == "global") {
@@ -1241,9 +1281,13 @@ Please follow the vignette for install instructions")
         data.boost <- data %>%
           dplyr::select(MARKERS, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
           dplyr::arrange(MARKERS, INDIVIDUALS) %>%
-          dplyr::group_by(INDIVIDUALS) %>%
-          tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-          dplyr::ungroup(.) %>% 
+          data.table::as.data.table(.) %>%
+          data.table::dcast.data.table(
+            data = .,
+            formula = INDIVIDUALS ~ MARKERS,
+            value.var = "GT"
+          ) %>%
+          tibble::as_tibble(.) %>% 
           as.matrix(.) %>% 
           Matrix::Matrix(., sparse = TRUE)
       }
@@ -1491,8 +1535,8 @@ Please follow the vignette for install instructions")
       tidy.name <- stringi::stri_join(
         filename, "_subsample.markers_", subsample.markers, ".rad")
     }
-    if (verbose) message("Writing the imputed data: \n", tidy.name)
-    #fst::write.fst(x = data.imp, path = tidy.name, compress = 85)
+    # if (verbose) message("Writing the imputed data: \n", tidy.name)
+    radiator::write_rad(data = data.imp, path = tidy.name, filename = tidy.name, verbose = TRUE)
   }
   
   # Missing after imputation:
@@ -1588,9 +1632,13 @@ grur_imputer <- function(
   data %<>% 
     dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
     dplyr::mutate(GT = replace(GT, which(is.na(GT)), "missing")) %>%
-    dplyr::group_by(INDIVIDUALS, STRATA) %>%
-    tidyr::spread(data = ., key = MARKERS, value = GT) %>%
-    dplyr::ungroup(.)
+    data.table::as.data.table(.) %>%
+    data.table::dcast.data.table(
+      data = .,
+      formula = INDIVIDUALS + STRATA ~ MARKERS,
+      value.var = "GT"
+    ) %>%
+    tibble::as_tibble(.)
   
   # data[is.na(data.model)] <- "missing"
   data.gl <- data.na <- NULL # remove after test
@@ -2183,7 +2231,15 @@ grur_lgbm_imputer <- function(
       dplyr::mutate(
         INDIVIDUALS = id.string,
         MARKERS = rep(markers.list, n())) %>% 
-      tidyr::gather(data = ., key = GT, value = SCORE, -c(INDIVIDUALS, MARKERS)) %>%
+      data.table::as.data.table(.) %>%
+      data.table::melt.data.table(
+        data = ., 
+        id.vars = c("MARKERS", "INDIVIDUALS"), 
+        variable.name = "GT", 
+        value.name = "SCORE",
+        variable.factor = FALSE
+      ) %>%
+      tibble::as_tibble(.) %>%
       dplyr::group_by(INDIVIDUALS, MARKERS) %>% 
       dplyr::filter(SCORE == max(SCORE)) %>%
       dplyr::distinct(INDIVIDUALS, MARKERS, .keep_all = TRUE) %>% 
@@ -2199,7 +2255,15 @@ grur_lgbm_imputer <- function(
       xtrain <- tibble::as_tibble(model$predict(xtrain, reshape = TRUE)) %>% 
         `colnames<-`(sort(unique(data.label))) %>%
         dplyr::mutate(INDIVIDUALS = unique(xtrain[, "INDIVIDUALS"])) %>% 
-        tidyr::gather(data = ., key = GT, value = SCORE, -INDIVIDUALS) %>%
+        data.table::as.data.table(.) %>%
+        data.table::melt.data.table(
+          data = ., 
+          id.vars = "INDIVIDUALS", 
+          variable.name = "GT", 
+          value.name = "SCORE",
+          variable.factor = FALSE
+        ) %>%
+        tibble::as_tibble(.) %>% 
         dplyr::group_by(INDIVIDUALS) %>% 
         dplyr::filter(SCORE == max(SCORE)) %>%
         dplyr::distinct(INDIVIDUALS, .keep_all = TRUE) %>% 
@@ -2260,9 +2324,14 @@ encoding_snp <- function(locus.list = NULL, data = NULL) {
     stringi::stri_join(., collapse = "_")
   binded.markers <- stringi::stri_join("BINDED_", binded.markers)
   
-  res <- res %>%
+  res <- data.table::as.data.table(res) %>%
+    data.table::dcast.data.table(
+      data = .,
+      formula = CHROM_LOCUS + INDIVIDUALS + STRATA ~ MARKERS,
+      value.var = "GT"
+    ) %>%
+    tibble::as_tibble(.) %>%
     dplyr::group_by(CHROM_LOCUS, STRATA, INDIVIDUALS) %>%
-    tidyr::spread(data = ., key = MARKERS, value = GT) %>%
     tidyr::unite(data = ., col = GT, -CHROM_LOCUS, -STRATA, -INDIVIDUALS, sep = "_", remove = TRUE) %>%
     dplyr::mutate(#Haplotype with combination of SNP and NA = NA (up for an argument?)
       GT = stringi::stri_replace_all_fixed(
@@ -2315,11 +2384,27 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
           sep = "_", extra = "drop")
       
       if (rlang::has_name(data.sep, "GL")) {
-        data.sep <- tidyr::gather(data = data.sep, key = MARKERS, value = GT, -STRATA, -INDIVIDUALS, -GL) %>%
+        data.sep <- data.table::as.data.table(data.sep) %>%
+          data.table::melt.data.table(
+            data = ., 
+            id.vars = c("STRATA", "INDIVIDUALS", "GL"),
+            variable.name = "MARKERS", 
+            value.name = "GT",
+            variable.factor = FALSE
+          ) %>%
+          tibble::as_tibble(.) %>% 
           dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT, GL) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS, GT, GL)
       } else {
-        data.sep <- tidyr::gather(data = data.sep, key = MARKERS, value = GT, -STRATA, -INDIVIDUALS) %>%
+        data.sep <- data.table::as.data.table(data.sep) %>%
+          data.table::melt.data.table(
+            data = ., 
+            id.vars = c("STRATA", "INDIVIDUALS"),
+            variable.name = "MARKERS", 
+            value.name = "GT",
+            variable.factor = FALSE
+          ) %>%
+          tibble::as_tibble(.) %>% 
           dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS, GT)
       }
@@ -2330,8 +2415,17 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
         data = data.sep,
         col = col.replace,
         into = stringi::stri_split_fixed(str = col.replace, pattern = "_", simplify = TRUE),
-        sep = "_", extra = "drop") %>%
-        tidyr::gather(data = ., key = MARKERS, value = GT, -STRATA, -INDIVIDUALS)
+        sep = "_", extra = "drop"
+      ) %>%
+        data.table::as.data.table(.) %>%
+        data.table::melt.data.table(
+          data = ., 
+          id.vars = c("STRATA", "INDIVIDUALS"),
+          variable.name = "MARKERS", 
+          value.name = "GT",
+          variable.factor = FALSE
+        ) %>%
+        tibble::as_tibble(.)
     }
     
     return(data.sep)
@@ -2377,7 +2471,15 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
           dplyr::select(
             .data = data,
             dplyr::one_of(c("STRATA", "INDIVIDUALS", markers.no.sep))) %>%
-            tidyr::gather(data = ., key = MARKERS, value = GT, -STRATA, -INDIVIDUALS)
+            data.table::as.data.table(.) %>%
+            data.table::melt.data.table(
+              data = ., 
+              id.vars = c("STRATA", "INDIVIDUALS"),
+              variable.name = "MARKERS", 
+              value.name = "GT",
+              variable.factor = FALSE
+            ) %>%
+            tibble::as_tibble(.)
         )
       }
     } else {
