@@ -344,7 +344,10 @@ generate_pcoa_plot <- function(
     pcoa.plots.strata[[4]],
     pcoa.plots.strata[[5]],
     pcoa.plots.strata[[6]],
-    ncol = 2, nrow = 3, legend = "right", common.legend = TRUE
+    ncol = 2, 
+    nrow = 3, 
+    legend = "right", 
+    common.legend = TRUE
   )
   
   # message("write plot problem")

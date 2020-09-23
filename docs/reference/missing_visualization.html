@@ -205,15 +205,15 @@ Tidy data: if the filename argument is used, the
     </div>
 
     <pre class="usage"><span class='fu'>missing_visualization</span>(
-  <span class='no'>data</span>,
-  <span class='kw'>strata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>strata.select</span> <span class='kw'>=</span> <span class='st'>"POP_ID"</span>,
-  <span class='kw'>distance.method</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>,
-  <span class='kw'>ind.missing.geno.threshold</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='fl'>30</span>, <span class='fl'>40</span>, <span class='fl'>50</span>, <span class='fl'>60</span>, <span class='fl'>70</span>, <span class='fl'>80</span>, <span class='fl'>90</span>),
-  <span class='kw'>filename</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() - <span class='fl'>1</span>,
-  <span class='kw'>write.plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
+  <span class='kw'>data</span>,
+  strata = <span class='kw'>NULL</span>,
+  strata.select = <span class='st'>"POP_ID"</span>,
+  distance.method = <span class='st'>"euclidean"</span>,
+  ind.missing.geno.threshold = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='fl'>30</span>, <span class='fl'>40</span>, <span class='fl'>50</span>, <span class='fl'>60</span>, <span class='fl'>70</span>, <span class='fl'>80</span>, <span class='fl'>90</span>),
+  filename = <span class='kw'>NULL</span>,
+  parallel.core = <span class='kw'>parallel</span>::<span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() <span class='op'>-</span> <span class='fl'>1</span>,
+  write.plot = <span class='fl'>TRUE</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -334,32 +334,36 @@ measures are better than pedigrees. Heredity, 115, 63–72.</p>
 Understanding Inbreeding Depression, Purging, and Genetic Rescue.
 Trends in Ecology and Evolution. 2016;31: 940-952.
 doi:10.1016/j.tree.2016.09.005</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a> and Eric Archer <a href='mailto:eric.archer@noaa.gov'>eric.archer@noaa.gov</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'>#Using a  VCF file, the simplest for of the function:</span>
-<span class='no'>ibm.koala</span> <span class='kw'>&lt;-</span> <span class='fu'>missing_visualization</span>(
-<span class='kw'>data</span> <span class='kw'>=</span> <span class='st'>"batch_1.vcf"</span>,
-<span class='kw'>strata</span> <span class='kw'>=</span> <span class='st'>"population.map.strata.tsv"</span>
+<span class='kw'>ibm.koala</span> <span class='op'>&lt;-</span> <span class='fu'>missing_visualization</span>(
+data = <span class='st'>"batch_1.vcf"</span>,
+strata = <span class='st'>"population.map.strata.tsv"</span>
 )
 
 <span class='co'># To see what's inside the list</span>
-<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='no'>ibm.koala</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='kw'>ibm.koala</span>)
 
 <span class='co'># To view the heatmap:</span>
-<span class='no'>ibm.koala</span>$<span class='no'>heatmap</span>
+<span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>heatmap</span>
 
 <span class='co'># To save the heatmap</span>
 <span class='co'># move to the appropriate directory</span>
-<span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave</a></span>(
-<span class='kw'>filename</span> <span class='kw'>=</span> <span class='st'>"heatmap.missing.pdf"</span>,
-<span class='kw'>plot</span> <span class='kw'>=</span> <span class='no'>ibm.koala</span>$<span class='no'>heatmap</span>,
-<span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-<span class='kw'>dpi</span> <span class='kw'>=</span> <span class='fl'>600</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='st'>"cm"</span>, <span class='kw'>useDingbats</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>ggplot2</span>::<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave</a></span>(
+filename = <span class='st'>"heatmap.missing.pdf"</span>,
+plot = <span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>heatmap</span>,
+width = <span class='fl'>15</span>, height = <span class='fl'>20</span>,
+dpi = <span class='fl'>600</span>, units = <span class='st'>"cm"</span>, useDingbats = <span class='fl'>FALSE</span>)
 
 <span class='co'># To view the IBM analysis plot:</span>
-<span class='no'>ibm.koala</span>$<span class='no'>ibm_plot</span>
-}</div></pre>
+<span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>ibm_plot</span>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -375,7 +379,7 @@ doi:10.1016/j.tree.2016.09.005</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

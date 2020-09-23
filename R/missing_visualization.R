@@ -151,6 +151,9 @@ missing_visualization <- function(
   write.plot = TRUE,
   ...
 ) {
+  # testing
+  # path.folder = NULL
+  
   verbose <- TRUE
   cat("################################################################################\n")
   cat("######################## grur::missing_visualization ###########################\n")
@@ -380,7 +383,8 @@ missing_visualization <- function(
       MISSING_GENOTYPE = length(GT_MISSING_BINARY[GT_MISSING_BINARY == 0]),
       MARKER_NUMBER = length(MARKERS),
       MISSING_GENOTYPE_PROP = MISSING_GENOTYPE/MARKER_NUMBER,
-      PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2)
+      PERCENT = round((MISSING_GENOTYPE_PROP)*100, 2), 
+      .groups = "keep"
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::arrange(POP_ID, INDIVIDUALS)
@@ -406,12 +410,14 @@ missing_visualization <- function(
     dplyr::ungroup(.)
   
   # we need rownames for this
-  suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
-  input.pcoa <- dplyr::select(input.pcoa, -POP_ID, -INDIVIDUALS)
+  rownames.pcoa <- input.pcoa$INDIVIDUALS
+  # suppressWarnings(rownames(input.pcoa) <- input.pcoa$INDIVIDUALS)
+  input.pcoa %<>% dplyr::select(-POP_ID, -INDIVIDUALS)
   
   radiator::write_rad(data = input.pcoa, path = file.path(path.folder, "input.rda.temp.rad"))
   input.rda <- list.files(path = path.folder, pattern = "input.rda.temp.rad", full.names = TRUE)
-  
+  input.pcoa <- data.frame(input.pcoa)
+  rownames(input.pcoa) <- rownames.pcoa
   #Legendre's pcoa in ape
   ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
   input.pcoa <- NULL

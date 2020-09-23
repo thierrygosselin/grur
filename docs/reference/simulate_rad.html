@@ -159,19 +159,19 @@ to be installed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>simulate_rad</span>(
-  <span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>25000</span>,
-  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>5</span>),
-  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
-  <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
-  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() - <span class='fl'>1</span>,
-  <span class='kw'>use.wd</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  num.pops = <span class='fl'>5</span>,
+  num.loci = <span class='fl'>1000</span>,
+  div.time = <span class='fl'>25000</span>,
+  ne = <span class='fl'>50</span>,
+  nm = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>5</span>),
+  theta = <span class='fl'>0.2</span>,
+  mig.type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
+  num.reps = <span class='fl'>10</span>,
+  num.rms.gens = <span class='fl'>10</span>,
+  label = <span class='kw'>NULL</span>,
+  fsc.exec = <span class='st'>"fsc26"</span>,
+  parallel.core = <span class='kw'>parallel</span>::<span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() <span class='op'>-</span> <span class='fl'>1</span>,
+  use.wd = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -282,25 +282,30 @@ Default: <code>use.wd = FALSE</code> means that files are written to temporary f
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='https://github.com/EricArcher/strataG'>strataG</a></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Eric Archer <a href='mailto:eric.archer@noaa.gov'>eric.archer@noaa.gov</a> and 
+  Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>grur</span>)
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>grur</span><span class='kw ns'>::</span><span class='fu'>simulate_rad</span>(
-  <span class='kw'>num.pops</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>num.loci</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='kw'>div.time</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>ne</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>50</span>,<span class='fl'>200</span>),
-  <span class='kw'>nm</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.1</span>),
-  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>mig.type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>),
-  <span class='kw'>num.reps</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>num.rms.gens</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>fsc.exec</span> <span class='kw'>=</span> <span class='st'>"fsc26"</span>,
-  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='fl'>4</span>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://github.com/thierrygosselin/grur'>grur</a></span>)
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='kw'>grur</span>::<span class='fu'>simulate_rad</span>(
+  num.pops = <span class='fl'>3</span>, 
+  num.loci = <span class='fl'>200</span>, 
+  div.time = <span class='fl'>1000</span>, 
+  ne = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>50</span>,<span class='fl'>200</span>),
+  nm = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.1</span>), 
+  theta = <span class='fl'>0.2</span>, 
+  mig.type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"island"</span>, <span class='st'>"stepping.stone"</span>), 
+  num.reps = <span class='fl'>3</span>,
+  num.rms.gens = <span class='fl'>5</span>,
+  label = <span class='kw'>NULL</span>, 
+  fsc.exec = <span class='st'>"fsc26"</span>, 
+  parallel.core = <span class='fl'>4</span>
  )
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -316,7 +321,7 @@ Default: <code>use.wd = FALSE</code> means that files are written to temporary f
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

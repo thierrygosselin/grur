@@ -255,15 +255,15 @@ Please, please, please, don't use defaults for publications!</p></li>
     </div>
 
     <pre class="usage"><span class='fu'>grur_imputations</span>(
-  <span class='no'>data</span>,
-  <span class='kw'>output</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>strata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>imputation.method</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>hierarchical.levels</span> <span class='kw'>=</span> <span class='st'>"strata"</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>parallel.core</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() - <span class='fl'>1</span>,
-  <span class='kw'>filename</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>data</span>,
+  output = <span class='kw'>NULL</span>,
+  strata = <span class='kw'>NULL</span>,
+  imputation.method = <span class='kw'>NULL</span>,
+  hierarchical.levels = <span class='st'>"strata"</span>,
+  verbose = <span class='fl'>TRUE</span>,
+  parallel.core = <span class='kw'>parallel</span>::<span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() <span class='op'>-</span> <span class='fl'>1</span>,
+  filename = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -571,6 +571,9 @@ a fast on-the-fly imputation method.</p>
 a fast C++ implementation for the extreme gradient tree boosting algorithm.</p>
 <p>The package <a href='https://github.com/Microsoft/LightGBM'>LightGBM</a> is an
 exciting new algorithm to conduct tree boosting.</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"></pre>
@@ -589,7 +592,7 @@ exciting new algorithm to conduct tree boosting.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

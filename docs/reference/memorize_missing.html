@@ -156,7 +156,7 @@ of imputation algorithms. A vignette is under construction to leverage this
 function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>memorize_missing</span>(<span class='no'>data</span>, <span class='kw'>strata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>randomize</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>filename</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>memorize_missing</span>(<span class='kw'>data</span>, strata = <span class='kw'>NULL</span>, randomize = <span class='kw'>NULL</span>, filename = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -219,15 +219,19 @@ the columns are:</p><ul>
 <li><p><code>MISSING_OVERALL_MIX</code>: for the missing pattern randomized overall (optional)</p></li>
 </ul>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>missing.memory</span> <span class='kw'>&lt;-</span> <span class='fu'>memorize_missing</span>(
-<span class='kw'>data</span> <span class='kw'>=</span> <span class='st'>"batch_1.vcf"</span>,
-<span class='kw'>strata</span> <span class='kw'>=</span> <span class='st'>"population.map.strata.tsv"</span>,
-<span class='kw'>randomize</span> <span class='kw'>=</span> <span class='st'>"populations"</span>, <span class='kw'>filename</span> <span class='kw'>=</span> <span class='st'>"missing.memory.panda"</span>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>missing.memory</span> <span class='op'>&lt;-</span> <span class='fu'>memorize_missing</span>(
+data = <span class='st'>"batch_1.vcf"</span>,
+strata = <span class='st'>"population.map.strata.tsv"</span>, 
+randomize = <span class='st'>"populations"</span>, filename = <span class='st'>"missing.memory.panda"</span>
 )
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -243,7 +247,7 @@ the columns are:</p><ul>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -25,6 +25,7 @@ Imports:
     radiator,
     rlang,
     rmetasim,
+    tidyselect,
     tidyverse,
     strataG,
     vegan

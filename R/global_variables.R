@@ -63,7 +63,7 @@ if (getRversion() >= "2.15.1") {
       "POLYMORPHIC.x", "POLYMORPHIC.y", "SPLIT_VEC", "SCORE", "IMPUTED_DATA",
       "LABEL", "MODEL", "ROWS", "ANCESTRY", "ASSIGN", "GROUP_POST", "GROUP_PRIOR",
       "LEVELS", "TERMS", "Variance", "input", "HETEROZYGOSITY", "id", "stratum",
-      "locus"
+      "locus", "subsample.markers"
     )
   )
 }

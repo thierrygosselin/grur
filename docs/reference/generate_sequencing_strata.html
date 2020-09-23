@@ -153,11 +153,11 @@ genotypes based on these variables.</p>
     </div>
 
     <pre class="usage"><span class='fu'>generate_sequencing_strata</span>(
-  <span class='no'>strata</span>,
-  <span class='kw'>number.ind.per.lanes</span> <span class='kw'>=</span> <span class='fl'>36</span>,
-  <span class='kw'>number.sequencer</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>randomize</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>filename</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>strata</span>,
+  number.ind.per.lanes = <span class='fl'>36</span>,
+  number.sequencer = <span class='kw'>NULL</span>,
+  randomize = <span class='fl'>FALSE</span>,
+  filename = <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -202,17 +202,21 @@ environment.</p></td>
 
     <p>A strata object (dataframe) in the global environment with columns: 
 <code>POP_ID</code>, <code>INDIVIDUALS</code>, <code>LANES</code> and optionally <code>SEQUENCER</code>.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>new.strata</span> <span class='kw'>&lt;-</span> <span class='fu'>generate_sequencing_strata</span>(
-<span class='kw'>strata</span> <span class='kw'>=</span> <span class='st'>"my.strata.tsv"</span>,
-<span class='kw'>number.ind.per.lanes</span> <span class='kw'>=</span> <span class='fl'>48</span>,
-<span class='kw'>number.sequencer</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-<span class='kw'>randomize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-<span class='kw'>filename</span> <span class='kw'>=</span> <span class='st'>"my.new.strata.tsv"</span>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>new.strata</span> <span class='op'>&lt;-</span> <span class='fu'>generate_sequencing_strata</span>(
+strata = <span class='st'>"my.strata.tsv"</span>,
+number.ind.per.lanes = <span class='fl'>48</span>,
+number.sequencer = <span class='fl'>3</span>,
+randomize = <span class='fl'>TRUE</span>,
+filename = <span class='st'>"my.new.strata.tsv"</span>
 )
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -228,7 +232,7 @@ environment.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
