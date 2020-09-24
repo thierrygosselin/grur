@@ -12,7 +12,7 @@ state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.1.3-orange.svg)](commits/master)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2020--09--23-brightgreen.svg)](/commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2020--09--24-brightgreen.svg)](/commits/master)
 <!-- badges: end -->
 
 <https://thierrygosselin.github.io/grur/>

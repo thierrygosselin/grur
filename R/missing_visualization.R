@@ -199,7 +199,7 @@ missing_visualization <- function(
   # parallel.core = parallel::detectCores() - 1
   # write.plot = TRUE
   # path.folder = NULL
-  
+  # 
   
   # manage missing arguments -----------------------------------------------------
   if (missing(data)) rlang::abort("Input file missing")
@@ -314,7 +314,7 @@ missing_visualization <- function(
         GT_MISSING_BINARY = as.numeric(GT_MISSING_BINARY)
       )
     }
-  }
+  }# finish importig data
   
   
   # Check if stata have different values
@@ -418,8 +418,19 @@ missing_visualization <- function(
   input.rda <- list.files(path = path.folder, pattern = "input.rda.temp.rad", full.names = TRUE)
   input.pcoa <- data.frame(input.pcoa)
   rownames(input.pcoa) <- rownames.pcoa
+  
+  
   #Legendre's pcoa in ape
-  ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
+  safe_pcoa <-  purrr::safely(.f = ape::pcoa)
+  # ibm <- ape::pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
+  ibm <- safe_pcoa(D = stats::dist(x = input.pcoa, method = distance.method))
+  
+  if (is.null(ibm$error)) {
+    ibm <- ibm$result
+  } else {
+    rlang::abort("error during the PCoA open an issue on grur's github page")
+  }
+  
   input.pcoa <- NULL
   
   # Should broken_stick values be reported?
