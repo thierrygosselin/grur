@@ -1,5 +1,5 @@
 
-# grur <img src="docs/logo.png" align="right" alt="" />
+# grur <a href='https://thierrygosselin.github.io/grur/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
