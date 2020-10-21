@@ -124,7 +124,7 @@ blacklists_id_generator <- function(x, y, path.folder) {
     blacklist.name <- stringi::stri_join("blacklist.id.missing.", x)
     readr::write_tsv(
       blacklist.id.missing.geno,
-      stringi::stri_join(path.folder, "/", as.name(blacklist.name), ".tsv"))
+      file.path(path.folder,  paste0(as.name(blacklist.name), ".tsv")))
     blacklist[[blacklist.name]] <- blacklist.id.missing.geno
   } else {
     blacklist <- NULL
@@ -496,7 +496,7 @@ pct_missing_by_total <- function(
   
   miss.lm.coefs <- res[[lm.res.name]] %>%
     dplyr::select(-c(std.error, statistic, p.value)) %>% 
-    tidyr::spread(data = ., key = term, value = estimate) %>% 
+    grur::rad_wide(x = ., names_from = term, values_from = estimate, tidy = TRUE) %>% 
     dplyr::rename(a = `(Intercept)`, b = `log10(num.missing.total)`) %>% 
     dplyr::mutate(
       STRATA_SELECT = factor(STRATA_SELECT, levels = level.miss, ordered = TRUE)
@@ -586,7 +586,6 @@ pct_missing_by_total <- function(
 #' @importFrom vegan anova.cca rda
 #' @importFrom ape pcoa
 #' @importFrom adespatial dist.ldc
-#' @importFrom pbmcapply pbmclapply
 #' @importFrom data.table as.data.table dcast.data.table melt.data.table
 
 missing_rda <- function(
@@ -721,3 +720,243 @@ missing_rda <- function(
   return(res)
 }#End missing_rda
 
+
+
+# parallel_core_opt ------------------------------------------------------------
+#' @title parallel_core_opt
+#' @description Optimization of parallel core argument for radiator
+#' @keywords internal
+#' @export
+parallel_core_opt <- function(parallel.core = NULL, max.core = NULL) {
+  # strategy:
+  # minimum of 1 core and a maximum of all the core available -2
+  # even number of core
+  # test
+  # parallel.core <- 1
+  # parallel.core <- 2
+  # parallel.core <- 3
+  # parallel.core <- 11
+  # parallel.core <- 12
+  # parallel.core <- 16
+  # max.core <- 5
+  # max.core <- 50
+  # max.core <- NULL
+  
+  # Add-ons options
+  # to control the max and min number to use...
+  
+  if (is.null(parallel.core)) {
+    parallel.core <- parallel::detectCores() - 2
+  } else {
+    parallel.core <- floor(parallel.core / 2) * 2
+    parallel.core <- max(1, min(parallel.core, parallel::detectCores() - 2))
+  }
+  
+  if (is.null(max.core)) {
+    parallel.core.opt <- parallel.core
+  } else {
+    parallel.core.opt <- min(parallel.core, floor(max.core / 2) * 2)
+  }
+  return(parallel.core.opt)
+}#End parallel_core_opt
+
+# using future and future.apply -------------------------------------------------
+#' @name grur_future
+#' @title grur parallel function
+#' @description Updating grur to use future
+# @inheritParams future::plan
+# @inheritParams future::availableCores
+#' @inheritParams future.apply::future_apply
+#' @rdname grur_future
+#' @export
+#' @keywords internal
+grur_future <- function(
+  .x,
+  .f,
+  flat.future = c("int", "chr", "dfr", "dfc", "walk", "drop"),
+  split.vec = FALSE,
+  split.with = NULL,
+  split.chunks = 4L,
+  parallel.core = parallel::detectCores() - 1,
+  ...
+) {
+  opt.change <- getOption("width")
+  options(width = 70)
+  on.exit(options(width = opt.change), add = TRUE)
+  on.exit(if (parallel.core > 1L) future::plan(strategy = "sequential"), add = TRUE)
+  
+  # argument for flattening the results
+  flat.future <- match.arg(
+    arg = flat.future,
+    choices = c("int", "chr", "dfr", "dfc", "walk", "drop"),
+    several.ok = FALSE
+  )
+  
+  # splitting into chunks-------------------------------------------------------
+  if (split.vec && is.null(split.with)) {
+    # d: data, data length, data size
+    # sv: split vector
+    d <- .x
+    df <- FALSE
+    if (any(class(d) %in% c("tbl_df","tbl","data.frame"))) {
+      d <- nrow(d)
+      df <- TRUE
+    }
+    if (length(d) > 1L) d <- length(d)
+    stopifnot(is.integer(d))
+    sv <- as.integer(floor((split.chunks * (seq_len(d) - 1) / d) + 1))
+    # sv <- as.integer(floor((parallel.core * cpu.rounds * (seq_len(d) - 1) / d) + 1))
+    stopifnot(length(sv) == d)
+    
+    # split
+    if (df) {
+      .x$SPLIT_VEC <- sv
+      .x %<>% dplyr::group_split(.tbl = ., "SPLIT_VEC", .keep = FALSE)
+    } else {
+      .x %<>% split(x = ., f = sv)
+    }
+  }
+  if (!is.null(split.with)) {
+    # check
+    if (length(split.with) != 1 || !is.character(split.with)) {
+      rlang::abort(message = "Contact author: problem with parallel computation")
+    }
+    .data <- NULL
+    stopifnot(rlang::has_name(.x, split.with))
+    if (split.vec) {
+      sv <- dplyr::distinct(.x, .data[[split.with]])
+      d <- nrow(sv)
+      sv$SPLIT_VEC <- as.integer(floor((split.chunks * (seq_len(d) - 1) / d) + 1))
+      .x %<>%
+        dplyr::left_join(sv, by = split.with) %>%
+        dplyr::group_split(.tbl = ., "SPLIT_VEC", .keep = FALSE)
+    } else {
+      .x %<>% dplyr::group_split(.tbl = ., .data[[split.with]], .keep = TRUE)
+    }
+  }
+  
+  
+  
+  if (parallel.core == 1L) {
+    future::plan(strategy = "sequential")
+  } else {
+    parallel.core <- parallel_core_opt(parallel.core = parallel.core)
+    lx <- length(.x)
+    if (lx < parallel.core) {
+      future::plan(strategy = "multisession", workers = lx)
+    } else {
+      future::plan(strategy = "multisession", workers = parallel.core)
+    }
+  }
+  
+  # .x <- future.apply::future_apply(X = .x, FUN = .f, ...)
+  # capture dots
+  # d <- rlang::dots_list(..., .ignore_empty = "all", .preserve_empty = TRUE, .homonyms = "first")
+  # if (bind.rows) .x %<>% dplyr::bind_rows(.)
+  
+  
+  
+  # Run the function in parallel and account for dots-dots-dots argument
+  rad_map <- switch(flat.future,
+                    int = {furrr::future_map_int},
+                    chr = {furrr::future_map_chr},
+                    dfr = {furrr::future_map_dfr},
+                    dfc = {furrr::future_map_dfc},
+                    walk = {furrr::future_walk},
+                    drop = {furrr::future_map}
+  )
+  
+  opts <- furrr::furrr_options(globals = FALSE)
+  if (length(list(...)) == 0) {
+    .x %<>% rad_map(.x = ., .f = .f, .options = opts)
+  } else {
+    .x %<>% rad_map(.x = ., .f = .f, ..., .options = opts)
+  }
+  return(.x)
+}#End grur_future
+
+
+# PIVOT-GATHER-CAST ------------------------------------------------------------
+# rationale for doing this is that i'm tired of using tidyverse or data.table semantics
+# tidyr changed from gather/spread to pivot_ functions but their are still very slow compared
+# to 1. the original gather/spread and data.table equivalent...
+
+#' @title rad_long
+#' @description Gather, melt and pivot_longer
+#' @rdname rad_long
+#' @keywords internal
+#' @export
+
+rad_long <- function(
+  x,
+  cols = NULL,
+  measure_vars = NULL,
+  names_to = NULL,
+  values_to = NULL,
+  variable_factor = TRUE,
+  keep_rownames = FALSE,
+  tidy = FALSE
+){
+  
+  
+  # tidyr
+  if (tidy) {
+    x %>%
+      tidyr::pivot_longer(
+        data = .,
+        cols = -cols,
+        names_to = names_to,
+        values_to = values_to
+      )
+  } else {# data.table
+    x %>%
+      data.table::as.data.table(., keep.rownames = keep_rownames) %>%
+      data.table::melt.data.table(
+        data = .,
+        id.vars = cols,
+        measure.vars = measure_vars,
+        variable.name = names_to,
+        value.name = values_to,
+        variable.factor = variable_factor
+      ) %>%
+      tibble::as_tibble(.)
+  }
+}#rad_long
+
+#' @title rad_wide
+#' @description Spread, dcast and pivot_wider
+#' @rdname rad_wide
+#' @keywords internal
+#' @export
+rad_wide <- function(
+  x ,
+  formula = NULL,
+  names_from = NULL,
+  values_from = NULL,
+  values_fill = NULL,
+  sep = "_",
+  tidy = FALSE
+  
+){
+  # tidyr
+  if (tidy) {
+    x %<>%
+      tidyr::pivot_wider(
+        data = .,
+        names_from = names_from,
+        values_from = values_from,
+        values_fill = values_fill
+      )
+  } else {# data.table
+    x  %>%
+      data.table::as.data.table(.) %>%
+      data.table::dcast.data.table(
+        data = .,
+        formula =  formula,
+        value.var = values_from,
+        sep = sep,
+        fill = values_fill
+      ) %>%
+      tibble::as_tibble(.)
+  }
+}#rad_wide

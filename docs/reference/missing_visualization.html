@@ -109,7 +109,7 @@ Tidy data: if the filename argument is used, the
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
       </span>
     </div>
 
@@ -190,7 +190,7 @@ Tidy data: if the filename argument is used, the
    Within this function, we're using a modified version of the measure
    described in (Keller et al., 2011; Kardos et al., 2015).
    The new measure is population-wise and tailored for RADseq data
-   (see <code><a href='https://rdrr.io/pkg/radiator/man/ibdg_fh.html'>ibdg_fh</a></code> for details).</p></li>
+   (see <code><a href='https://thierrygosselin.github.io/radiator/reference/ibdg_fh.html'>ibdg_fh</a></code> for details).</p></li>
 <li><p><strong>Figures and Tables:</strong> figures and summary tables of
    missing information at the marker, individual and population level are
    generated.</p></li>
@@ -204,17 +204,17 @@ Tidy data: if the filename argument is used, the
 
     </div>
 
-    <pre class="usage"><span class='fu'>missing_visualization</span>(
-  <span class='kw'>data</span>,
-  strata = <span class='kw'>NULL</span>,
-  strata.select = <span class='st'>"POP_ID"</span>,
-  distance.method = <span class='st'>"euclidean"</span>,
-  ind.missing.geno.threshold = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='fl'>30</span>, <span class='fl'>40</span>, <span class='fl'>50</span>, <span class='fl'>60</span>, <span class='fl'>70</span>, <span class='fl'>80</span>, <span class='fl'>90</span>),
-  filename = <span class='kw'>NULL</span>,
-  parallel.core = <span class='kw'>parallel</span>::<span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() <span class='op'>-</span> <span class='fl'>1</span>,
-  write.plot = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>missing_visualization</span><span class='op'>(</span>
+  <span class='va'>data</span>,
+  strata <span class='op'>=</span> <span class='cn'>NULL</span>,
+  strata.select <span class='op'>=</span> <span class='st'>"POP_ID"</span>,
+  distance.method <span class='op'>=</span> <span class='st'>"euclidean"</span>,
+  ind.missing.geno.threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='fl'>30</span>, <span class='fl'>40</span>, <span class='fl'>50</span>, <span class='fl'>60</span>, <span class='fl'>70</span>, <span class='fl'>80</span>, <span class='fl'>90</span><span class='op'>)</span>,
+  filename <span class='op'>=</span> <span class='cn'>NULL</span>,
+  parallel.core <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  write.plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -226,8 +226,8 @@ to make the vcf population ready),
 plink (tped, bed), stacks haplotype file, genind (library(adegenet)),
 genlight (library(adegenet)), gtypes (library(strataG)), genepop, DArT,
 and a data frame in long/tidy or wide format. To verify that radiator detect
-your file format use <code><a href='https://rdrr.io/pkg/radiator/man/detect_genomic_format.html'>detect_genomic_format</a></code> (see example below).
-Documented in <strong>Input genomic datasets</strong> of <code><a href='https://rdrr.io/pkg/radiator/man/tidy_genomic_data.html'>tidy_genomic_data</a></code>.</p>
+your file format use <code><a href='https://thierrygosselin.github.io/radiator/reference/detect_genomic_format.html'>detect_genomic_format</a></code> (see example below).
+Documented in <strong>Input genomic datasets</strong> of <code><a href='https://thierrygosselin.github.io/radiator/reference/tidy_genomic_data.html'>tidy_genomic_data</a></code>.</p>
 <p><strong>DArT and VCF data</strong>: <span class="pkg">radiator</span> was not meant to generate alleles
 and genotypes if you are using a VCF file with no genotype
 (only genotype likelihood: GL or PL).
@@ -339,30 +339,30 @@ doi:10.1016/j.tree.2016.09.005</p>
     <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a> and Eric Archer <a href='mailto:eric.archer@noaa.gov'>eric.archer@noaa.gov</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'>#Using a  VCF file, the simplest for of the function:</span>
-<span class='kw'>ibm.koala</span> <span class='op'>&lt;-</span> <span class='fu'>missing_visualization</span>(
-data = <span class='st'>"batch_1.vcf"</span>,
-strata = <span class='st'>"population.map.strata.tsv"</span>
-)
+<span class='va'>ibm.koala</span> <span class='op'>&lt;-</span> <span class='fu'>missing_visualization</span><span class='op'>(</span>
+data <span class='op'>=</span> <span class='st'>"batch_1.vcf"</span>,
+strata <span class='op'>=</span> <span class='st'>"population.map.strata.tsv"</span>
+<span class='op'>)</span>
 
 <span class='co'># To see what's inside the list</span>
-<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='kw'>ibm.koala</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>ibm.koala</span><span class='op'>)</span>
 
 <span class='co'># To view the heatmap:</span>
-<span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>heatmap</span>
+<span class='va'>ibm.koala</span><span class='op'>$</span><span class='va'>heatmap</span>
 
 <span class='co'># To save the heatmap</span>
 <span class='co'># move to the appropriate directory</span>
-<span class='kw'>ggplot2</span>::<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave</a></span>(
-filename = <span class='st'>"heatmap.missing.pdf"</span>,
-plot = <span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>heatmap</span>,
-width = <span class='fl'>15</span>, height = <span class='fl'>20</span>,
-dpi = <span class='fl'>600</span>, units = <span class='st'>"cm"</span>, useDingbats = <span class='fl'>FALSE</span>)
+<span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave</a></span><span class='op'>(</span>
+filename <span class='op'>=</span> <span class='st'>"heatmap.missing.pdf"</span>,
+plot <span class='op'>=</span> <span class='va'>ibm.koala</span><span class='op'>$</span><span class='va'>heatmap</span>,
+width <span class='op'>=</span> <span class='fl'>15</span>, height <span class='op'>=</span> <span class='fl'>20</span>,
+dpi <span class='op'>=</span> <span class='fl'>600</span>, units <span class='op'>=</span> <span class='st'>"cm"</span>, useDingbats <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># To view the IBM analysis plot:</span>
-<span class='kw'>ibm.koala</span><span class='op'>$</span><span class='kw'>ibm_plot</span>
-}
+<span class='va'>ibm.koala</span><span class='op'>$</span><span class='va'>ibm_plot</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

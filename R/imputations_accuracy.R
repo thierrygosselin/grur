@@ -211,6 +211,6 @@ data_stats <- function(data) {
       INDIVIDUALS = dplyr::n_distinct(INDIVIDUALS),
       MARKERS = dplyr::n_distinct(MARKERS)
     ) %>%
-    tidyr::gather(data = ., key = GROUPS, value = N)
+    rad_long(x = ., names_to = "GROUPS", values_to = "N", tidy = TRUE)
   return(data)
 }#End data_stats

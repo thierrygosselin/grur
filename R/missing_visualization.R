@@ -400,13 +400,7 @@ missing_visualization <- function(
   
   input.pcoa <- tidy.data %>%
     dplyr::select(MARKERS, POP_ID, INDIVIDUALS, GT_MISSING_BINARY) %>%
-    data.table::as.data.table(.) %>%
-    data.table::dcast.data.table(
-      data = .,
-      formula = POP_ID + INDIVIDUALS ~ MARKERS,
-      value.var = "GT_MISSING_BINARY"
-    ) %>%
-    tibble::as_tibble(.) %>% 
+    grur::rad_wide(x = ., formula = "POP_ID + INDIVIDUALS ~ MARKERS", values_from = "GT_MISSING_BINARY") %>% 
     dplyr::ungroup(.)
   
   # we need rownames for this
@@ -622,12 +616,7 @@ missing_visualization <- function(
   
   message("Blacklist(s) of individuals generated: ", length(blacklists))
   blacklists.stats <- purrr::map_df(.x = blacklists, .f = nrow) %>% 
-    tidyr::pivot_longer(
-      data = .,
-      cols = tidyselect::everything(),
-      names_to = "BLACKLIST",
-      values_to = "n"
-    ) %>%
+    grur::rad_long(x = ., cols = tidyselect::everything(), names_to = "BLACKLIST", values_to = "n") %>%
     dplyr::transmute(BLACKLIST = stringi::stri_join(BLACKLIST, n, sep = " = "))
   message("    Number of individual(s) blacklisted per blacklist generated:\n", stringi::stri_join("    ", blacklists.stats$BLACKLIST, collapse = "\n"))
   res <- c(res, blacklists)
@@ -740,8 +729,8 @@ missing_visualization <- function(
   message("Whitelist(s) of markers generated: ", length(whitelists))
   if (length(whitelists) > 0) {
     whitelists.stats <- purrr::map_df(.x = whitelists, .f = nrow) %>% 
-      tidyr::pivot_longer(
-        data = .,
+      grur::rad_long(
+        x = ., 
         cols = tidyselect::everything(),
         names_to = "WHITELIST",
         values_to = "n"

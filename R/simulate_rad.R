@@ -197,7 +197,7 @@ simulate_rad <- function(
   fnames <- if(params$num.cores == 1) {  
     tryCatch(lapply(sc.rep.vec, .runWithLabel, params = params))
   } else {
-    .grur_parallel_mc(sc.rep.vec, .runScRep, params = params, mc.cores = params$num.cores)
+    grur_future(.x = sc.rep.vec, .f = .runScRep, flat.future = "walk", parallel.core = params$num.cores, params = params)
   }
   
   timing <- difftime(Sys.time(), start.time)
@@ -241,21 +241,22 @@ simulate_rad <- function(
 
 #' @noRd
 #' 
-.runScRep <- function(rep.i, params) {
+.runScRep <- carrier::crate(function(rep.i, params) {
+  `%>%` <- magrittr::`%>%`
   sc.num <- params$rep.df$sc[rep.i]
   rep.num <- params$rep.df$rep[rep.i]
   
   tryCatch(
     {
-      p <- .runFscSim(rep.i, params)
+      p <- grur::.runFscSim(rep.i, params)
       gen.data <- strataG::fscReadArp(p)
       strataG::fscCleanup(p$label, p$folder)
       sc <- params$scenarios[sc.num, ]
-      if(sc$num.rms.gen > 0) {
+      if (sc$num.rms.gen > 0) {
         cat(format(Sys.time()), "running rmetasim...\n")
         gen.data <- gen.data %>%
-          .calcFreqs() %>%
-          .runRmetasim(Rland = params$Rland[[sc.num]], sc = sc) %>%
+          grur::.calcFreqs() %>%
+          grur::.runRmetasim(Rland = params$Rland[[sc.num]], sc = sc) %>%
           strataG::landscape2df()
       }
       
@@ -275,10 +276,11 @@ simulate_rad <- function(
       )
     }
   )
-}
+})
 
 #' @noRd
-#' 
+#' @export
+#' @keywords internal
 .runFscSim <- function(rep.i, params) {
   sc.i <- params$rep.df$sc[rep.i]
   sc <- params$scenarios[sc.i, ]
@@ -335,9 +337,10 @@ simulate_rad <- function(
 }
 
 #' @noRd
-#' 
+#' @export
+#' @keywords internal
 .runRmetasim <- function(freqs, Rland, sc) {
-  for(i in 1:length(freqs$global)) {
+  for (i in 1:length(freqs$global)) {
     Rland <- rmetasim::landscape.new.locus(
       Rland, type = 2, ploidy = 2, mutationrate = 0,
       transmission = 0, numalleles = 2, allelesize = 1,
@@ -352,18 +355,20 @@ simulate_rad <- function(
 }
 
 #' @noRd
+#' @export
+#' @keywords internal
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' 
 .calcFreqs <- function(snps) {
-  if(ncol(snps) < 3) stop("no loci present")
+  if (ncol(snps) < 3) stop("no loci present")
   mac.df <- snps %>% 
     strataG::df2gtypes(ploidy = 2) %>% 
     strataG::as.data.frame(coded = T) %>% 
     dplyr::select(-.data$id) %>% 
-    tidyr::pivot_longer(
-      data = .,
-      cols = -.data$stratum,
+    grur::rad_long(
+      x = ., 
+      cols = .data$stratum,
       names_to = "locus",
       values_to = "mac"
     ) %>% 

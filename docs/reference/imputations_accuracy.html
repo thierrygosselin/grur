@@ -81,7 +81,7 @@ of different algorithms on simulated or biological datasets." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
       </span>
     </div>
 
@@ -148,7 +148,7 @@ of different algorithms on simulated or biological datasets." />
 of different algorithms on simulated or biological datasets.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>imputations_accuracy</span>(<span class='kw'>obs</span>, <span class='kw'>imp</span>)</pre>
+    <pre class="usage"><span class='fu'>imputations_accuracy</span><span class='op'>(</span><span class='va'>obs</span>, <span class='va'>imp</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,12 +175,12 @@ The ME is provided by populations, individuals, markers and overall.</p>
     <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>me.imputations</span> <span class='op'>&lt;-</span> <span class='fu'>imputations_accuracy</span>(
-obs = <span class='st'>"sim.data"</span>,
-imp = <span class='st'>"imputed.data"</span>
-)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>me.imputations</span> <span class='op'>&lt;-</span> <span class='fu'>imputations_accuracy</span><span class='op'>(</span>
+obs <span class='op'>=</span> <span class='st'>"sim.data"</span>,
+imp <span class='op'>=</span> <span class='st'>"imputed.data"</span>
+<span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

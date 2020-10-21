@@ -1,6 +1,7 @@
 ---
 output: github_document
 ---
+
 # grur <a href='https://thierrygosselin.github.io/grur/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 
@@ -13,12 +14,13 @@ version <- gsub(" ", "", gsub("Version:", "", grep("Version:", description, valu
 <!-- badges: start -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://tidyverse.org/lifecycle/#experimental)
-[![Travis-CI Build Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
+[![minimal R version](https://img.shields.io/badge/R%3E%3D-`r rvers`-6666ff.svg)](https://cran.r-project.org/)
 [![packageversion](https://img.shields.io/badge/Package%20version-`r version`-orange.svg)](commits/master)
 [![Last-changedate](https://img.shields.io/badge/last%20change-`r gsub('-', '--', Sys.Date())`-brightgreen.svg)](/commits/master)
+[![R-CMD-checks](https://github.com/thierrygosselin/grur/workflows/R-CMD-check/badge.svg)](https://github.com/thierrygosselin/grur/actions)
+[![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
 <!-- badges: end -->
 
 ```{r setup, include = FALSE}

@@ -82,10 +82,11 @@ tidy_sim <- function(sim.directory, write.tidy = TRUE, parallel.core = parallel:
   #   ) %>% purrr::flatten(.)
 
   # parallel
-  res <- .grur_parallel_mc(
-    X = list.gtypes,
-    FUN = load_sim_data,
-    mc.cores = parallel.core,
+  res <- grur::grur_future(
+    .x = list.gtypes,
+    .f = load_sim_data,
+    flat.future = "drop",
+    parallel.core = parallel.core,
     write.tidy = write.tidy
     ) %>% 
     purrr::flatten(.)

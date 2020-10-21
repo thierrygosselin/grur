@@ -739,7 +739,7 @@ Please follow the vignette for install instructions")
     
     readr::write_tsv(
       x = sample.markers,
-      path = stringi::stri_join("subsampled.markers_",
+      file = stringi::stri_join("subsampled.markers_",
                                 subsample.markers,
                                 "_random.seed_", 
                                 random.seed, ".tsv"))
@@ -886,13 +886,25 @@ Please follow the vignette for install instructions")
       if (length(locus.multiple.snp) > 100) {
         # parallel
         data <- list()
-        data <- .grur_parallel_mc(
-          X = locus.multiple.snp,
-          FUN = encoding_snp,
-          mc.cores = parallel.core,
+        data <- grur::grur_future(
+          .x = locus.multiple.snp,
+          .f = encoding_snp,
+          flat.future = "dfr",
+          split.vec = FALSE,
+          split.with = NULL,
+          parallel.core = parallel.core,
           data = data.multiple.snp
-        ) %>% dplyr::bind_rows(.) %>%
+        ) %>% 
           dplyr::bind_rows(data.one.snp)
+          
+        
+        # data <- .grur_parallel_mc(
+        #   X = locus.multiple.snp,
+        #   FUN = encoding_snp,
+        #   mc.cores = parallel.core,
+        #   data = data.multiple.snp
+        # ) %>% dplyr::bind_rows(.) %>%
+        #   dplyr::bind_rows(data.one.snp)
       } else {
         data <- purrr::map_dfr(
           .x = locus.multiple.snp,
@@ -1135,13 +1147,7 @@ Please follow the vignette for install instructions")
       
       # prepare data
       data.imp <- dplyr::select(data, MARKERS, STRATA, INDIVIDUALS, GT) %>%
-        data.table::as.data.table(.) %>%
-        data.table::dcast.data.table(
-          data = .,
-          formula = INDIVIDUALS + STRATA ~ MARKERS,
-          value.var = "GT"
-        ) %>%
-        tibble::as_tibble(.) %>% 
+        grur::rad_wide(x = ., formula = "INDIVIDUALS + STRATA ~ MARKERS",values_from = "GT") %>%
         dplyr::mutate_all(.tbl = ., .funs = factor)
       
       # Random Forest by pop
@@ -1155,15 +1161,7 @@ Please follow the vignette for install instructions")
             verbose = FALSE,
             hierarchical.levels = "strata") %>%
           dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-          data.table::as.data.table(.) %>%
-          data.table::melt.data.table(
-            data = ., 
-            id.vars = "INDIVIDUALS", 
-            variable.name = "MARKERS", 
-            value.name = "GT",
-            variable.factor = FALSE
-          ) %>%
-          tibble::as_tibble(.) %>% 
+          grur::rad_long(x = ., cols = "INDIVIDUALS", names_to = "MARKERS", values_to = "GT", variable_factor = FALSE) %>%
           dplyr::right_join(strata.before, by = "INDIVIDUALS") %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS)
       }#End RF by pop
@@ -1177,15 +1175,7 @@ Please follow the vignette for install instructions")
           nimpute = nimpute, verbose = FALSE,
           hierarchical.levels = "global") %>%
           dplyr::mutate_all(.tbl = ., .funs = as.character) %>%
-          data.table::as.data.table(.) %>%
-          data.table::melt.data.table(
-            data = ., 
-            id.vars = c("STRATA", "INDIVIDUALS"), 
-            variable.name = "MARKERS", 
-            value.name = "GT",
-            variable.factor = FALSE
-          ) %>%
-          tibble::as_tibble(.) %>% 
+          grur::rad_long(x = ., cols = c("STRATA", "INDIVIDUALS"), names_to = "MARKERS", values_to = "GT", variable_factor = FALSE) %>%
           dplyr::mutate(STRATA = factor(STRATA)) %>% 
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS)
       } #End RF global
@@ -1251,18 +1241,11 @@ Please follow the vignette for install instructions")
           dplyr::group_by(MARKERS) %>%
           dplyr::mutate(GT_N = factorize_gt(GT)) %>%
           dplyr::ungroup(.)
-        readr::write_tsv(x = data, path = "imputation_factor_dictionary.rad")
-        #fst::write.fst(x = data, path = "imputation_factor_dictionary.rad")
+        readr::write_tsv(x = data, file = "imputation_factor_dictionary.rad")
         data.boost <- data %>%
           dplyr::select(MARKERS, STRATA = POP_ID_N, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS) %>%
-          data.table::as.data.table(.) %>%
-          data.table::dcast.data.table(
-            data = .,
-            formula = INDIVIDUALS + STRATA ~ MARKERS,
-            value.var = "GT"
-          ) %>%
-          tibble::as_tibble(.) %>% 
+          grur::rad_wide(x = ., formula = "INDIVIDUALS + STRATA ~ MARKERS", values_from = "GT") %>% 
           as.matrix(.) %>% 
           Matrix::Matrix(., sparse = TRUE)
       }
@@ -1281,13 +1264,7 @@ Please follow the vignette for install instructions")
         data.boost <- data %>%
           dplyr::select(MARKERS, INDIVIDUALS = INDIVIDUALS_N, GT = GT_N) %>%
           dplyr::arrange(MARKERS, INDIVIDUALS) %>%
-          data.table::as.data.table(.) %>%
-          data.table::dcast.data.table(
-            data = .,
-            formula = INDIVIDUALS ~ MARKERS,
-            value.var = "GT"
-          ) %>%
-          tibble::as_tibble(.) %>% 
+          grur::rad_wide(x = ., formula = "INDIVIDUALS ~ MARKERS", values_from = "GT") %>% 
           as.matrix(.) %>% 
           Matrix::Matrix(., sparse = TRUE)
       }
@@ -1336,10 +1313,11 @@ Please follow the vignette for install instructions")
         boost.split <- unique(markers.df$SPLIT_VEC)
         
         data.imp <- list()
-        data.imp <- .grur_parallel_mc(
-          X = boost.split,
-          FUN = grur_boost_imputer,
-          mc.cores = parallel.core,
+        data.imp <- grur::grur_future(
+          .x = boost.split,
+          .f = grur_boost_imputer,
+          flat.future = "dfr",
+          parallel.core = parallel.core,
           markers.df = markers.df,
           data.xgb = data.boost,
           gl.wide = gl.wide,
@@ -1353,8 +1331,28 @@ Please follow the vignette for install instructions")
           cpu.boost = cpu.boost,
           nrounds = nrounds,
           early_stopping_rounds = early_stopping_rounds,
-          save_name = save_name) %>% 
-          dplyr::bind_rows(.)
+          save_name = save_name
+          )
+        
+        # data.imp <- .grur_parallel_mc(
+        #   X = boost.split,
+        #   FUN = grur_boost_imputer,
+        #   mc.cores = parallel.core,
+        #   markers.df = markers.df,
+        #   data.xgb = data.boost,
+        #   gl.wide = gl.wide,
+        #   eta = eta,
+        #   gamma = gamma,
+        #   max_depth = max_depth,
+        #   min_child_weight = min_child_weight,
+        #   subsample = subsample,
+        #   colsample_bytree = colsample_bytree,
+        #   num_parallel_tree = num_parallel_tree,
+        #   cpu.boost = cpu.boost,
+        #   nrounds = nrounds,
+        #   early_stopping_rounds = early_stopping_rounds,
+        #   save_name = save_name) %>% 
+        #   dplyr::bind_rows(.)
       }
       if (imputation.method == "lightgbm") {
         if (verbose) message("Using Light Gradient Boosting Machine algorithm, take a break...")
@@ -1632,13 +1630,7 @@ grur_imputer <- function(
   data %<>% 
     dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
     dplyr::mutate(GT = replace(GT, which(is.na(GT)), "missing")) %>%
-    data.table::as.data.table(.) %>%
-    data.table::dcast.data.table(
-      data = .,
-      formula = INDIVIDUALS + STRATA ~ MARKERS,
-      value.var = "GT"
-    ) %>%
-    tibble::as_tibble(.)
+    grur::rad_wide(x = ., formula = "INDIVIDUALS + STRATA ~ MARKERS", values_from = "GT")
   
   # data[is.na(data.model)] <- "missing"
   data.gl <- data.na <- NULL # remove after test
@@ -1658,22 +1650,36 @@ grur_imputer <- function(
     pred.error.last <- pred.error
     
     data.rf <- list()
-    data.rf <- .grur_parallel_mc(
-      X = markers.list,
-      FUN = impute_genotypes,
-      mc.cores = parallel.core,
+    data.rf <- grur::grur_future(
+      .x = markers.list,
+      .f = impute_genotypes,
+      flat.future = "dfr",
+      parallel.core = parallel.core,
       data = data,
       data.na = data.na,
       data.gl = data.gl,
       num.tree = num.tree,
       pmm = pmm,
       random.seed = random.seed,
-      parallel.core = parallel.core,
       hierarchical.levels = hierarchical.levels,
-      # markers.linkage = markers.linkage,
       pred.error = pred.error
-    ) %>%
-    dplyr::bind_rows(.)
+    )
+    # data.rf <- .grur_parallel_mc(
+    #   X = markers.list,
+    #   FUN = impute_genotypes,
+    #   mc.cores = parallel.core,
+    #   data = data,
+    #   data.na = data.na,
+    #   data.gl = data.gl,
+    #   num.tree = num.tree,
+    #   pmm = pmm,
+    #   random.seed = random.seed,
+    #   parallel.core = parallel.core,
+    #   hierarchical.levels = hierarchical.levels,
+    #   # markers.linkage = markers.linkage,
+    #   pred.error = pred.error
+    # ) %>%
+    # dplyr::bind_rows(.)
     
     # system.time(test <- purrr::map(
     #   .x = markers.list, .f = impute_genotypes,
@@ -1718,7 +1724,7 @@ grur_imputer <- function(
 #' @keywords internal
 #' @export
 
-impute_genotypes <- function(
+impute_genotypes <- carrier::crate(function(
   markers.list,
   data,
   data.na,
@@ -1736,6 +1742,9 @@ impute_genotypes <- function(
   # m <- "BINDED_M1_M2_M3_M4_M5"
   # m <- "BINDED_M101_M102"
   # m <- "M993"
+  `%>%` <- magrittr::`%>%`
+  `%<>%` <- magrittr::`%<>%`
+  
   m <- markers.list
   message("Marker: ", m)# for diagnostic
   
@@ -1896,7 +1905,7 @@ impute_genotypes <- function(
   # }
   return(res)
   message("results: ok")# for diagnostic
-} #End impute_genotypes
+}) #End impute_genotypes
 
 # grur_boost_imputer ---------------------------------------------------------------
 #' @title grur_boost_imputer
@@ -1904,7 +1913,7 @@ impute_genotypes <- function(
 #' @rdname grur_boost_imputer
 #' @keywords internal
 #' @export
-grur_boost_imputer <- function(
+grur_boost_imputer <- carrier::crate(function(
   boost.split = NULL,
   markers.df = NULL,
   data.xgb = NULL,
@@ -1921,6 +1930,9 @@ grur_boost_imputer <- function(
   early_stopping_rounds = 20,
   save_name = "imputation.model.temp"
 ) {
+  `%>%` <- magrittr::`%>%`
+  `%<>%` <- magrittr::`%<>%`
+  
   # boost.split <- 3
   # markers.list <- dplyr::distinct(markers.df, MARKERS) %>% purrr::flatten_chr(.)
   markers.list <- dplyr::filter(markers.df, SPLIT_VEC == boost.split) %>%
@@ -2000,7 +2012,7 @@ grur_boost_imputer <- function(
         ntreelimit = model$result$best_ntreelimit,
         missing = NA)
     } else {
-      readr::write_lines(x = boost.res$error, path = "grur_imputations_error.txt", append = TRUE)
+      readr::write_lines(x = boost.res$error, file = "grur_imputations_error.txt", append = TRUE)
       res$GT <- as.numeric(rep(NA, nrow(res)))
     }
     
@@ -2022,7 +2034,7 @@ grur_boost_imputer <- function(
   
   return(boost.res)
   
-}#End xgboost
+})#End xgboost
 
 
 # grur_lgbm_imputer ------------------------------------------------------------
@@ -2231,15 +2243,7 @@ grur_lgbm_imputer <- function(
       dplyr::mutate(
         INDIVIDUALS = id.string,
         MARKERS = rep(markers.list, n())) %>% 
-      data.table::as.data.table(.) %>%
-      data.table::melt.data.table(
-        data = ., 
-        id.vars = c("MARKERS", "INDIVIDUALS"), 
-        variable.name = "GT", 
-        value.name = "SCORE",
-        variable.factor = FALSE
-      ) %>%
-      tibble::as_tibble(.) %>%
+      grur::rad_long(x = ., cols = c("MARKERS", "INDIVIDUALS"), names_to = "GT", values_to = "SCORE", variable_factor = FALSE) %>%
       dplyr::group_by(INDIVIDUALS, MARKERS) %>% 
       dplyr::filter(SCORE == max(SCORE)) %>%
       dplyr::distinct(INDIVIDUALS, MARKERS, .keep_all = TRUE) %>% 
@@ -2255,15 +2259,7 @@ grur_lgbm_imputer <- function(
       xtrain <- tibble::as_tibble(model$predict(xtrain, reshape = TRUE)) %>% 
         `colnames<-`(sort(unique(data.label))) %>%
         dplyr::mutate(INDIVIDUALS = unique(xtrain[, "INDIVIDUALS"])) %>% 
-        data.table::as.data.table(.) %>%
-        data.table::melt.data.table(
-          data = ., 
-          id.vars = "INDIVIDUALS", 
-          variable.name = "GT", 
-          value.name = "SCORE",
-          variable.factor = FALSE
-        ) %>%
-        tibble::as_tibble(.) %>% 
+        grur::rad_long(x = ., cols = "INDIVIDUALS", names_to = "GT", values_to = "SCORE", variable_factor = FALSE) %>%
         dplyr::group_by(INDIVIDUALS) %>% 
         dplyr::filter(SCORE == max(SCORE)) %>%
         dplyr::distinct(INDIVIDUALS, .keep_all = TRUE) %>% 
@@ -2316,7 +2312,10 @@ grur_lgbm_imputer <- function(
 #' @rdname encoding_snp
 #' @keywords internal
 #' @export
-encoding_snp <- function(locus.list = NULL, data = NULL) {
+encoding_snp <- carrier::crate(function(locus.list = NULL, data = NULL) {
+  `%>%` <- magrittr::`%>%`
+  `%<>%` <- magrittr::`%<>%`
+  
   # locus.list <- "1_135"
   res <- dplyr::filter(.data = data, CHROM_LOCUS %in% locus.list)
   binded.markers <- dplyr::distinct(.data = res, MARKERS) %>%
@@ -2324,25 +2323,20 @@ encoding_snp <- function(locus.list = NULL, data = NULL) {
     stringi::stri_join(., collapse = "_")
   binded.markers <- stringi::stri_join("BINDED_", binded.markers)
   
-  res <- data.table::as.data.table(res) %>%
-    data.table::dcast.data.table(
-      data = .,
-      formula = CHROM_LOCUS + INDIVIDUALS + STRATA ~ MARKERS,
-      value.var = "GT"
-    ) %>%
-    tibble::as_tibble(.) %>%
+  res %<>% 
+    grur::rad_wide(x = ., formula = "CHROM_LOCUS + INDIVIDUALS + STRATA ~ MARKERS", values_from = "GT") %>% 
     dplyr::group_by(CHROM_LOCUS, STRATA, INDIVIDUALS) %>%
     tidyr::unite(data = ., col = GT, -CHROM_LOCUS, -STRATA, -INDIVIDUALS, sep = "_", remove = TRUE) %>%
     dplyr::mutate(#Haplotype with combination of SNP and NA = NA (up for an argument?)
       GT = stringi::stri_replace_all_fixed(
         str = GT, pattern = "NA", replacement = NA, vectorize_all = FALSE),
-      MARKERS = rep(binded.markers, n())
+      MARKERS = rep(binded.markers, dplyr::n())
     ) %>%
     dplyr::ungroup(.) %>%
     dplyr::select(MARKERS, CHROM_LOCUS, STRATA, INDIVIDUALS, GT)
   
   return(res)
-}#End encoding_snp
+})#End encoding_snp
 
 # decoding_haplotypes------------------------------------------------------------
 #' @title decoding_haplotypes
@@ -2368,8 +2362,10 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
     col.names.data <- NULL
   }
   # nested function required ---------------------------------------------------
-  separate_locus <- function(binded.markers = NULL, data = NULL) {
+  separate_locus <- carrier::crate(function(binded.markers = NULL, data = NULL) {
     # binded.markers <- markers.sep[[1]]
+    `%>%` <- magrittr::`%>%`
+    `%<>%` <- magrittr::`%<>%`
     
     col.replace <- stringi::stri_replace_all_fixed(
       str = binded.markers, pattern = "BINDED_", replacement = "", vectorize_all = FALSE)
@@ -2384,27 +2380,13 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
           sep = "_", extra = "drop")
       
       if (rlang::has_name(data.sep, "GL")) {
-        data.sep <- data.table::as.data.table(data.sep) %>%
-          data.table::melt.data.table(
-            data = ., 
-            id.vars = c("STRATA", "INDIVIDUALS", "GL"),
-            variable.name = "MARKERS", 
-            value.name = "GT",
-            variable.factor = FALSE
-          ) %>%
-          tibble::as_tibble(.) %>% 
+        data.sep %<>% 
+          grur::rad_long(x = ., cols = c("STRATA", "INDIVIDUALS", "GL"), names_to = "MARKERS", values_to = "GT", variable_factor = FALSE) %>%
           dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT, GL) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS, GT, GL)
       } else {
-        data.sep <- data.table::as.data.table(data.sep) %>%
-          data.table::melt.data.table(
-            data = ., 
-            id.vars = c("STRATA", "INDIVIDUALS"),
-            variable.name = "MARKERS", 
-            value.name = "GT",
-            variable.factor = FALSE
-          ) %>%
-          tibble::as_tibble(.) %>% 
+        data.sep %<>% 
+          grur::rad_long(x = ., cols = c("STRATA", "INDIVIDUALS"), names_to = "MARKERS", values_to = "GT", variable_factor = FALSE) %>%
           dplyr::select(STRATA, INDIVIDUALS, MARKERS, GT) %>%
           dplyr::arrange(STRATA, INDIVIDUALS, MARKERS, GT)
       }
@@ -2417,29 +2399,31 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
         into = stringi::stri_split_fixed(str = col.replace, pattern = "_", simplify = TRUE),
         sep = "_", extra = "drop"
       ) %>%
-        data.table::as.data.table(.) %>%
-        data.table::melt.data.table(
-          data = ., 
-          id.vars = c("STRATA", "INDIVIDUALS"),
-          variable.name = "MARKERS", 
-          value.name = "GT",
-          variable.factor = FALSE
-        ) %>%
-        tibble::as_tibble(.)
+        grur::rad_long(x = ., cols = c("STRATA", "INDIVIDUALS"), names_to = "MARKERS", values_to = "GT", variable_factor = FALSE)
     }
     
     return(data.sep)
-  }#End separate_locus
+  })#End separate_locus
   
   if (length(markers.sep) > 0) {
     if (length(markers.sep) > 100) {
       data.sep <- list()
-      data.sep <- .grur_parallel_mc(
-        X = markers.sep,
-        FUN = separate_locus,
-        mc.cores = parallel.core,
+      data.sep <- grur::grur_future(
+        .x = markers.sep,
+        .f = separate_locus,
+        flat.future = "dfr",
+        split.vec = FALSE,
+        split.with = NULL,
+        parallel.core = parallel.core,
         data = data
-      ) %>% dplyr::bind_rows(.)
+      )
+      
+      # data.sep <- .grur_parallel_mc(
+      #   X = markers.sep,
+      #   FUN = separate_locus,
+      #   mc.cores = parallel.core,
+      #   data = data
+      # ) %>% dplyr::bind_rows(.)
     } else {
       data.sep <- purrr::map_dfr(.x = markers.sep, .f = separate_locus, data = data)
     }
@@ -2471,15 +2455,7 @@ decoding_haplotypes <- function(data = NULL, parallel.core = parallel::detectCor
           dplyr::select(
             .data = data,
             dplyr::one_of(c("STRATA", "INDIVIDUALS", markers.no.sep))) %>%
-            data.table::as.data.table(.) %>%
-            data.table::melt.data.table(
-              data = ., 
-              id.vars = c("STRATA", "INDIVIDUALS"),
-              variable.name = "MARKERS", 
-              value.name = "GT",
-              variable.factor = FALSE
-            ) %>%
-            tibble::as_tibble(.)
+            grur::rad_long(x = ., cols = c("STRATA", "INDIVIDUALS"), names_to = "MARKERS", values_to = "GT", variable_factor = FALSE)
         )
       }
     } else {

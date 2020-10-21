@@ -1,9 +1,17 @@
+# grur 0.1.4 2020-10-21
+
+* Version bump because it updates numerous packages: `tidyr`, `readr`.
+* using `future` and `carrier`.
+* Switched to GitHub actions to run the **R-CMD-check** on the 3 OS instead of Travis CI and AppVeyor.
+* Further testing are required to highlight breaking change.
+
+
 # grur 0.1.3 2020-08-31
 
 * `grur_imputations`: `tidyr::spread` and `tidyr::gather` are now
 deprecated in favor of (pivot_) functions. These are actually a lot slower
 than gather and spread (https://github.com/tidyverse/tidyr/issues/613).
-No thank you. They are not replaced in grur by the data.table equivalent verbs.
+No thank you. They are now replaced in grur by the data.table equivalent verbs.
 
 # grur 0.1.2 2020-02-13
 

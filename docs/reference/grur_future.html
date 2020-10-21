@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>generate_pcoa_plot — generate_pcoa_plot • grur</title>
+<title>grur parallel function — grur_future • grur</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="generate_pcoa_plot — generate_pcoa_plot" />
-<meta property="og:description" content="Generate the PCoA plots" />
+<meta property="og:title" content="grur parallel function — grur_future" />
+<meta property="og:description" content="Updating grur to use future" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,22 +137,24 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>generate_pcoa_plot</h1>
+    <h1>grur parallel function</h1>
     <small class="dont-index">Source: <a href='https://github.com/thierrygosselin/grur/blob/master/R/internal.R'><code>R/internal.R</code></a></small>
-    <div class="hidden name"><code>generate_pcoa_plot.Rd</code></div>
+    <div class="hidden name"><code>grur_future.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generate the PCoA plots</p>
+    <p>Updating grur to use future</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_pcoa_plot</span><span class='op'>(</span>
-  <span class='va'>strata.select</span>,
-  <span class='va'>pc.to.do</span>,
-  <span class='va'>vectors</span>,
-  <span class='va'>variance.component</span>,
-  <span class='va'>path.folder</span>,
-  <span class='va'>write.plot</span>
+    <pre class="usage"><span class='fu'>grur_future</span><span class='op'>(</span>
+  <span class='va'>.x</span>,
+  <span class='va'>.f</span>,
+  flat.future <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"int"</span>, <span class='st'>"chr"</span>, <span class='st'>"dfr"</span>, <span class='st'>"dfc"</span>, <span class='st'>"walk"</span>, <span class='st'>"drop"</span><span class='op'>)</span>,
+  split.vec <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  split.with <span class='op'>=</span> <span class='cn'>NULL</span>,
+  split.chunks <span class='op'>=</span> <span class='fl'>4L</span>,
+  parallel.core <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
 

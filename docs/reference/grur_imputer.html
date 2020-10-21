@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
       </span>
     </div>
 
@@ -146,16 +146,16 @@
     <p>imputations using Ranger package and predictive mean matching</p>
     </div>
 
-    <pre class="usage"><span class='fu'>grur_imputer</span>(
-  <span class='kw'>data</span>,
-  num.tree = <span class='fl'>100</span>,
-  pmm = <span class='fl'>0</span>,
-  random.seed = <span class='kw'>NULL</span>,
-  parallel.core = <span class='kw'>parallel</span>::<span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span>() <span class='op'>-</span> <span class='fl'>1</span>,
-  hierarchical.levels = <span class='st'>"strata"</span>,
-  markers.list = <span class='kw'>markers.list</span>,
-  verbose = <span class='kw'>verbose</span>
-)</pre>
+    <pre class="usage"><span class='fu'>grur_imputer</span><span class='op'>(</span>
+  <span class='va'>data</span>,
+  num.tree <span class='op'>=</span> <span class='fl'>100</span>,
+  pmm <span class='op'>=</span> <span class='fl'>0</span>,
+  random.seed <span class='op'>=</span> <span class='cn'>NULL</span>,
+  parallel.core <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  hierarchical.levels <span class='op'>=</span> <span class='st'>"strata"</span>,
+  markers.list <span class='op'>=</span> <span class='va'>markers.list</span>,
+  verbose <span class='op'>=</span> <span class='va'>verbose</span>
+<span class='op'>)</span></pre>
 
 
 

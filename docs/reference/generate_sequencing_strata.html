@@ -83,7 +83,7 @@ genotypes based on these variables." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">grur</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
       </span>
     </div>
 
@@ -152,13 +152,13 @@ no missingness pattern associated with these variables or to generate missing
 genotypes based on these variables.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_sequencing_strata</span>(
-  <span class='kw'>strata</span>,
-  number.ind.per.lanes = <span class='fl'>36</span>,
-  number.sequencer = <span class='kw'>NULL</span>,
-  randomize = <span class='fl'>FALSE</span>,
-  filename = <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>generate_sequencing_strata</span><span class='op'>(</span>
+  <span class='va'>strata</span>,
+  number.ind.per.lanes <span class='op'>=</span> <span class='fl'>36</span>,
+  number.sequencer <span class='op'>=</span> <span class='cn'>NULL</span>,
+  randomize <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  filename <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,7 +166,7 @@ genotypes based on these variables.</p>
     <tr>
       <th>strata</th>
       <td><p>The strata file used in <code>grur</code>, <code>radiator</code> and
-<code>assigner</code> is described in <code><a href='https://rdrr.io/pkg/radiator/man/tidy_genomic_data.html'>tidy_genomic_data</a></code>.</p></td>
+<code>assigner</code> is described in <code><a href='https://thierrygosselin.github.io/radiator/reference/tidy_genomic_data.html'>tidy_genomic_data</a></code>.</p></td>
     </tr>
     <tr>
       <th>number.ind.per.lanes</th>
@@ -207,15 +207,15 @@ environment.</p></td>
     <p>Thierry Gosselin <a href='mailto:thierrygosselin@icloud.com'>thierrygosselin@icloud.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>new.strata</span> <span class='op'>&lt;-</span> <span class='fu'>generate_sequencing_strata</span>(
-strata = <span class='st'>"my.strata.tsv"</span>,
-number.ind.per.lanes = <span class='fl'>48</span>,
-number.sequencer = <span class='fl'>3</span>,
-randomize = <span class='fl'>TRUE</span>,
-filename = <span class='st'>"my.new.strata.tsv"</span>
-)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>new.strata</span> <span class='op'>&lt;-</span> <span class='fu'>generate_sequencing_strata</span><span class='op'>(</span>
+strata <span class='op'>=</span> <span class='st'>"my.strata.tsv"</span>,
+number.ind.per.lanes <span class='op'>=</span> <span class='fl'>48</span>,
+number.sequencer <span class='op'>=</span> <span class='fl'>3</span>,
+randomize <span class='op'>=</span> <span class='cn'>TRUE</span>,
+filename <span class='op'>=</span> <span class='st'>"my.new.strata.tsv"</span>
+<span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

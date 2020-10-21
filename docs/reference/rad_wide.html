@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>generate_pcoa_plot — generate_pcoa_plot • grur</title>
+<title>rad_wide — rad_wide • grur</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="generate_pcoa_plot — generate_pcoa_plot" />
-<meta property="og:description" content="Generate the PCoA plots" />
+<meta property="og:title" content="rad_wide — rad_wide" />
+<meta property="og:description" content="Spread, dcast and pivot_wider" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,22 +137,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>generate_pcoa_plot</h1>
+    <h1>rad_wide</h1>
     <small class="dont-index">Source: <a href='https://github.com/thierrygosselin/grur/blob/master/R/internal.R'><code>R/internal.R</code></a></small>
-    <div class="hidden name"><code>generate_pcoa_plot.Rd</code></div>
+    <div class="hidden name"><code>rad_wide.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generate the PCoA plots</p>
+    <p>Spread, dcast and pivot_wider</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_pcoa_plot</span><span class='op'>(</span>
-  <span class='va'>strata.select</span>,
-  <span class='va'>pc.to.do</span>,
-  <span class='va'>vectors</span>,
-  <span class='va'>variance.component</span>,
-  <span class='va'>path.folder</span>,
-  <span class='va'>write.plot</span>
+    <pre class="usage"><span class='fu'>rad_wide</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  formula <span class='op'>=</span> <span class='cn'>NULL</span>,
+  names_from <span class='op'>=</span> <span class='cn'>NULL</span>,
+  values_from <span class='op'>=</span> <span class='cn'>NULL</span>,
+  values_fill <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sep <span class='op'>=</span> <span class='st'>"_"</span>,
+  tidy <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
 

@@ -1,8 +1,8 @@
 Package: grur
 Type: Package
 Title: Imputations of RADseq data
-Version: 0.1.3
-Date: 2020-08-31
+Version: 0.1.4
+Date: 2020-10-21
 Encoding: UTF-8
 Authors@R: c(
   person("Thierry", "Gosselin", email = "thierrygosselin@icloud.com", role = c("aut", "cre")),
@@ -15,13 +15,15 @@ Depends:
 Imports:
     adespatial,
     ape,
+    carrier,
     cowplot,
     data.table,
     dplyr (>= 1.0.0),
+    future,
+    furrr,
     ggpubr,
     magrittr,
     Matrix,
-    pbmcapply,
     radiator,
     rlang,
     rmetasim,
@@ -56,5 +58,5 @@ LazyLoad: yes
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 ByteCompile: TRUE
-URL: https://github.com/thierrygosselin/grur
+URL: https://thierrygosselin.github.io/grur/
 BugReports: https://github.com/thierrygosselin/grur/issues

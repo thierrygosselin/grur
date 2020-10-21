@@ -4,15 +4,16 @@
 <!-- badges: start -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://tidyverse.org/lifecycle/#experimental)
-[![Travis-CI Build
-Status](https://travis-ci.org/thierrygosselin/grur.svg?branch=master)](https://travis-ci.org/thierrygosselin/grur)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/grur)](http://cran.r-project.org/package=grur)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![minimal R
+version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.4-orange.svg)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2020--10--20-brightgreen.svg)](/commits/master)
+[![R-CMD-checks](https://github.com/thierrygosselin/grur/workflows/R-CMD-check/badge.svg)](https://github.com/thierrygosselin/grur/actions)
 [![DOI](https://zenodo.org/badge/87596763.svg)](https://zenodo.org/badge/latestdoi/87596763)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.1.3-orange.svg)](commits/master)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2020--09--24-brightgreen.svg)](/commits/master)
 <!-- badges: end -->
 
 <https://thierrygosselin.github.io/grur/>
